@@ -127,6 +127,51 @@ renderController.renderBulkImport = async (req, res) => {
 		res.send({ status: 0, msg: "Something Went Wrong" });
 	}
 };
+
+renderController.aiImport = async (req, res) => {
+	try {
+		let token = req.session.token;
+		if (token.user_role === "0") {
+			siteQuery = `SELECT * FROM sites WHERE site_parent_id = 0`;
+			folderQuery = `
+				SELECT s.*, sp.site_name as site_parent_name
+				FROM sites s
+				LEFT JOIN sites sp ON s.site_parent_id = sp.site_id
+				WHERE s.site_parent_id != 0
+				ORDER BY s.site_name`;
+		} else {
+			siteQuery = `
+				SELECT s.*
+				FROM sites s
+				JOIN users_sites_junction usj ON s.site_id = usj.usj_site_id
+				WHERE usj.usj_user_id = ${token.user_id} AND site_parent_id = 0
+			`;
+			folderQuery = `
+				SELECT s.*, sp.site_name as site_parent_name
+				FROM sites s
+				JOIN users_sites_junction usj ON s.site_id = usj.usj_site_id
+				LEFT JOIN sites sp ON s.site_parent_id = sp.site_id
+				WHERE usj.usj_user_id = ${token.user_id} AND s.site_parent_id != 0
+				ORDER BY s.site_name
+			`;
+		}
+		let siteFromDb = await pool.query(siteQuery);
+		let folderFromDb = await pool.query(folderQuery);
+		let sites = siteFromDb.rows;
+		let folders = folderFromDb.rows;
+
+		let config = {
+			keyId: process.env.BUCKET_KEY,
+			accessKey: process.env.BUCKET_SECRET,
+			region: process.env.BUCKET_REGION,
+			bucketName: process.env.BUCKET_NAME,
+		};
+		res.render("ai-import.ejs", { token, sites, folders, config });
+	} catch (err) {
+		console.log(err);
+		res.send({ status: 0, msg: "Something Went Wrong" });
+	}
+};
 renderController.renderSingleDocument = async (req, res) => {
 	let token = req.session.token;
 	try {

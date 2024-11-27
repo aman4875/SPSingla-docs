@@ -23,6 +23,8 @@ const processOpenAI = async (text) => {
     2. references : Include only valid reference numbers found after the Letter Number. Exclude any labels or prefixes. Multiple references should be comma-separated without spaces. Example: SPSCPL/BSRDCL/GANGAPATH/22-23/110,AE/TRUMPET/TL/EPC/2023/001
     3. date : Strictly follow 'dd/mm/yyyy' format. Convert any other date formats encountered to this standard format.
     4. subject : Include the whole subject section usually starts with Subject: , Sub: , Sub-
+    5. format if you need to format the text and extract the data from it as above mentioned  
+    6. Also, please re-check the result twice before returning the response to minimize mistakes.
 
     Text: ${text}`;
 
@@ -33,6 +35,9 @@ const processOpenAI = async (text) => {
 			temperature: 0.2,
 			response_format: { type: "json_object" },
 		});
+        const responseContent = response.choices[0].message.content;
+        console.log(responseContent);
+        
 		return response;
 	} catch (error) {
 		console.error("Error extracting information from OpenAI:", error);
