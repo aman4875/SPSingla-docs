@@ -124,7 +124,7 @@
                                                                     <label class="form-label" for="doc_file">Upload Zip
                                                                         File</label>
                                                                     <div class="form-control-wrap">
-                                                                        <input type="file" accept=".zip"
+                                                                        <input type="file" accept=".zip,.rar"
                                                                             class="form-control"
                                                                             placeholder="Upload File" id="doc_file"
                                                                             name="doc_file" required />
@@ -177,9 +177,10 @@
         folders = folders ? JSON.parse(folders) : [];
         let config = `<%- JSON.stringify(config) %>`;
         config = JSON.parse(config);
-        let fileName = `${Date.now()}.zip`;
+      
         let token = `<%- JSON.stringify(token) %>`;
         token = token ? JSON.parse(token) : [];
+
 
         AWS.config.update({
             accessKeyId: config.keyId,
@@ -210,6 +211,10 @@
             }
 
             const file = document.getElementById("doc_file").files[0];
+
+            
+            const fileExtension = file.name.split('.').filter(Boolean).slice(1).join('.')
+            let fileName = `${Date.now()}${fileExtension === 'rar' ?'.rar':'.zip' }`;
             const selectedFolderOption = $("#doc_folder").find("option:selected");
             const siteId = selectedFolderOption.data("site-id");
 
@@ -232,7 +237,6 @@
                     ],
                 },
             };
-
             s3.upload(params, function (err, data) {
                 if (err) {
                     console.error("Error uploading file:", err);
