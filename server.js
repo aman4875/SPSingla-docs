@@ -8,9 +8,14 @@ const connectRedis = require("connect-redis");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const router = require("./app/routes/router.js");
+const { checkRedisConnection } = require('./app/helpers/queue.js');
+const { connection, queue } = require('./app/helpers/queue.js');
+const { createBullBoard } = require('@bull-board/api');
+const { ExpressAdapter } = require('@bull-board/express');
+const { BullMQAdapter } = require('@bull-board/api/bullMQAdapter');
 const devEnvivronment = process.env.NODE_ENV;
 
-require("./app/crons/textract.cron.js");
+// require("./app/crons/textract.cron.js");
 //require("./app/crons/openai.cron.js");
 
 // Creating Express Application
@@ -24,23 +29,26 @@ global.app = app;
 global.basePath = __dirname;
 
 // Initializing Redis
-let RedisStore, redisClient;
-if (devEnvivronment === "development") {
-	RedisStore = connectRedis(session);
-	redisClient = redis.createClient({
-		host: "http://localhost/",
-		port: 6379,
-		legacyMode: true,
-	});
-	redisClient.connect();
+// let RedisStore, redisClient;
+// if (devEnvivronment === "development") {
+// 	RedisStore = connectRedis(session);
+// 	redisClient = redis.createClient({
+// 		host: "http://localhost/",
+// 		port: 6379,
+// 		legacyMode: true,
+// 	});
+// 	redisClient.connect();
 
-	redisClient.on("error", function (err) {
-		console.log("Could not establish a connection with redis. " + err);
-	});
-	redisClient.on("connect", function (err) {
-		console.log("Connected to redis successfully 👍👍👍👍👍👍👍👍");
-	});
-}
+// 	redisClient.on("error", function (err) {
+// 		console.log("Could not establish a connection with redis. " + err);
+// 	});
+// 	redisClient.on("connect", function (err) {
+// 		console.log("Connected to redis successfully");
+// 	});
+// }
+checkRedisConnection()
+
+
 
 // Setting EJS
 app.use(express.static(__dirname + ""));
@@ -68,6 +76,15 @@ app.use(
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(cookieParser());
+const serverAdapter = new ExpressAdapter();
+serverAdapter.setBasePath('/admin/queues');
+createBullBoard({
+	queues: [
+	  new BullMQAdapter(queue) 
+	],
+	serverAdapter: serverAdapter,
+});
+  
 
 // Allowing CORS
 app.use(function (req, res, next) {
@@ -78,7 +95,8 @@ app.use(function (req, res, next) {
 process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 
 // Listening on routes
-app.use("/", router);
+app.use('/admin/queues', serverAdapter.getRouter());
+app.use("/", router);  
 
 // Starting server on port
 app.listen(port, function () {
