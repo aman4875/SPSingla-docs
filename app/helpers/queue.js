@@ -42,7 +42,7 @@ const worker = new Worker(
         } catch (error) {
             await pool.query(
                 `INSERT INTO failed_job_stats (job_status,end_at,feed) VALUES ($1,$2,$3)`,
-                ["failed", getCurrentDateTime(), err.message]
+                ["failed", getCurrentDateTime(), error.message]
             );
         }
     },
@@ -61,7 +61,7 @@ worker.on("completed", async (job) => {
 });
 
 worker.on("failed", async (job, err) => {
-    console.error(`Job ${job.data.jobID} failed: ${err.message}`);
+    console.error(`Job ${job.data.jobID} failed: ${err?.message}`);
 
     const feedMessage = err?.message || "Unknown error";
 
