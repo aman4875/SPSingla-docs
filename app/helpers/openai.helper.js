@@ -15,7 +15,8 @@ const processOpenAI = async (text) => {
     "letter_number": "",
     "references": "",
     "date": "",
-    "subject": ""
+    "subject": "",
+    "letter_type:"",
     }
 
     Rules and Clarifications :- 
@@ -51,9 +52,11 @@ const processOpenAI = async (text) => {
 
     4. If “subject or Sub or sub” field in the PDF has some underlined or bold text then  that’s the subject we need to extract otherwise whole text under the “Sub” field would be subject for the application and subject : Include the whole subject section usually starts with Subject: , Sub: , Sub-
 
-    5. Format if you need to format the text and extract the data from it as above mentioned  
+    5. Letter Type - if Letter No starts with SPS then it's an outgoing document, otherwise it’s an incoming document.
 
-    6. Also, please re-check the result twice before returning the response to minimize mistakes.
+    6. Format if you need to format the text and extract the data from it as above mentioned  
+
+    7. Also, please re-check the result twice before returning the response to minimize mistakes.
 
     Example for References no:-
 

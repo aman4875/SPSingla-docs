@@ -20,6 +20,7 @@ const processDocument = async (jobID) => {
 
 	let cronId = uuidv4();
 	let tempLetterNumber = false;
+	let pdfKey
 
 	console.log('job started for', jobID);
 
@@ -40,7 +41,7 @@ const processDocument = async (jobID) => {
 
 		for (const file of pdfFiles) {
 			console.log('processing pdf ->', file.Key);
-
+            pdfKey = file.Key
 			let textractData = await textractHelper(process.env.BUCKET_NAME, file.Key, true);
 			let extractData = await openAIHelper(textractData.textractResult);
 			let extractedOpenAIData = JSON.parse(extractData.choices[0].message.content);
@@ -108,7 +109,7 @@ const processDocument = async (jobID) => {
 			let document = {};
 
 			document.doc_number = extractedOpenAIData.letter_number;
-			if (!tempLetterNumber) document.doc_type = extractedOpenAIData.letter_number.includes("SPS/") ? "OUTGOING" : "INCOMING";
+			document.doc_type = extractedOpenAIData.letter_number.includes("SPS/") ? "OUTGOING" : "INCOMING";
 			document.doc_reference = extractedOpenAIData.references.replace(/\s+/g, "");
 			document.doc_created_at = extractedOpenAIData.date;
 			document.doc_subject = extractedOpenAIData.subject;
@@ -173,8 +174,8 @@ const processDocument = async (jobID) => {
 		console.log(error.message);
 
 		await pool.query(
-			`INSERT INTO failed_job_stats (flagged,feed,status,stop_at) VALUES ($1,$2,$3,$4)`,
-			[true, error.message, "processing pdf failed", getCurrentDateTime()]
+			`INSERT INTO failed_job_stats (flagged,feed,status,stop_at,failed_pdf) VALUES ($1,$2,$3,$4)`,
+			[true, error.message, "processing pdf failed", getCurrentDateTime(),pdfKey]
 		);
 
 		return error.message
