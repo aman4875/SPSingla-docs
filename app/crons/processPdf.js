@@ -121,9 +121,9 @@ const processDocument = async (jobID) => {
 				document.doc_reference = extractedOpenAIData.references.replace(/\s+/g, "");
 				document.doc_created_at = extractedOpenAIData.date;
 				document.doc_subject = extractedOpenAIData.subject;
-				document.doc_source = "AI-IMPORT";
+				document.doc_source = "AI IMPORT";
 				document.doc_uploaded_at = moment().format("MM/DD/YYYY");
-				document.doc_status = "Uploaded";
+				document.doc_status = "UPLOADED";
 				document.doc_site = parentSiteFromDb[0].site_name;
 				document.doc_folder = siteDataFromDb[0].site_name;
 				document.doc_uploaded_by_id = uploadedById;
