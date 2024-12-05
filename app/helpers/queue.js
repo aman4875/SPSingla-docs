@@ -1,5 +1,13 @@
 const { createClient } = require("redis");
 const { Queue, Worker } = require("bullmq");
+const processDocument = require('../crons/processPdf')
+const { pool } = require("../helpers/database.helper");
+const moment = require("moment");
+
+const getCurrentDateTime = () => {
+    const timeStamp = moment().format("DD/MM/YYYY hh:mm:ss A");
+    return timeStamp;
+};
 
 const connection = {
     host: process.env.REDIS_HOST,
@@ -29,17 +37,13 @@ const worker = new Worker(
     "ai-uploads",
     async (job) => {
         try {
-            //   console.log(`Processing job ${job.data}...`);
-
-            return await new Promise((resolve, reject) => {
-                setTimeout(async () => {
-                    resolve()
-                }, 10000)
-            })
-
+            await processDocument(job.data.jobID)
 
         } catch (error) {
-            console.error(`Error processing job ${job.id}:`, error);
+            await pool.query(
+                `INSERT INTO failed_job_stats (job_status,end_at,feed) VALUES ($1,$2,$3)`,
+                ["failed", getCurrentDateTime(), err.message]
+            );
         }
     },
 
@@ -47,17 +51,39 @@ const worker = new Worker(
 );
 
 worker.on("completed", async (job) => {
-    console.log(`Job ${job.data
-        
-    }`);
+    await pool.query(
+        `UPDATE jobs 
+         SET job_status = $1, end_at = $2
+         WHERE job_id = $3`,
+        ["completed", getCurrentDateTime(), job.data.jobID]
+    );
+
 });
 
-worker.on("failed", (job, err) => {
-    console.error(`Job ${job} failed: ${err.message}`);
+worker.on("failed", async (job, err) => {
+    console.error(`Job ${job.data.jobID} failed: ${err.message}`);
+
+    const feedMessage = err?.message || "Unknown error";
+
+    await pool.query(
+        `UPDATE jobs 
+         SET job_status = $1, end_at = $2, feed = $3 
+         WHERE job_id = $4`,
+        ["failed", getCurrentDateTime(), feedMessage, job.data.jobID]
+    );
+
+
 });
 
-worker.on("error", (err) => {
-    console.error("Worker error:", err.message);
+worker.on("error", async (err) => {
+    const feedMessage = err?.message || "Unknown error";
+
+    await pool.query(
+        `UPDATE jobs 
+         SET job_status = $1, end_at = $2, feed = $3 
+         WHERE job_id = $4`,
+        ["failed", getCurrentDateTime(), feedMessage, job.data.jobID]
+    );
 });
 
 module.exports = { connection, worker, checkRedisConnection, queue };

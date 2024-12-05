@@ -45,6 +45,8 @@ const processOpenAI = async (text) => {
                    9. Your Letter No B / W .148 / 1 / 99723 / EPC / WA - Br. dated 29.05.2024 for Registered JV Agreement
                   10. Your Letter No B / W .148 / 1 / 99723 / EPC / WA - Br./ 008 dated 30.05.2024 for Signing of Agreement 
 
+        NOTE:- If the text contains references such as references, ref, or Ref but lacks proper formatting or context (e.g., it is incomplete or fragmented like Ref: "Your quotation ref. date 22.03.2022" or "some text ref. date 22.03.2022"), treat it as though the reference is missing. Additionally, if the text only contains partial elements like "Your quotation ref" or "date 22.03.2022", consider the reference invalid. In both cases, return an empty string and avoid extracting or processing any incomplete or invalid references
+
     3. date : Strictly follow 'dd/mm/yyyy' format. Convert any other date formats encountered to this standard format.
 
     4. If “subject or Sub or sub” field in the PDF has some underlined or bold text then  that’s the subject we need to extract otherwise whole text under the “Sub” field would be subject for the application and subject : Include the whole subject section usually starts with Subject: , Sub: , Sub-
