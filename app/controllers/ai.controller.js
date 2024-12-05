@@ -30,6 +30,9 @@ aiController.addNewJob = async (req, res) => {
     try {
         // let token = req.session.token;
         const { jobID } = req.body;
+        if (!jobID) {
+            return res.json({ status: 400, msg: "no jobID found" });
+        }
         const params = {
             Bucket: process.env.BUCKET_NAME,
             key: "unzipped_uploads/",
@@ -47,7 +50,7 @@ aiController.addNewJob = async (req, res) => {
                 [jobID, getUserID, false, 'open-ai','failed',getCurrentDateTime()]
             );
 
-            return res.json({ status: 422, msg: "Zip not processed uccessfully or invalid" });
+            return res.json({ status: 400, msg: "Zip not processed uccessfully or invalid" });
         }
 
 
