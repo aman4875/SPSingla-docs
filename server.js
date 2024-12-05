@@ -28,7 +28,7 @@ const port = process.env.PORT || 3000;
 global.app = app;
 global.basePath = __dirname;
 
-// Initializing Redis
+
 // let RedisStore, redisClient;
 // if (devEnvivronment === "development") {
 // 	RedisStore = connectRedis(session);
