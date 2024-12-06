@@ -3,7 +3,7 @@ const OpenAIApi = require("openai");
 const openai = new OpenAIApi({ apiKey: process.env.OPENAI_API_KEY });
 
 const processOpenAI = async (text) => {
-    console.log(text);
+
     
     const prompt = `
     Extract and structure the following information from the given text in JSON object:
