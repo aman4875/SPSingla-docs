@@ -21,8 +21,6 @@ const processOpenAI = async (text) => {
 
     Rules and Clarifications :- 
     1. letter_number: Include only the first exact alphanumeric code in the specified format found in the document header. Ignore any prefixes like "Ref:" or "No:". Example: SPSCPL/BSRDCL/GANGAPATH/22-23/109 , AECOM-RODIC/BSRDCL/GANGAPATH/SPSCPL/23-24/0127.
-
-    NOTE:- If the text contains references such as references, ref, or Ref but lacks proper formatting or context (e.g., it is incomplete or fragmented like Ref: "Your quotation ref. date 22.03.2022" or "some text ref. date 22.03.2022" or"YourQuotationdated15.04.2022"), treat it as though the reference is missing. Additionally, if the text only contains partial elements like "Your quotation ref" or "date 22.03.2022", consider the reference invalid. In both cases, return an empty string and avoid extracting or processing any incomplete or invalid references
     
     2. references : Include only valid reference numbers found after the Letter Number. Exclude any labels or prefixes. Multiple references should be comma-separated without spaces Example: SPSCPL/BSRDCL/GANGAPATH/22-23/110,AE/TRUMPET/TL/EPC/2023/001.
     There could also be a scenario where the Ref: numbers can be number wise 1.,2.,3.,4. etc and could end with date Example(date 18.07.2023) or start with some text  you should only extract Ref: number don't inculued date or any prefixes here are some Example
@@ -52,7 +50,7 @@ const processOpenAI = async (text) => {
 
     3. date : Strictly follow 'dd/mm/yyyy' format. Convert any other date formats encountered to this standard format.
 
-    4. If “subject or Sub or sub” field in the PDF has some underlined or bold text then  that’s the subject we need to extract otherwise whole text under the “Sub” field would be subject for the application and subject : Include the whole subject section usually starts with Subject: , Sub: , Sub-
+    4. If the feeded text in the "Subject" or "Sub" field contains underlined or bold text, ensure to extract that as the subject only. If no underlined or bold text is present, consider the entire text under the "Sub" field as the subject. The subject should typically include the entire section starting with "Subject:", "Sub:", or "Sub-". Make sure to double-check everything for accuracy.
 
     5. Letter Type - if Letter No starts with SPS then it's an outgoing document, otherwise it’s an incoming document.
 
