@@ -50,7 +50,7 @@ const processOpenAI = async (text) => {
 
     3. date : Strictly follow 'dd/mm/yyyy' format. Convert any other date formats encountered to this standard format.
 
-    4. If the feeded text in the "Subject" or "Sub" field contains underlined or bold text, ensure to extract that as the subject only. If no underlined or bold text is present, consider the entire text under the "Sub" field as the subject. The subject should typically include the entire section starting with "Subject:", "Sub:", or "Sub-". Make sure to double-check everything for accuracy.
+    4. If the feeded text in the "Subject" or "Sub" field contains underlined or bold text, ensure to extract that as the subject only. If no underlined or bold text is present, consider the entire text under the "Sub" field as the subject. The subject should typically include the entire section starting with "Subject:", "Sub:", or "Sub-" or has inner text eg-> (Mode - then some uder line text or). Make sure to double-check everything for accuracy.
 
     5. Letter Type - if Letter No starts with SPS then it's an outgoing document, otherwise it’s an incoming document.
 
@@ -58,7 +58,7 @@ const processOpenAI = async (text) => {
 
     7. Also, please re-check the result twice before returning the response to minimize mistakes.
 
-    Example for References no:-
+    NOTE:- Given the text extracted from the first page of a formal letter using Amazon Textract, ensure that it is properly formatted to resemble a professional letter. The formatting should include appropriate alignment, paragraphs, salutations, sign-offs, and any other necessary structural elements for a formal letter
 
 
     Text: ${text}`;
