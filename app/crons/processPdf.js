@@ -32,12 +32,14 @@ const processDocument = async (jobID) => {
 		};
 		const s3Data = await s3.listObjectsV2(params).promise();
 		const pdfFiles = s3Data.Contents.filter((file) => file.Key.endsWith(".pdf"));
+		console.log(pdfFiles,'pdfFiles');
+		
 
 
-		if (!pdfFiles.length) {
-			console.log('no pdf found');
-			return
-		}
+		// if (!pdfFiles.length) {
+		// 	console.log('no pdf found');
+		// 	return
+		// }
 
 		for (const file of pdfFiles) {
 			console.log('Processing pdf ->', file.Key);
