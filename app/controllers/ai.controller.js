@@ -22,8 +22,8 @@ const s3 = new AWS.S3({
 const aiController = {};
 
 const getCurrentDateTime = () => {
-	const timeStamp = moment().format("DD/MM/YYYY hh:mm:ss A");
-	return timeStamp;
+    const timeStamp = moment().format("DD/MM/YYYY hh:mm:ss A");
+    return timeStamp;
 };
 
 aiController.addNewJob = async (req, res) => {
@@ -47,7 +47,7 @@ aiController.addNewJob = async (req, res) => {
         if (!exists) {
             await pool.query(
                 `INSERT INTO jobs (job_id,user_id,upload_status,job_type,job_status,started_at) VALUES ($1,$2,$3,$4,$5,$6)`,
-                [jobID, getUserID, false, 'open-ai','failed',getCurrentDateTime()]
+                [jobID, getUserID, false, 'open-ai', 'failed', getCurrentDateTime()]
             );
 
             return res.json({ status: 400, msg: "Zip not processed uccessfully or invalid" });
@@ -61,16 +61,16 @@ aiController.addNewJob = async (req, res) => {
         // saving Job details in db
         let dataFromDb
         if (response.id) {
-          dataFromDb = await pool.query(
-            `INSERT INTO jobs (job_id,user_id,upload_status,job_type,job_status) VALUES ($1,$2,$3,$4,$5)`,
-            [jobID, getUserID, true, "open-ai",'pending']
-          );
+            dataFromDb = await pool.query(
+                `INSERT INTO jobs (job_id,user_id,upload_status,job_type,job_status) VALUES ($1,$2,$3,$4,$5)`,
+                [jobID, getUserID, true, "open-ai", 'pending']
+            );
         }
         res.json({ status: 200, msg: "Job Added Auccessfully" });
     } catch (err) {
         console.error("Error Uploading Attachments", err);
 
-        res.json({ status: 0, msg: "Internal Server Error" });
+        res.json({ status: 0, msg: "Internal Server Error", err: err });
     }
 };
 
