@@ -37,6 +37,7 @@ const processDocument = async (cronJob) => {
 		await pool.query(`UPDATE misc SET misc_run_count = misc_run_count + 1 WHERE misc_id = 1;`);
 
 		const pdfFileKey = pdfFiles[0].Key;
+		
 
 		await pool.query("INSERT INTO crons (cron_id, cron_feed, cron_type, cron_started_at) VALUES ($1, $2, $3, $4)", [cronId, pdfFileKey, "open_ai", getCurrentDateTime()]);
 

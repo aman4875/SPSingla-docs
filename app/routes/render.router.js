@@ -10,5 +10,6 @@ router.get("/sites", authMiddleware.checkLoginStatus, renderController.renderSit
 router.get("/documents/create-document", authMiddleware.checkLoginStatus, renderController.renderCreateDocument);
 router.get("/documents/:id", authMiddleware.checkLoginStatus, renderController.renderSingleDocument);
 router.get("/documents/import/bulk", authMiddleware.checkLoginStatus, renderController.renderBulkImport);
+router.get("/ai-import", authMiddleware.checkLoginStatus, renderController.aiImport);
 
 module.exports = router;
