@@ -22,6 +22,7 @@ const textract = new AWS.Textract({
 });
 
 const ProcessDocument = async (cronJob) => {
+    let cronId
     const client = await pool.connect();
     try {
 
@@ -42,7 +43,6 @@ const ProcessDocument = async (cronJob) => {
             return
         }
         document = document[0];
-        console.log(document);
 
 
         // Extracting document name from 
@@ -50,9 +50,14 @@ const ProcessDocument = async (cronJob) => {
         doc_pdf_name = doc_pdf_name.pathname;
         doc_pdf_name = doc_pdf_name.replace("/docs/", "docs/");
 
-        await client.query('INSERT INTO crons (cron_doc_number, cron_start_time) VALUES ($1, $2)', [document.doc_number, getCurrentDateTime()]);
-        console.log(doc_pdf_name);
+       	// Generate cron_id
+		cronId = uuidv4();
 
+		// Insert into crons table with generated cron_id
+        const res = await pool.query(
+            "INSERT INTO crons (cron_id, cron_feed, cron_started_at, cron_type) VALUES ($1, $2, $3, $4) RETURNING *", 
+            [cronId, document.doc_number, getCurrentDateTime(), "textract"]
+          );  
         const startTextractParams = {
             DocumentLocation: {
                 S3Object: {
@@ -142,14 +147,22 @@ const ProcessDocument = async (cronJob) => {
         }
 
         await pool.query(`UPDATE documents SET doc_ocr_proccessed = true WHERE doc_number = '${document.doc_number}';`);
-        await client.query(`UPDATE crons SET cron_end_time = '${getCurrentDateTime()}', cron_status = true`);
+        await client.query(`UPDATE crons SET cron_stopped_at = '${getCurrentDateTime()}', cron_status = true`);
         console.log("Content Update Successfully");
-    } catch (err) {
-        await pool.query(`UPDATE crons SET cron_error = $1, cron_status = $2, cron_flagged = $3, cron_stopped_at = $4 WHERE cron_feed = $5`, [err.message, true, true, getCurrentDateTime(), err]);
-        console.error('Error executing query 22222', err);
-    } finally {
-        client.release()
-    }
+    }  catch (err) {
+		// Catch block updates for crons table
+		const cronError = err.toString();
+        const res = await pool.query(
+            `UPDATE crons 
+             SET cron_stopped_at = $1, cron_status = true, cron_flagged = true, cron_error = $2 
+             WHERE cron_id = $3 
+             RETURNING *`, 
+            [getCurrentDateTime(), cronError, cronId]
+          );
+          console.log(res.rows); // Logs the updated row
+          
+        
+	}
 };
 
 const getCurrentDateTime = () => {
