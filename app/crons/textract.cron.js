@@ -42,6 +42,8 @@ const ProcessDocument = async (cronJob) => {
             return
         }
         document = document[0];
+        console.log(document);
+        
 
         // Extracting document name from 
         let doc_pdf_name = new URL(document.doc_pdf_link)
@@ -49,6 +51,7 @@ const ProcessDocument = async (cronJob) => {
         doc_pdf_name = doc_pdf_name.replace("/docs/", "docs/");
 
         await client.query('INSERT INTO crons (cron_doc_number, cron_start_time) VALUES ($1, $2)', [document.doc_number, getCurrentDateTime()]);
+console.log(doc_pdf_name);
 
         const startTextractParams = {
             DocumentLocation: {
@@ -142,9 +145,8 @@ const ProcessDocument = async (cronJob) => {
         await client.query(`UPDATE crons SET cron_end_time = '${getCurrentDateTime()}', cron_status = true`);
         console.log("Content Update Successfully");
     } catch (err) {
-        console.error('Error executing query', err);
-    } finally {
-        client.release();
+        await pool.query(`UPDATE crons SET cron_error = $1, cron_status = $2, cron_flagged = $3, cron_stopped_at = $4 WHERE cron_feed = $5`, [err.message, true, true, getCurrentDateTime(), err]);
+        console.error('Error executing query 22222', err);
     }
 };
 
