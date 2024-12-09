@@ -162,7 +162,10 @@ const ProcessDocument = async (cronJob) => {
           console.log(res.rows); // Logs the updated row
           
         
-	}
+	}finally {
+        client.release(); // Ensure connection is released
+        console.log(`Cron finished at ${getCurrentDateTime()}`);
+    }
 };
 
 const getCurrentDateTime = () => {
