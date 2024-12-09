@@ -147,7 +147,7 @@ const ProcessDocument = async (cronJob) => {
     } catch (err) {
         await pool.query(`UPDATE crons SET cron_error = $1, cron_status = $2, cron_flagged = $3, cron_stopped_at = $4 WHERE cron_feed = $5`, [err.message, true, true, getCurrentDateTime(), err]);
         console.error('Error executing query 22222', err);
-    } finally (){
+    } finally {
         client.release()
     }
 };
