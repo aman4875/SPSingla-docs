@@ -222,7 +222,7 @@
             const key = `uploads/${siteId}_${token.user_id}_${fileName}`;
             NioApp.handleButtonState("uploadZipButton", "Uploading...", true);
 
-
+            
 
             if (file.name.endsWith(".pdf")) {
                 let formData = new FormData(this);
@@ -239,11 +239,13 @@
                             $("#card-2").removeClass("d-none");
                             $("#card-1").addClass("d-none");
                         } else {
-                            NioApp.Toast("<h5>Something Went Wrong</h5><p>Error while uploading Document</p>", "error");
+                            console.error("Error uploading file:");
+                            NioApp.handleButtonState("uploadZipButton", "Upload File", false);
+                            NioApp.Toast(`<h5>Upload Failed</h5><p>${response.msg}</p>`, "error");
                         }
                     },
                     error: function (xhr, status, error) {
-                        console.error("Error uploading file:", err);
+                        console.error("Error uploading file:");
                         NioApp.handleButtonState("uploadZipButton", "Upload File", false);
                         NioApp.Toast("<h5>Upload Failed</h5><p>Error Uploading File</p>", "error");
                     },

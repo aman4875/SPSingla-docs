@@ -103,7 +103,6 @@ aiController.processSingleFile = async (req, res) => {
         let extractData = await openAIHelper(textractData.textractResult);
         let extractedOpenAIData = JSON.parse(extractData.choices[0].message.content);
         
-
         if (!extractedOpenAIData) {
             return res.send({ status: 0, msg: "No AI Response" });
         }
@@ -112,10 +111,6 @@ aiController.processSingleFile = async (req, res) => {
         let { rows: userDataFromDb } = await pool.query(`SELECT user_name FROM users WHERE user_id = $1`, [token.user_id]);
         let { rows: siteDataFromDb } = await pool.query(`SELECT * FROM sites WHERE site_id = $1`, [siteCode]);
         let { rows: parentSiteFromDb } = await pool.query(`SELECT * FROM sites WHERE site_id = ${siteDataFromDb[0].site_parent_id}`);
-
-
-
-        console.log('REPLACEING PDF FOLDER');
 
         let document = {};
 
