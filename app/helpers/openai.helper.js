@@ -4,7 +4,6 @@ const openai = new OpenAIApi({ apiKey: process.env.OPENAI_API_KEY });
 
 const processOpenAI = async (text) => {
 
-    
     const prompt = `
     Extract and structure the following information from the given text in JSON object:
     1. Letter Number
@@ -68,7 +67,7 @@ const processOpenAI = async (text) => {
     try {
         const response = await openai.chat.completions.create({
             messages: [{ role: "user", content: prompt }],
-            model: "ft:gpt-3.5-turbo-1106:personal:002:9qxghOlU",
+            model: "gpt-3.5-turbo",
             temperature: 0.2,
             response_format: { type: "json_object" },
         });

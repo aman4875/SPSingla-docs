@@ -124,7 +124,7 @@
                                                                     <label class="form-label" for="doc_file">Upload Zip
                                                                         File</label>
                                                                     <div class="form-control-wrap">
-                                                                        <input type="file" accept=".zip,.rar"
+                                                                        <input type="file" accept=".zip,.rar,.pdf"
                                                                             class="form-control"
                                                                             placeholder="Upload File" id="doc_file"
                                                                             name="doc_file" required />
@@ -178,7 +178,7 @@
         folders = folders ? JSON.parse(folders) : [];
         let config = `<%- JSON.stringify(config) %>`;
         config = JSON.parse(config);
-      
+
         let token = `<%- JSON.stringify(token) %>`;
         token = token ? JSON.parse(token) : [];
 
@@ -192,7 +192,7 @@
         const bucketName = config.bucketName;
 
         const MAX_FILE_SIZE = 5 * 1024 * 1024 * 1024;
-        
+
 
 
         $("#doc_site").on("change", function () {
@@ -214,15 +214,45 @@
             }
 
             const file = document.getElementById("doc_file").files[0];
-
-            
             const fileExtension = file.name.split('.').filter(Boolean).slice(1).join('.')
-            let fileName = `${Date.now()}${fileExtension === 'rar' ?'.rar':'.zip' }`;
+            let fileName = `${Date.now()}${fileExtension === 'rar' ? '.rar' : '.zip'}`;
             const selectedFolderOption = $("#doc_folder").find("option:selected");
             const siteId = selectedFolderOption.data("site-id");
 
             const key = `uploads/${siteId}_${token.user_id}_${fileName}`;
             NioApp.handleButtonState("uploadZipButton", "Uploading...", true);
+
+            
+
+            if (file.name.endsWith(".pdf")) {
+                let formData = new FormData(this);
+                formData.append("siteId", siteId);
+                $.ajax({
+                    type: "POST",
+                    url: "/ai/process-single-file",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        if (response.status == 1) {
+                            NioApp.Toast("<h5>Upload Success</h5><p>File Uploaded Successfully</p>", "success");
+                            $("#card-2").removeClass("d-none");
+                            $("#card-1").addClass("d-none");
+                        } else {
+                            console.error("Error uploading file:");
+                            NioApp.handleButtonState("uploadZipButton", "Upload File", false);
+                            NioApp.Toast(`<h5>Upload Failed</h5><p>${response.msg}</p>`, "error");
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error uploading file:");
+                        NioApp.handleButtonState("uploadZipButton", "Upload File", false);
+                        NioApp.Toast("<h5>Upload Failed</h5><p>Error Uploading File</p>", "error");
+                    },
+                });
+
+                return
+            }
 
             const params = {
                 Bucket: bucketName,
