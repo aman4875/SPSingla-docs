@@ -362,19 +362,24 @@ documentController.getFilteredDocuments = async (req, res) => {
             folderQuery = `
           SELECT s.*, sp.site_name as site_parent_name
           FROM sites s
-          JOIN users_sites_junction usj ON s.site_id = usj.usj_site_id
-          LEFT JOIN sites sp ON s.site_parent_id = sp.site_id
+          JOIN users_sites_junction as usj ON s.site_id = usj.usj_site_id
+          LEFT JOIN sites as sp ON s.site_parent_id = sp.site_id
           WHERE usj.usj_user_id = ${token.user_id} AND s.site_parent_id != 0
           ORDER BY s.site_name`;
+
             let { rows: folderPermission } = await pool.query(folderQuery);
             const permission = folderPermission.map((fp) => `'${fp.site_name.replace(/'/g, "''")}'`).join(", ");
+			
             if (permission.length > 0) {
                 joins += ` JOIN sites s ON d.doc_folder = s.site_name`;
+				baseQuery += joins
                 conditions.push(`s.site_name IN (${permission})`);
             } else if (permission.length == 0 && token.user_role != "0") {
                 return res.json({ status: 1, msg: "Success", payload: { documents: [], totalPages: 0, currentPage: page } });
             }
+			
         }
+		
         // Handle filters from inputs.activeFilter
         for (const [field, filter] of Object.entries(inputs.activeFilter)) {
             if (filter.type === "multiple") {
@@ -397,6 +402,7 @@ documentController.getFilteredDocuments = async (req, res) => {
 			  
             }
         }
+
 		
 		
         // Handle sorting
@@ -414,17 +420,20 @@ documentController.getFilteredDocuments = async (req, res) => {
         if (conditions.length > 0) {
             baseQuery += " WHERE " + conditions.join(" AND ");
         }
+		
         // Query to get the total count of documents
-        let countQuery = `
-        SELECT COUNT(DISTINCT d.doc_number) as total
-        FROM documents d
-        LEFT JOIN doc_reference_junction j ON j.doc_junc_replied = d.doc_number
-		${conditions.length ?" WHERE " + conditions.join(" AND "):"" }
-      `;
+		let countQuery = `
+		SELECT COUNT(DISTINCT d.doc_number) as total
+		FROM documents d
+		LEFT JOIN doc_reference_junction j ON j.doc_junc_replied = d.doc_number
+		${joins}
+		${conditions.length ? " WHERE " + conditions.join(" AND ") : ""}
+	  `;
 	  
-        let { rows: countResult } = await pool.query(countQuery);
+        let { rows: countResult } = await pool.query(countQuery);		
+		
         const totalDocuments = countResult[0].total; 
-        const totalPages = Math.ceil(totalDocuments / pageSize);		
+        const totalPages = Math.ceil(totalDocuments / pageSize);	
         // Main query with pagination
         let query = `
         ${baseQuery}
@@ -446,7 +455,6 @@ documentController.getFilteredDocuments = async (req, res) => {
         LIMIT ${pageSize}
         OFFSET ${offset}
       `;
-	  
         // Execute the main query
         let { rows: documents } = await pool.query(query);
         res.json({
