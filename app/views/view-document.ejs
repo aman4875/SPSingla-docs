@@ -28,6 +28,7 @@
 				<%- include('./common/sidebar' , {active : "Documents"}); -%>
 				<div class="nk-wrap">
 					<%- include('./common/navbar'); -%>
+					
 					<div class="nk-content">
 						<div class="container-fluid">
 							<div class="nk-content-inner">
@@ -38,10 +39,15 @@
 												<h4 class="nk-block-title page-title">Document - <strong class="text-primary small"><%=documentData.doc_number%></strong></h4>
 											</div>
 											<div class="nk-block-head-content">
+												<%if(token.user_role !=3){%>
+												<a href="/edit-document/<%=btoa(documentData.doc_number)%>" >	<button id="addAttachmentButton" data-bs-toggle="modal" style="height:35px" class="btn btn-sm btn-dim  btn-outline-primary edit-document" >Edit Document</button></a>  
+												<%}%>
 												<a href="/documents" class="btn btn-outline-light bg-white d-none d-sm-inline-flex"><em class="icon ni ni-arrow-left"></em><span>Back</span></a>
 											</div>
+											
 										</div>
 									</div>
+									
 									<!-- .nk-block-head -->
 									<div class="nk-block">
 										<div class="row gy-5">

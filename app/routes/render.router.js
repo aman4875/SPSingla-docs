@@ -11,5 +11,6 @@ router.get("/documents/create-document", authMiddleware.checkLoginStatus, render
 router.get("/documents/:id", authMiddleware.checkLoginStatus, renderController.renderSingleDocument);
 router.get("/documents/import/bulk", authMiddleware.checkLoginStatus, renderController.renderBulkImport);
 router.get("/ai-import", authMiddleware.checkLoginStatus, renderController.aiImport);
+router.get("/edit-document/:id", authMiddleware.checkLoginStatus, renderController.editDoc);
 
 module.exports = router;
