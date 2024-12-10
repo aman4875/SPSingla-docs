@@ -157,7 +157,6 @@ documentController.editDocument = async (req, res) => {
 		// Store the new doc_number
 		let newDocNumber = inputs.new_doc_number || inputs.doc_number;
 
-		// Step 1: Insert the new record with the updated doc_number
 		const generateInsertQuery = (data) => {
 			delete data.doc_file;
 			if (inputs.doc_reference && Array.isArray(inputs.doc_reference)) {
@@ -176,9 +175,25 @@ documentController.editDocument = async (req, res) => {
 			const columns = keys.join(", ");
 			const values = keys.map((_, i) => `$${i + 1}`).join(", ");
 			const updateValues = keys.map((key) => `${key} = EXCLUDED.${key}`).join(", ");
+			Object.values(data)
+			if (inputs.doc_reference && Array.isArray(inputs.doc_reference)) {
+				inputs.doc_reference = inputs.doc_reference.map((item) =>
+					typeof item === "string" && item.startsWith('"') && item.endsWith('"')
+						? JSON.parse(item)
+						: item
+				).join(",");
+			}
 
-			const query = `INSERT INTO documents (${columns}) VALUES (${values})
-						   ON CONFLICT (doc_number) DO NOTHING;`;
+			data["doc_reference"] = inputs.doc_reference;
+
+
+
+
+			const query = `INSERT INTO documents (${columns}) 
+			VALUES (${values})
+			ON CONFLICT (doc_number) 
+			DO UPDATE SET ${updateValues};`;
+
 			return { query, values: Object.values(data) };
 		};
 
@@ -188,11 +203,6 @@ documentController.editDocument = async (req, res) => {
 		});
 		await pool.query(insertQuery, insertValues);
 
-		// Step 2: Delete the old record with the old doc_number
-		const deleteQuery = `DELETE FROM documents WHERE doc_number = $1`;
-		await pool.query(deleteQuery, [inputs.doc_number]);
-
-		// Step 3: Update references and history with the new doc_number
 		if (inputs.doc_reference) {
 			let references = Array.isArray(inputs.doc_reference) ? inputs.doc_reference : [inputs.doc_reference];
 			references = references.filter((reference) => reference.trim() !== "");
@@ -334,32 +344,32 @@ documentController.createDocument = async (req, res) => {
 };
 
 documentController.getFilteredDocuments = async (req, res) => {
-    try {
-        let inputs = req.body;
-        let token = req.session.token;
-        const page = inputs.page || 1;
-        const pageSize = inputs.limit || 10;
-        const offset = (page - 1) * pageSize;
-        let baseQuery = `
+	try {
+		let inputs = req.body;
+		let token = req.session.token;
+		const page = inputs.page || 1;
+		const pageSize = inputs.limit || 10;
+		const offset = (page - 1) * pageSize;
+		let baseQuery = `
             SELECT d.*,string_agg(j.doc_junc_number, ', ') AS doc_replied_vide
             FROM documents d
             LEFT JOIN doc_reference_junction j ON j.doc_junc_replied = d.doc_number
         `;;
-        let conditions = [];
-        let joins = "";
-        let folderQuery = ''
-        // Handle folder permissions based on user role
-        if (token.user_role == "0") {
-            // Admin role
-            folderQuery = `
+		let conditions = [];
+		let joins = "";
+		let folderQuery = ''
+		// Handle folder permissions based on user role
+		if (token.user_role == "0") {
+			// Admin role
+			folderQuery = `
           SELECT s.*, sp.site_name as site_parent_name
           FROM sites s
           LEFT JOIN sites sp ON s.site_parent_id = sp.site_id
           WHERE s.site_parent_id != 0
           ORDER BY s.site_name`;
-        } else {
-            // Non-admin role with permissions
-            folderQuery = `
+		} else {
+			// Non-admin role with permissions
+			folderQuery = `
           SELECT s.*, sp.site_name as site_parent_name
           FROM sites s
           JOIN users_sites_junction as usj ON s.site_id = usj.usj_site_id
@@ -367,27 +377,27 @@ documentController.getFilteredDocuments = async (req, res) => {
           WHERE usj.usj_user_id = ${token.user_id} AND s.site_parent_id != 0
           ORDER BY s.site_name`;
 
-            let { rows: folderPermission } = await pool.query(folderQuery);
-            const permission = folderPermission.map((fp) => `'${fp.site_name.replace(/'/g, "''")}'`).join(", ");
-			
-            if (permission.length > 0) {
-                joins += ` JOIN sites s ON d.doc_folder = s.site_name`;
+			let { rows: folderPermission } = await pool.query(folderQuery);
+			const permission = folderPermission.map((fp) => `'${fp.site_name.replace(/'/g, "''")}'`).join(", ");
+
+			if (permission.length > 0) {
+				joins += ` JOIN sites s ON d.doc_folder = s.site_name`;
 				baseQuery += joins
-                conditions.push(`s.site_name IN (${permission})`);
-            } else if (permission.length == 0 && token.user_role != "0") {
-                return res.json({ status: 1, msg: "Success", payload: { documents: [], totalPages: 0, currentPage: page } });
-            }
-			
-        }
-		
-        // Handle filters from inputs.activeFilter
-        for (const [field, filter] of Object.entries(inputs.activeFilter)) {
-            if (filter.type === "multiple") {
-                const values = filter.value.map((val) => `'${val.replace(/'/g, "''")}'`).join(", ");
-				values &&  conditions.push(`d.${field} IN (${values})`);
-            } else if (filter.type === "text") {
-				filter?.value &&  conditions.push(`LOWER(d.${field}) LIKE LOWER('%${filter.value.replace(/'/g, "''")}%')`);
-            } else if (filter.type === "keyword") {
+				conditions.push(`s.site_name IN (${permission})`);
+			} else if (permission.length == 0 && token.user_role != "0") {
+				return res.json({ status: 1, msg: "Success", payload: { documents: [], totalPages: 0, currentPage: page } });
+			}
+
+		}
+
+		// Handle filters from inputs.activeFilter
+		for (const [field, filter] of Object.entries(inputs.activeFilter)) {
+			if (filter.type === "multiple") {
+				const values = filter.value.map((val) => `'${val.replace(/'/g, "''")}'`).join(", ");
+				values && conditions.push(`d.${field} IN (${values})`);
+			} else if (filter.type === "text") {
+				filter?.value && conditions.push(`LOWER(d.${field}) LIKE LOWER('%${filter.value.replace(/'/g, "''")}%')`);
+			} else if (filter.type === "keyword") {
 				baseQuery += `
 				JOIN doc_metadata dm 
 				ON d.doc_number = dm.dm_id 
@@ -399,29 +409,29 @@ documentController.getFilteredDocuments = async (req, res) => {
 				  OR LOWER(dm.dm_ocr_content) LIKE LOWER('%${filter.value}%')
 				  )
 			  `;
-			  
-            }
-        }
 
-		
-		
-        // Handle sorting
-        let orderByClause = "";
-        if (inputs.sort && Object.keys(inputs.sort).length > 0) {
-            const sortFields = Object.entries(inputs.sort).map(([field, direction]) => {
-                const dir = direction.toLowerCase() === "asc" ? "ASC" : "DESC";
-                return `d.${field} ${dir}`;
-            });
-            orderByClause = `ORDER BY ${sortFields.join(", ")}`;
-        } else {
-            orderByClause = `ORDER BY d.doc_number DESC`;
-        }
-        // Build the WHERE clause
-        if (conditions.length > 0) {
-            baseQuery += " WHERE " + conditions.join(" AND ");
-        }
-		
-        // Query to get the total count of documents
+			}
+		}
+
+
+
+		// Handle sorting
+		let orderByClause = "";
+		if (inputs.sort && Object.keys(inputs.sort).length > 0) {
+			const sortFields = Object.entries(inputs.sort).map(([field, direction]) => {
+				const dir = direction.toLowerCase() === "asc" ? "ASC" : "DESC";
+				return `d.${field} ${dir}`;
+			});
+			orderByClause = `ORDER BY ${sortFields.join(", ")}`;
+		} else {
+			orderByClause = `ORDER BY d.doc_number DESC`;
+		}
+		// Build the WHERE clause
+		if (conditions.length > 0) {
+			baseQuery += " WHERE " + conditions.join(" AND ");
+		}
+
+		// Query to get the total count of documents
 		let countQuery = `
 		SELECT COUNT(DISTINCT d.doc_number) as total
 		FROM documents d
@@ -429,13 +439,13 @@ documentController.getFilteredDocuments = async (req, res) => {
 		${joins}
 		${conditions.length ? " WHERE " + conditions.join(" AND ") : ""}
 	  `;
-	  
-        let { rows: countResult } = await pool.query(countQuery);		
-		
-        const totalDocuments = countResult[0].total; 
-        const totalPages = Math.ceil(totalDocuments / pageSize);	
-        // Main query with pagination
-        let query = `
+
+		let { rows: countResult } = await pool.query(countQuery);
+
+		const totalDocuments = countResult[0].total;
+		const totalPages = Math.ceil(totalDocuments / pageSize);
+		// Main query with pagination
+		let query = `
         ${baseQuery}
         GROUP BY
           d.doc_id,
@@ -455,21 +465,21 @@ documentController.getFilteredDocuments = async (req, res) => {
         LIMIT ${pageSize}
         OFFSET ${offset}
       `;
-        // Execute the main query
-        let { rows: documents } = await pool.query(query);
-        res.json({
-            status: 1,
-            msg: "Success",
-            payload: {
-                documents,
-                totalPages,
-                currentPage: page,
-            },
-        });
-    } catch (err) {
-        console.error("Error fetching filtered documents:", err);
-        res.json({ status: 0, msg: "Internal Server Error" });
-    }
+		// Execute the main query
+		let { rows: documents } = await pool.query(query);
+		res.json({
+			status: 1,
+			msg: "Success",
+			payload: {
+				documents,
+				totalPages,
+				currentPage: page,
+			},
+		});
+	} catch (err) {
+		console.error("Error fetching filtered documents:", err);
+		res.json({ status: 0, msg: "Internal Server Error" });
+	}
 };
 
 documentController.uploadAttachment = async (req, res) => {

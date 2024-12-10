@@ -47,7 +47,7 @@ const processOpenAI = async (text) => {
                    9. Your Letter No B / W .148 / 1 / 99723 / EPC / WA - Br. dated 29.05.2024 for Registered JV Agreement
                   10. Your Letter No B / W .148 / 1 / 99723 / EPC / WA - Br./ 008 dated 30.05.2024 for Signing of Agreement 
 
-        
+    NOTE- Make sure to never return reference numbers in any way unless the input contains "Ref:-" or "ref:-" or "References:-"(case-insensitive). If the reference marker is not present, return an empty result without exception. Additionally, before returning any reference numbers, cross-check the extracted data with the database to ensure its validity. If the references are invalid or do not exist in the database, the system should still return an empty result. Always double-check both the presence of the reference marker and the database validation before providing any output.
 
     3. date : Strictly follow 'dd/mm/yyyy' format. Convert any other date formats encountered to this standard format.
 

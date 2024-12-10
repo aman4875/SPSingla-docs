@@ -66,7 +66,19 @@
     }
     .nk-tb-col {
     position: relative;
-}
+    }
+    .no-click{
+     cursor: none;
+     pointer-events: none;
+    }
+
+    .editDocument em.icon {
+      font-size: 20px;
+   }  
+
+    /* .editDocument {
+        text-align: center !important;
+    } */
 
 .nk-tb-col .sort-indicator:after {
     content: "";
@@ -216,7 +228,12 @@
                           <div class="card-inner p-0 scrollable-datatable">
                             <div class="nk-tb-list nk-tb-ulist is-compact">
                               <div class="nk-tb-item nk-tb-head" id="table-head">
-                                <div class="nk-tb-col text-start">
+                                <%if(token.user_role !=3){%>
+                                <div class="nk-tb-col no-click  text-start">
+                                    <span data-field="edit_doc">EDIT</span><span class="sort-indicator"></span>
+                                </div>
+                                <%}%>
+                                <div class="nk-tb-col ">
                                     <span data-field="doc_site">SITE</span><span class="sort-indicator"></span>
                                 </div>
                                 <div class="nk-tb-col">
@@ -258,7 +275,13 @@
                             </div>
                             
                               <div class="nk-tb-item nk-tb-head" id="table-filters">
+                                <%if(token.user_role !=3){%>
                                 <div class="nk-tb-col text-start">
+                                  <span>
+                                  </span>
+                                </div>
+                                <%}%>
+                                <div class="nk-tb-col ">
                                   <span>
                                     <select class="form-select form-control js-select2 filter-input" data-filter="multiple" id="doc_site" name="doc_site"
                                       data-placeholder="Site" multiple>
@@ -470,6 +493,11 @@
               $("#table-status").empty();
               response.payload.documents.forEach(function (document) {
                 let rowHtml = `<div class="nk-tb-item text-left table-content">
+                                  <%if(token.user_role !=3){%>
+                                  <div class="nk-tb-col text-start editDocument">
+                                      <span><a href="/edit-document/${btoa(document.doc_number)}"><em class="icon ni ni-edit-fill"></em></a></span>
+                                  </div>
+                                   <%}%>
                                   <div class="nk-tb-col text-start">
                                       <span>${document.doc_site || "-"}</span>
                                   </div>
