@@ -89,7 +89,7 @@ aiController.processSingleFile = async (req, res) => {
     const fileName = uuidv4();
     try {
         const s3Params = {
-            Bucket: "spsinglabucket",
+            Bucket: process.env.BUCKET_NAME,
             Key: `docs/${fileName}.pdf`,
             Body: req.file.buffer,
             ContentType: req.file.mimetype,
@@ -99,7 +99,7 @@ aiController.processSingleFile = async (req, res) => {
         const pdfLocation = s3Response.Location;
 
 
-        let textractData = await textractHelper("spsinglabucket", s3Response.Key, true);
+        let textractData = await textractHelper(process.env.BUCKET_NAME, s3Response.Key, true);
         let extractData = await openAIHelper(textractData.textractResult);
         let extractedOpenAIData = JSON.parse(extractData.choices[0].message.content);
 
