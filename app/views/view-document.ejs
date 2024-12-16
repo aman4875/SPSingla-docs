@@ -276,11 +276,14 @@
 		<script src="/app/assets/js/scripts.js"></script>
 		<script>
 			$(document).ready(function() {
+				const folderName = "<%= documentData.doc_folder %>"
+				
 				$('#attachmentForm').on('submit', function(event) {
+					NioApp.handleButtonState("uploadAttachmentButton", "Uploading...", true);
 					event.preventDefault();
 		
 					var formData = new FormData(this);
-		
+					formData.append("doc_folder", folderName);
 					$.ajax({
 						url: '/docs/upload-attachment',
 						type: 'POST',
@@ -295,6 +298,7 @@
 							}
 						},
 						error: function(xhr, status, error) {
+							NioApp.handleButtonState("uploadAttachmentButton", "Upload File", false);
 							console.error('Error:', error);
 						}
 					});
