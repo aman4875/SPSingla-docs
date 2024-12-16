@@ -3,11 +3,7 @@ const { Queue, Worker } = require("bullmq");
 const processDocument = require('../crons/processPdf')
 const { pool } = require("../helpers/database.helper");
 const moment = require("moment");
-
-const getCurrentDateTime = () => {
-    const timeStamp = moment().format("DD/MM/YYYY hh:mm:ss A");
-    return timeStamp;
-};
+const getCurrentDateTime = require("../utils/getCurrentDateTime")
 
 const connection = {
     host: process.env.REDIS_HOST,
@@ -51,11 +47,35 @@ const worker = new Worker(
 );
 
 worker.on("completed", async (job) => {
+    // update jobs stats
     await pool.query(
         `UPDATE jobs 
          SET job_status = $1, end_at = $2
          WHERE job_id = $3`,
         ["completed", getCurrentDateTime(), job.data.jobID]
+    );
+
+    // update folder_stats 
+    const siteId = job.data.jobID.split("_")[0];
+    if (!siteId) {
+        return
+    }
+
+    let { rows: folder } = await pool.query(
+        `SELECT site_id, site_name FROM sites WHERE site_id = $1`,
+        [siteId]
+    );
+
+    await pool.query(
+        `
+        INSERT INTO folder_stats (doc_folder_name, doc_folder_id, last_updated) 
+        VALUES ($1, $2, $3) 
+        ON CONFLICT (doc_folder_name) 
+        DO UPDATE SET
+          last_updated = EXCLUDED.last_updated,
+          doc_folder_id = EXCLUDED.doc_folder_id;
+        `,
+        [folder[0].site_name, folder[0].site_id, getCurrentDateTime()]
     );
 
 });
