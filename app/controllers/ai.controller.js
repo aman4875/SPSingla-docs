@@ -89,7 +89,7 @@ aiController.processSingleFile = async (req, res) => {
     const fileName = uuidv4();
     try {
         const s3Params = {
-            Bucket: process.env.BUCKET_NAME,
+            Bucket: "spsinglabucket",
             Key: `docs/${fileName}.pdf`,
             Body: req.file.buffer,
             ContentType: req.file.mimetype,
@@ -99,10 +99,10 @@ aiController.processSingleFile = async (req, res) => {
         const pdfLocation = s3Response.Location;
 
 
-        let textractData = await textractHelper(process.env.BUCKET_NAME, s3Response.Key, true);
+        let textractData = await textractHelper("spsinglabucket", s3Response.Key, true);
         let extractData = await openAIHelper(textractData.textractResult);
         let extractedOpenAIData = JSON.parse(extractData.choices[0].message.content);
-        
+
         if (!extractedOpenAIData) {
             return res.send({ status: 0, msg: "No AI Response" });
         }
@@ -128,7 +128,7 @@ aiController.processSingleFile = async (req, res) => {
         document.doc_uploaded_by = userDataFromDb[0].user_name;
         document.doc_pdf_link = pdfLocation;
         document.doc_ocr_status = false;
-        
+
         await pool.query(
             `INSERT INTO documents (
                 doc_number, doc_type, doc_reference, doc_created_at, doc_subject, doc_source, doc_uploaded_at, doc_status, doc_site, doc_folder, doc_uploaded_by_id, doc_uploaded_by, doc_pdf_link, doc_ocr_status
@@ -171,6 +171,19 @@ aiController.processSingleFile = async (req, res) => {
             [doc_folder, doc_site, textractData.totalPagesProcessed]
         );
 
+        await pool.query(
+            `
+            INSERT INTO folder_stats (doc_folder_name, doc_folder_id, last_updated) 
+            VALUES ($1, $2, $3) 
+            ON CONFLICT (doc_folder_name) 
+            DO UPDATE SET
+              last_updated = EXCLUDED.last_updated,
+              doc_folder_id = EXCLUDED.doc_folder_id;
+            `,
+            [doc_folder, siteId, getCurrentDateTime()]
+        );
+
+
         // ADDING HISTORY
         await pool.query(`INSERT INTO doc_history_junction (dhj_doc_number, dhj_history_type, dhj_timestamp,dhj_history_blame,dhj_history_blame_user) VALUES ($1,$2,$3,$4,$5)`, [extractedOpenAIData.letter_number, "UPLOADED", moment().format("MM/DD/YYYY HH:mm:ss"), token.user_id, userDataFromDb[0].user_name]);
 
@@ -178,8 +191,8 @@ aiController.processSingleFile = async (req, res) => {
 
         return res.send({ status: 1, msg: "File Processed Successfully" });
     } catch (error) {
-          console.log(error);
-          return res.send({ status: 0, msg: "error" });
+        console.log(error);
+        return res.send({ status: 0, msg: "error" });
     }
 }
 

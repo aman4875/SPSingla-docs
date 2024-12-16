@@ -3,6 +3,7 @@ const { v4: uuidv4 } = require("uuid");
 const moment = require("moment");
 const AWS = require("aws-sdk");
 const path = require("path");
+const getCurrentDateTime = require('../utils/getCurrentDateTime.js')
 
 // AWS Config
 AWS.config.update({
@@ -64,7 +65,7 @@ documentController.saveDraft = async (req, res) => {
 	try {
 		let inputs = req.body;
 		let token = req.session.token;
-		console.log(inputs);
+
 		if (token.user_role == "3") {
 			return res.send({ status: 0, msg: "Access Denied Insufficient Permissions." });
 		}
@@ -151,7 +152,7 @@ documentController.editDocument = async (req, res) => {
 		// getting site id
 		let { rows: siteId } = await pool.query(`SELECT site_id FROM sites WHERE site_name = $1`, [inputs.doc_site]);
 
-		// getting folder id
+		// getting folder id	
 		let { rows: folderId } = await pool.query(`SELECT site_id FROM sites WHERE site_name = $1`, [inputs.doc_folder]);
 
 		// Store the new doc_number
@@ -226,6 +227,18 @@ documentController.editDocument = async (req, res) => {
 			[newDocNumber, "UPDATED", moment().format("MM/DD/YYYY HH:mm:ss"), token.user_id, token.user_name]
 		);
 
+		await pool.query(
+			`
+			INSERT INTO folder_stats (doc_folder_name, doc_folder_id, last_updated) 
+			VALUES ($1, $2, $3) 
+			ON CONFLICT (doc_folder_name) 
+			DO UPDATE SET
+			  last_updated = EXCLUDED.last_updated,
+			  doc_folder_id = EXCLUDED.doc_folder_id;
+			`,
+			[inputs.doc_folder, folderId[0].site_id, getCurrentDateTime()]
+		);
+
 		res.send({ status: 1, msg: "Success", payload: newDocNumber });
 	} catch (error) {
 		console.error(error);
@@ -236,6 +249,8 @@ documentController.editDocument = async (req, res) => {
 documentController.createDocument = async (req, res) => {
 	try {
 		let inputs = req.body;
+
+		let { rows: folderId } = await pool.query(`SELECT site_id FROM sites WHERE site_name = $1`, [inputs.doc_folder]);
 		let token = req.session.token;
 		if (token.user_role == "3") {
 			return res.send({ status: 0, msg: "Access Denied Insufficient Permissions." });
@@ -332,6 +347,19 @@ documentController.createDocument = async (req, res) => {
 				await pool.query(refQuery, referenceValues);
 			}
 		}
+
+		// updating folder stats
+		await pool.query(
+			`
+			INSERT INTO folder_stats (doc_folder_name, doc_folder_id, last_updated) 
+			VALUES ($1, $2, $3) 
+			ON CONFLICT (doc_folder_name) 
+			DO UPDATE SET
+			  last_updated = EXCLUDED.last_updated,
+			  doc_folder_id = EXCLUDED.doc_folder_id;
+			`,
+			[inputs.doc_folder, folderId[0].site_id, getCurrentDateTime()]
+		);
 
 		// ADDING HISTORY
 		await pool.query(`INSERT INTO doc_history_junction (dhj_doc_number, dhj_history_type, dhj_timestamp,dhj_history_blame,dhj_history_blame_user) VALUES ($1,$2,$3,$4,$5)`, [inputs.doc_number, "UPDATED", moment().format("MM/DD/YYYY HH:mm:ss"), token.user_id, token.user_name]);

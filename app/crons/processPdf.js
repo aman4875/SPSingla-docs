@@ -24,7 +24,6 @@ const processDocument = async (jobID) => {
 
 	console.log('job started for', jobID);
 
-	try {
 
 		const params = {
 			Bucket: process.env.BUCKET_NAME,
@@ -36,10 +35,10 @@ const processDocument = async (jobID) => {
 		
 
 
-		// if (!pdfFiles.length) {
-		// 	console.log('no pdf found');
-		// 	return
-		// }
+		if (!pdfFiles.length) {
+			throw new Error("No PDF files found");
+		}
+		  
 
 		for (const file of pdfFiles) {
 			console.log('Processing pdf ->', file.Key);
@@ -194,10 +193,7 @@ const processDocument = async (jobID) => {
 		}
 
 
-	} catch (error) {
-		console.log(error.message);
-		return error.message
-	}
+	
 };
 
 const getCurrentDateTime = () => {
