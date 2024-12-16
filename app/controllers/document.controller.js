@@ -529,9 +529,22 @@ documentController.uploadAttachment = async (req, res) => {
 
 		const s3Response = await s3.upload(s3Params).promise();
 		const attachmentLocation = s3Response.Location;
+		let { rows: folderId } = await pool.query(`SELECT site_id FROM sites WHERE site_name = $1`, [inputs.doc_folder]);
+
+
+		await pool.query(
+			`
+					INSERT INTO folder_stats (doc_folder_name, doc_folder_id, last_updated) 
+					VALUES ($1, $2, $3) 
+					ON CONFLICT (doc_folder_name) 
+					DO UPDATE SET
+					  last_updated = EXCLUDED.last_updated,
+					  doc_folder_id = EXCLUDED.doc_folder_id;
+					`,
+			[inputs.doc_folder, folderId[0].site_id, getCurrentDateTime()]
+		);
 
 		await pool.query(`INSERT INTO doc_attachment_junction (daj_doc_number, daj_attachment_name, daj_attachment_link, daj_attachment_upload_date) VALUES ($1, $2, $3, $4)`, [inputs.doc_number, inputs.doc_attachment, attachmentLocation, moment().format("MM/DD/YYYY")]);
-
 		res.send({ status: 1, msg: "Attachment Uploaded" });
 	} catch (err) {
 		console.error("Error Uploading Attachments", err);
