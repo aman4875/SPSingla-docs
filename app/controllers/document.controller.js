@@ -156,10 +156,12 @@ documentController.editDocument = async (req, res) => {
 		let { rows: folderId } = await pool.query(`SELECT site_id FROM sites WHERE site_name = $1`, [inputs.doc_folder]);
 
 		// Store the new doc_number
+		let doc_data = JSON.parse(JSON.stringify(req.body))
 		let newDocNumber = inputs.new_doc_number || inputs.doc_number;
 
 		const generateInsertQuery = (data) => {
 			delete data.doc_file;
+			delete data.new_doc_number
 			if (inputs.doc_reference && Array.isArray(inputs.doc_reference)) {
 				inputs.doc_reference = inputs.doc_reference.join(",");
 			}
@@ -203,6 +205,20 @@ documentController.editDocument = async (req, res) => {
 			doc_number: newDocNumber,
 		});
 		await pool.query(insertQuery, insertValues);
+
+		//Delete the old record with the old doc_number
+		if (doc_data.new_doc_number) {
+			const deleteQuery = `DELETE FROM documents WHERE doc_number = $1`;
+			await pool.query(deleteQuery, [doc_data.doc_number]);
+
+			//Updating attachments related to old doc_number
+		    await pool.query(`
+				UPDATE doc_attachment_junction
+			    SET daj_doc_number = '${newDocNumber}'
+				WHERE daj_doc_number = '${doc_data.doc_number}'`);
+			;
+		}
+
 
 		if (inputs.doc_reference) {
 			let references = Array.isArray(inputs.doc_reference) ? inputs.doc_reference : [inputs.doc_reference];
