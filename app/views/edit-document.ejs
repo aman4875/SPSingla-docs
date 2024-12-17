@@ -93,7 +93,7 @@
                                 <label class="form-label" for="doc_number">Number</label>
                                 <div class="form-control-wrap">
                                   <div class="input-group">
-                                    <input type="text" class="form-control" placeholder="Document Number" id="doc_number" name="doc_number" value="<%= documentData ? documentData.doc_number : '' %>" required <% if(documentData.doc_status != "INSERTED" || token.user_role != "0") { %> disabled <% } %>/>
+                                    <input type="text" class="form-control" placeholder="Document Number" id="doc_number" name="doc_number" value="<%= documentData ? documentData.doc_number : '' %>" required <% if(documentData.doc_status != "INSERTED" || token.user_role != "0") { %>  <% } %>/>
                                     <div class="input-group-append">
                                       <button disabled id="choosePrefixButton" class="btn btn-outline-primary btn-dim">Choose Prefix</button>
                                   </div>
@@ -248,6 +248,8 @@
       let documentStatus = $("#doc_status").val();
       let folders = `<%- JSON.stringify(folders) %>`;
       let selectedPrefix = "";
+      let docNumberInput = $("#doc_number").val();   
+      let NewURl = null  
       folders = folders ? JSON.parse(folders) : [];
       $(document).ready(function () {
         $("#doc_site").on("change", function () {
@@ -400,6 +402,7 @@
         $(".form-control").each(function () {
           let fieldName = $(this).attr('id');
           let fieldValue = $(this).val();
+          let newDocNumberInput = $("#doc_number").val();      
           if(fieldName == "folder_prefix") return;
           if(fieldValue == "" || fieldValue.length == 0 || fieldValue.length == []){
             fieldValue = null;
@@ -408,6 +411,12 @@
           if($("#doc_status").val() == "INSERTED"){
             formData["insertedFlag"] = true;
           }
+          if (docNumberInput !== newDocNumberInput) {
+            formData["new_doc_number"] = newDocNumberInput; 
+            formData["doc_number"] = docNumberInput;
+            formData["insertedFlag"] = true;
+            NewURl = newDocNumberInput
+          }
         });
         $.ajax({
           type: "POST",
@@ -415,9 +424,17 @@
           data: formData,
           success: function (response) {
             if (response.status == 1) {
-              $("#doc_site,#doc_folder,#doc_number,#choosePrefixButton,#doc_type").prop("disabled", true);
+              $("#doc_site,#doc_folder,#choosePrefixButton,#doc_type").prop("disabled", true);
               NioApp.handleButtonState("uploadDocumentBtn", "Update", false);
               NioApp.Toast("<h5>Update Successfully</h5><p>Document Updated Successfully</p>", "success");
+
+              if (NewURl !== null) {
+                const encodedDocNumber = btoa(NewURl);
+                const newUrl = `/edit-document/${encodedDocNumber}`;
+                window.history.pushState(null, '', newUrl);
+              }
+
+
             } else {
               NioApp.handleButtonState("uploadDocumentBtn", "Update", false);
               NioApp.Toast("<h5>Something Went Wrong</h5><p>Error while updating document.</p>", "error");
