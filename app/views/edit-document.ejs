@@ -414,16 +414,21 @@
           if($("#doc_status").val() == "INSERTED"){
             formData["insertedFlag"] = true;
           }
-
           
-          if (docNumberInput?.toLocaleLowerCase().trim() !== newDocNumberInput?.toLocaleLowerCase().trim()) {
-            formData["new_doc_number"] = newDocNumberInput; 
+        });
+        let newDocNumberInput = $("#doc_number").val();    
+        if (
+            docNumberInput?.toLocaleLowerCase().trim() !==
+            newDocNumberInput?.toLocaleLowerCase().trim()
+          ) {
+            console.log('working');
+            formData["new_doc_number"] = newDocNumberInput;
             formData["doc_number"] = docNumberInput;
             formData["insertedFlag"] = true;
-            formData["doc_ID"] = doc_ID.doc_id
+           
             NewURl = newDocNumberInput
           }
-        });
+          formData["doc_ID"] = doc_ID.doc_id
         $.ajax({
           type: "POST",
           url: "/docs/edit-document",
