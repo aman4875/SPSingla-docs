@@ -249,7 +249,7 @@
       let folders = `<%- JSON.stringify(folders) %>`;
       let documentData = `<%- JSON.stringify(documentData) %>`;
       let selectedPrefix = "";
-      let docNumberInput = $("#doc_number").val();
+      let oldDocNumberInput = $("#doc_number").val();
       const doc_ID = JSON.parse(documentData)
 
       let NewURl = null  
@@ -418,12 +418,12 @@
         });
         let newDocNumberInput = $("#doc_number").val();    
         if (
-            docNumberInput?.toLocaleLowerCase().trim() !==
+          oldDocNumberInput?.toLocaleLowerCase().trim() !==
             newDocNumberInput?.toLocaleLowerCase().trim()
           ) {
             console.log('working');
             formData["new_doc_number"] = newDocNumberInput;
-            formData["doc_number"] = docNumberInput;
+            formData["doc_number"] = oldDocNumberInput;
             formData["insertedFlag"] = true;
            
             NewURl = newDocNumberInput
@@ -438,6 +438,7 @@
               $("#doc_site,#doc_folder,#choosePrefixButton,#doc_type").prop("disabled", true);
               NioApp.handleButtonState("uploadDocumentBtn", "Update", false);
               NioApp.Toast("<h5>Update Successfully</h5><p>Document Updated Successfully</p>", "success")
+              location.reload()
 
             } else {
               NioApp.handleButtonState("uploadDocumentBtn", "Update", false);
