@@ -143,7 +143,10 @@ documentController.saveDraft = async (req, res) => {
 
 documentController.editDocument = async (req, res) => {
 	try {
-		let inputs = req.body;				
+		let inputs = req.body;	
+		console.log(inputs);
+
+					
 		let token = req.session.token;
 		if (token.user_role === "3") {
 			return res.send({ status: 0, msg: "Access Denied: Insufficient Permissions." });
@@ -189,29 +192,21 @@ documentController.editDocument = async (req, res) => {
 			}
 
 			data["doc_reference"] = inputs.doc_reference;
-			let query
-
-			query = `INSERT INTO documents (${columns}) 
-			VALUES (${values})
-			ON CONFLICT (doc_number) 
-			DO UPDATE SET ${updateValues};`;
-
-			if (doc_data.new_doc_number) {
+			let query		
 				const condition = `doc_id = ${doc_data.doc_ID}`;
 				const setClause = Object.keys(data)
-
 				.map((key, index) => `${key} = $${index + 1}`)
 				.join(', ');
 
 				query = `UPDATE documents SET ${setClause} WHERE ${condition}`;
-			}
+		
 
 			return { query, values: Object.values(data) };
 		};
 		const { query: insertQuery, values: insertValues } = generateInsertQuery({
 			...inputs,
 			doc_number: newDocNumber,
-		});
+		});		
 	    await pool.query(insertQuery, insertValues);
 
 		//Delete the old record with the old doc_number

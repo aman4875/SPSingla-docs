@@ -251,26 +251,31 @@
                                 <div class="nk-tb-col">
                                     <span data-field="doc_created_at">DATE</span><span class="sort-indicator"></span>
                                 </div>
-                                <div class="nk-tb-col">
-                                    <span data-field="doc_purpose">PURPOSE</span><span class="sort-indicator"></span>
-                                </div>
+                                
                                 <div class="nk-tb-col">
                                     <span data-field="doc_subject">SUBJECT</span><span class="sort-indicator"></span>
                                 </div>
-                                <div class="nk-tb-col">
-                                    <span data-field="doc_from">FROM</span><span class="sort-indicator"></span>
-                                </div>
-                                <div class="nk-tb-col">
-                                    <span data-field="doc_to">TO</span><span class="sort-indicator"></span>
-                                </div>
-                                <div class="nk-tb-col">
-                                    <span data-field="doc_storage_location">STORAGE</span><span class="sort-indicator"></span>
-                                </div>
+                               
+                                
+                               
                                 <div class="nk-tb-col">
                                     <span data-field="doc_reference">REFERENCE</span><span class="sort-indicator"></span>
                                 </div>
                                 <div class="nk-tb-col">
                                     <span data-field="doc_replied_vide">REPLIED VIDE</span><span class="sort-indicator"></span>
+                                </div>
+                                 
+                                <div class="nk-tb-col">
+                                  <span data-field="doc_purpose">PURPOSE</span><span class="sort-indicator"></span>
+                                </div>
+                                <div class="nk-tb-col">
+                                  <span data-field="doc_from">FROM</span><span class="sort-indicator"></span>
+                                </div>
+                                <div class="nk-tb-col">
+                                  <span data-field="doc_to">TO</span><span class="sort-indicator"></span>
+                                </div>
+                                <div class="nk-tb-col">
+                                  <span data-field="doc_storage_location">STORAGE</span><span class="sort-indicator"></span>
                                 </div>
                             </div>
                             
@@ -342,37 +347,14 @@
                                   </div>
                                   </span>
                                 </div>
-                                <div class="nk-tb-col">
-                                  <span>
-                                    <select class="form-select form-control js-select2 filter-input" data-filter="text" id="doc_purpose" name="doc_purpose"
-                                      data-placeholder="Select Purpose">
-                                      <option label="empty" value=""></option>
-                                      <option label="DESIGN & DRAWINGS" value="DESIGN & DRAWINGS">DESIGN & DRAWINGS</option>
-                                      <option label="EOT" value="EOT">EOT</option>
-                                      <option label="OTHERS" value="OTHERS">OTHERS</option>
-                                    </select>
-                                  </span>
-                                </div>
+                                
                                 <div class="nk-tb-col">
                                   <span>
                                     <input type="text" class="form-control filter-input" data-filter="text" id="doc_subject" placeholder="Subject">
                                   </span>
                                 </div>
-                                <div class="nk-tb-col">
-                                  <span>
-                                    <input type="text" class="form-control filter-input" data-filter="text" id="doc_from" placeholder="Subject">
-                                  </span>
-                                </div>
-                                <div class="nk-tb-col">
-                                  <span>
-                                    <input type="text" class="form-control filter-input" data-filter="text" id="doc_to" placeholder="Subject">
-                                  </span>
-                                </div>
-                                <div class="nk-tb-col">
-                                  <span>
-                                    <input type="text" class="form-control filter-input" data-filter="text" id="doc_storage_location" placeholder="Storage">
-                                  </span>
-                                </div>
+                        
+                                
                                 <div class="nk-tb-col">
                                   <span>
                                     <select class="form-select form-control js-select2 filter-input" data-filter="multiple" id="doc_reference"
@@ -388,6 +370,35 @@
                                       name="doc_replied_vide" data-placeholder="Select Replied Vide" multiple>
                                       <option label="empty" value=""></option>
                                     </select>
+                                  </span>
+                                </div>
+
+
+
+                                <div class="nk-tb-col">
+                                  <span>
+                                    <select class="form-select form-control js-select2 filter-input" data-filter="text" id="doc_purpose" name="doc_purpose"
+                                      data-placeholder="Select Purpose">
+                                      <option label="empty" value=""></option>
+                                      <option label="DESIGN & DRAWINGS" value="DESIGN & DRAWINGS">DESIGN & DRAWINGS</option>
+                                      <option label="EOT" value="EOT">EOT</option>
+                                      <option label="OTHERS" value="OTHERS">OTHERS</option>
+                                    </select>
+                                  </span>
+                                </div>
+                                <div class="nk-tb-col">
+                                  <span>
+                                    <input type="text" class="form-control filter-input" data-filter="text" id="doc_from" placeholder="Subject">
+                                  </span>
+                                </div>
+                                <div class="nk-tb-col">
+                                  <span>
+                                    <input type="text" class="form-control filter-input" data-filter="text" id="doc_to" placeholder="Subject">
+                                  </span>
+                                </div>
+                                <div class="nk-tb-col">
+                                  <span>
+                                    <input type="text" class="form-control filter-input" data-filter="text" id="doc_storage_location" placeholder="Storage">
                                   </span>
                                 </div>
                               </div>
@@ -519,21 +530,11 @@
                                   <div class="nk-tb-col">
                                       <span>${document.doc_created_at || "-"}</span>
                                   </div>
-                                  <div class="nk-tb-col">
-                                    <span title="${document.doc_purpose || "-"}">${document.doc_purpose || "-"}</span>
-                                  </div>
+                                  
                                   <div class="nk-tb-col">
                                     <span title="${document.doc_subject || "-"}">${document.doc_subject || "-"}</span>
                                   </div>
-                                  <div class="nk-tb-col">
-                                    <span title="${document.doc_from || "-"}">${document.doc_from || "-"}</span>
-                                  </div>
-                                  <div class="nk-tb-col">
-                                    <span title="${document.doc_to || "-"}">${document.doc_to || "-"}</span>
-                                  </div>
-                                  <div class="nk-tb-col">
-                                      <span title="${document.doc_storage_location || "-"}">${document.doc_storage_location || "-"}</span>
-                                  </div>
+                                  
                                   <div class="nk-tb-col">
                                       ${document.doc_reference ?
                     document.doc_reference.split(',').map((ref, index) => {
@@ -550,11 +551,24 @@
                     }).join('')
                     : "-"}
                                   </div>
+
+                                  <div class="nk-tb-col">
+                                    <span title="${document.doc_purpose || "-"}">${document.doc_purpose || "-"}</span>
+                                  </div>
+                                  <div class="nk-tb-col">
+                                    <span title="${document.doc_from || "-"}">${document.doc_from || "-"}</span>
+                                  </div>
+                                  <div class="nk-tb-col">
+                                    <span title="${document.doc_to || "-"}">${document.doc_to || "-"}</span>
+                                  </div>
+                                  <div class="nk-tb-col">
+                                      <span title="${document.doc_storage_location || "-"}">${document.doc_storage_location || "-"}</span>
+                                  </div>
                               </div>`;
                 $(rowHtml).insertAfter("#table-filters");
               });
               totalPages = response.payload.totalPages || 1;
-              console.log(response.payload);
+
               
               updatePagination(totalPages, filters.page);
             } else {
