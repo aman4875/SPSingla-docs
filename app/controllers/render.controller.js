@@ -176,14 +176,14 @@ renderController.renderSingleDocument = async (req, res) => {
 	let token = req.session.token;
 	try {
 		let siteQuery, folderQuery, documentQuery, referencesQuery;
-		let doc_number = Buffer.from(req.params.id, "base64").toString("utf-8");
+		let doc_id = Buffer.from(req.params.id, "base64").toString("utf-8");		
 
 		// Query to get document details
 		documentQuery = `
 			 SELECT d.*, string_agg(j.doc_junc_number, ', ') AS doc_replied_vide
             FROM documents d
             LEFT JOIN doc_reference_junction j ON j.doc_junc_replied = d.doc_number
-			WHERE d.doc_number = '${doc_number}'
+			WHERE d.doc_id = '${doc_id}'
 			GROUP BY d.doc_id,d.doc_number
 		`;
 
@@ -289,14 +289,14 @@ renderController.editDoc = async (req, res) => {
 	let token = req.session.token;
 	try {
 		let siteQuery, folderQuery, documentQuery, referencesQuery;
-		let doc_number = Buffer.from(req.params.id, "base64").toString("utf-8");
+		let doc_id = Buffer.from(req.params.id, "base64").toString("utf-8");		
 
 		// Query to get document details
 		documentQuery = `
 			 SELECT d.*, string_agg(j.doc_junc_number, ', ') AS doc_replied_vide
             FROM documents d
             LEFT JOIN doc_reference_junction j ON j.doc_junc_replied = d.doc_number
-			WHERE d.doc_number = '${doc_number}'
+			WHERE d.doc_id = '${doc_id}'
 			GROUP BY d.doc_id,d.doc_number
 		`;
 

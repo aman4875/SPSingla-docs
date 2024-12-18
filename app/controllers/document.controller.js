@@ -143,7 +143,7 @@ documentController.saveDraft = async (req, res) => {
 
 documentController.editDocument = async (req, res) => {
 	try {
-		let inputs = req.body;
+		let inputs = req.body;				
 		let token = req.session.token;
 		if (token.user_role === "3") {
 			return res.send({ status: 0, msg: "Access Denied: Insufficient Permissions." });
@@ -162,6 +162,7 @@ documentController.editDocument = async (req, res) => {
 		const generateInsertQuery = (data) => {
 			delete data.doc_file;
 			delete data.new_doc_number
+			delete data.doc_ID
 			if (inputs.doc_reference && Array.isArray(inputs.doc_reference)) {
 				inputs.doc_reference = inputs.doc_reference.join(",");
 			}
@@ -188,31 +189,38 @@ documentController.editDocument = async (req, res) => {
 			}
 
 			data["doc_reference"] = inputs.doc_reference;
+			let query
 
-
-
-
-			const query = `INSERT INTO documents (${columns}) 
+			query = `INSERT INTO documents (${columns}) 
 			VALUES (${values})
 			ON CONFLICT (doc_number) 
 			DO UPDATE SET ${updateValues};`;
 
+			if (doc_data.new_doc_number) {
+				const condition = `doc_id = ${doc_data.doc_ID}`;
+				const setClause = Object.keys(data)
+
+				.map((key, index) => `${key} = $${index + 1}`)
+				.join(', ');
+
+				query = `UPDATE documents SET ${setClause} WHERE ${condition}`;
+			}
+
 			return { query, values: Object.values(data) };
 		};
-
 		const { query: insertQuery, values: insertValues } = generateInsertQuery({
 			...inputs,
 			doc_number: newDocNumber,
 		});
-		await pool.query(insertQuery, insertValues);
+	    await pool.query(insertQuery, insertValues);
 
 		//Delete the old record with the old doc_number
 		if (doc_data.new_doc_number) {
-			const deleteQuery = `DELETE FROM documents WHERE doc_number = $1`;
-			await pool.query(deleteQuery, [doc_data.doc_number]);
+			// const deleteQuery = `DELETE FROM documents WHERE doc_number = $1`;
+			// await pool.query(deleteQuery, [doc_data.doc_number]);
 
 			//Updating attachments related to old doc_number
-		    await pool.query(`
+			await pool.query(`
 				UPDATE doc_attachment_junction
 			    SET daj_doc_number = '${newDocNumber}'
 				WHERE daj_doc_number = '${doc_data.doc_number}'`);

@@ -247,8 +247,11 @@
     <script>
       let documentStatus = $("#doc_status").val();
       let folders = `<%- JSON.stringify(folders) %>`;
+      let documentData = `<%- JSON.stringify(documentData) %>`;
       let selectedPrefix = "";
-      let docNumberInput = $("#doc_number").val();   
+      let docNumberInput = $("#doc_number").val();
+      const doc_ID = JSON.parse(documentData)
+
       let NewURl = null  
       folders = folders ? JSON.parse(folders) : [];
       $(document).ready(function () {
@@ -411,10 +414,13 @@
           if($("#doc_status").val() == "INSERTED"){
             formData["insertedFlag"] = true;
           }
-          if (docNumberInput !== newDocNumberInput) {
+
+          
+          if (docNumberInput?.toLocaleLowerCase().trim() !== newDocNumberInput?.toLocaleLowerCase().trim()) {
             formData["new_doc_number"] = newDocNumberInput; 
             formData["doc_number"] = docNumberInput;
             formData["insertedFlag"] = true;
+            formData["doc_ID"] = doc_ID.doc_id
             NewURl = newDocNumberInput
           }
         });
@@ -426,14 +432,7 @@
             if (response.status == 1) {
               $("#doc_site,#doc_folder,#choosePrefixButton,#doc_type").prop("disabled", true);
               NioApp.handleButtonState("uploadDocumentBtn", "Update", false);
-              NioApp.Toast("<h5>Update Successfully</h5><p>Document Updated Successfully</p>", "success");
-
-              if (NewURl !== null) {
-                const encodedDocNumber = btoa(NewURl);
-                const newUrl = `/edit-document/${encodedDocNumber}`;
-                window.history.pushState(null, '', newUrl);
-              }
-
+              NioApp.Toast("<h5>Update Successfully</h5><p>Document Updated Successfully</p>", "success")
 
             } else {
               NioApp.handleButtonState("uploadDocumentBtn", "Update", false);

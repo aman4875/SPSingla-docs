@@ -495,7 +495,7 @@
                 let rowHtml = `<div class="nk-tb-item text-left table-content">
                                   <%if(token.user_role !=3){%>
                                   <div class="nk-tb-col text-start editDocument">
-                                      <span><a href="/edit-document/${btoa(document.doc_number)}"><em class="icon ni ni-edit-fill"></em></a></span>
+                                      <span><a href="/edit-document/${btoa(document.doc_id)}"><em class="icon ni ni-edit-fill"></em></a></span>
                                   </div>
                                    <%}%>
                                   <div class="nk-tb-col text-start">
@@ -511,7 +511,7 @@
                                       </span>
                                   </div>
                                   <div class="nk-tb-col">
-                                      <span><a href="/documents/${btoa(document.doc_number)}">${document.doc_number || "-"}</a></span>
+                                      <span><a href="/documents/${btoa(document.doc_id)}">${document.doc_number || "-"}</a></span>
                                   </div>
                                   <div class="nk-tb-col">
                                       <span${document.doc_status === "DRAFTED" ? ' class="text-warning"' : document.doc_status === "UPLOADED" ? ' class="text-primary"' : ""}>${document.doc_status || "-"}</span>
