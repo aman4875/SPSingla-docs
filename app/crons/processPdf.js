@@ -5,7 +5,6 @@ const { v4: uuidv4 } = require("uuid");
 const cron = require("node-cron");
 const moment = require("moment");
 const AWS = require("aws-sdk");
-const { tryCatch } = require("bullmq");
 
 // AWS Config
 AWS.config.update({
@@ -31,7 +30,7 @@ const processDocument = async (jobID) => {
 		};
 		const s3Data = await s3.listObjectsV2(params).promise();
 		const pdfFiles = s3Data.Contents.filter((file) => file.Key.endsWith(".pdf"));
-		console.log(pdfFiles,'pdfFiles');
+		console.log('total',pdfFiles.length,'are in que');
 		
 
 
