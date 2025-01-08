@@ -21,6 +21,11 @@
 				color: black;
 				font-size: 13px;
 			}
+			.disabled{
+				opacity: 0.9;
+				pointer-events: none;
+				cursor: none;
+			}
 		</style>
 		<div class="nk-app-root">
 			<!-- main @s -->
@@ -188,7 +193,9 @@
 											<div class="col-lg-12">
 												<div class="nk-block-head">
 													<div class="nk-block-head-content">
-														<h5 class="nk-block-title title">Attachments <button id="addAttachmentButton" data-bs-toggle="modal" data-bs-target="#attachmentModal" style="margin-left: 10px;margin-bottom: 8px;" class="btn btn-sm btn-dim  btn-outline-primary" >Add Attachments</button></h5>
+														<h5 class="nk-block-title title">Attachments 
+															<!-- <button id="addAttachmentButton" data-bs-toggle="modal" data-bs-target="#attachmentModal" style="margin-left: 10px;margin-bottom: 8px;" class="btn btn-sm btn-dim  btn-outline-primary" >Add Attachments</button> -->
+														</h5>
 														
 													</div>
 												</div>
@@ -259,7 +266,7 @@
 							<div class="form-group">
                                 <label class="form-label" for="doc_file">Upload PDF</label>
                                 <div class="form-control-wrap">
-                                  <input type="file" class="form-control" placeholder="Upload File" id="doc_file" name="doc_file" required />
+                                  <input type="file" class="form-control" accept=".pdf" placeholder="Upload File" id="doc_file" name="doc_file" required />
                                 </div>
                             </div>
 							<input type="hidden" name="doc_number" id="doc_number" value="<%=documentData.doc_number%>">
@@ -276,33 +283,33 @@
 		<script src="/app/assets/js/scripts.js"></script>
 		<script>
 			$(document).ready(function() {
-				const folderName = "<%= documentData.doc_folder %>"
+				// const folderName = "<%= documentData.doc_folder %>"
 				
-				$('#attachmentForm').on('submit', function(event) {
-					NioApp.handleButtonState("uploadAttachmentButton", "Uploading...", true);
-					event.preventDefault();
-		
-					var formData = new FormData(this);
-					formData.append("doc_folder", folderName);
-					$.ajax({
-						url: '/docs/upload-attachment',
-						type: 'POST',
-						data: formData,
-						contentType: false,
-						processData: false,
-						success: function(response) {
-							if (response.status === 1) {
-								location.reload();
-							} else {
-								alert('Upload failed: ' + response.message);
-							}
-						},
-						error: function(xhr, status, error) {
-							NioApp.handleButtonState("uploadAttachmentButton", "Upload File", false);
-							console.error('Error:', error);
-						}
-					});
-				});
+				// $('#attachmentForm').on('submit', function(event) {
+				// 	NioApp.handleButtonState("uploadAttachmentButton", "Uploading...", true);
+				// 	event.preventDefault();
+				// 	var formData = new FormData(this);
+				// 	formData.append("doc_folder", folderName);
+				// 	fromData.append("doc_attachment",'')
+				// 	$.ajax({
+				// 		url: '/docs/upload-attachment',
+				// 		type: 'POST',
+				// 		data: formData,
+				// 		contentType: false,
+				// 		processData: false,
+				// 		success: function(response) {
+				// 			if (response.status === 1) {
+				// 				location.reload();
+				// 			} else {
+				// 				alert('Upload failed: ' + response.message);
+				// 			}
+				// 		},
+				// 		error: function(xhr, status, error) {
+				// 			NioApp.handleButtonState("uploadAttachmentButton", "Upload File", false);
+				// 			console.error('Error:', error);
+				// 		}
+				// 	});
+				// });
 				
 				let documentNumber = $("#doc_number").val();
 				if(documentNumber.length > 0){

@@ -1,7 +1,5 @@
 const pdfjsLib = require('pdfjs-dist');
-const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
 const { createCanvas } = require('canvas');
-const fs = require('fs');
 const { PDFDocument } = require("pdf-lib");
 
 
