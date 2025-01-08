@@ -123,10 +123,11 @@
                           </div>
                           <%if(token.user_role !=3){%>
                             <div class="nk-block-head-content">
-                              <%if(token.user_role == 0 || token.user_role==1){%>
+                              <%if(token.user_role == 0 || token.user_role==1 || token.user_role==2){%>
                                 <a 
                                     href="/ai-import"
                                     class="btn btn-white btn-dim btn-outline-light"><span>AI Import</span></a>
+                                    <%if(token.user_role!=2){%>
                                 <span class="drodown">
                                   <a href="#" class="dropdown-toggle btn btn-white btn-dim btn-outline-light"
                                     data-bs-toggle="dropdown"><em class="icon ni ni-inbox-in"></em><span><span
@@ -141,6 +142,7 @@
                                     </ul>
                                   </div>
                                 </span>
+                                <%}%>
                                 <%}%>
                                   <a href="/documents/create-document"
                                     class="btn btn-white btn-dim btn-outline-light"><em

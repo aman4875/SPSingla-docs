@@ -43,7 +43,12 @@ const worker = new Worker(
         }
     },
 
-    { connection }
+    {
+        connection, limiter: {
+            max: 1,
+            duration: 30000,
+        },
+    }
 );
 
 worker.on("completed", async (job) => {

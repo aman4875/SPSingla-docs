@@ -563,7 +563,7 @@ documentController.uploadAttachment = async (req, res) => {
 			[inputs.doc_folder, folderId[0].site_id, getCurrentDateTime()]
 		);
 
-		await pool.query(`INSERT INTO doc_attachment_junction (daj_doc_number, daj_attachment_name, daj_attachment_link, daj_attachment_upload_date) VALUES ($1, $2, $3, $4)`, [inputs.doc_number, inputs.doc_attachment, attachmentLocation, moment().format("MM/DD/YYYY")]);
+		await pool.query(`INSERT INTO doc_attachment_junction (daj_doc_number, daj_attachment_name, daj_attachment_link, daj_attachment_upload_date) VALUES ($1, $2, $3, $4)`, [inputs.doc_number, inputs.doc_attachment, attachmentLocation, moment().format("DD/MM/YYYY")]);
 		res.send({ status: 1, msg: "Attachment Uploaded" });
 	} catch (err) {
 		console.error("Error Uploading Attachments", err);

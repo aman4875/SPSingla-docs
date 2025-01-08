@@ -17,6 +17,9 @@
       #saveDraftButton{
         opacity: 0;
       }
+      .displayNone{
+        display: none;
+      }
     </style>
   </head>
 
@@ -200,9 +203,87 @@
                             </div>
                           </div>
                         </form>
+                        <div class="row gy-5" style="margin-top: 5px;">
+                          <div class="col-lg-12">
+                            <div class="nk-block-head">
+                              <div class="nk-block-head-content">
+                                <h5 class="nk-block-title title">Attachments 
+                                  <button id="addAttachmentButton" data-bs-toggle="modal" data-bs-target="#attachmentModal" style="margin-left: 10px;margin-bottom: 8px;" class="btn btn-sm btn-dim  btn-outline-primary" >Add Attachments</button>
+                                </h5>
+                                
+                              </div>
+                            </div>
+                            <div class="card card-bordered card-preview disabled">
+                              <table class="table table-bordered">
+                                <thead>
+                                  <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Attachment Name</th>
+                                    <th scope="col">Upload Date</th>
+                                    <th scope="col">Actions</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <% if (docAttachments && docAttachments.length > 0) { %>
+                                    <% docAttachments.forEach((attachment, index) => { %>
+                                    <tr>
+                                      <th scope="row"><%= index + 1 %></th>
+                                      <td><%= attachment.daj_attachment_name %></td>
+                                      <td><%= attachment.daj_attachment_upload_date %></td>
+                                      <td>
+                                      <a href="<%= attachment.daj_attachment_link %>" target="_blank" class="btn btn-sm btn-outline-primary">View</a>
+                                      </td>
+                                    </tr>
+                                    <% }); %>
+                                  <% } else { %>
+                                    <tr>
+                                    <th scope="row">1</th>
+                                    <td>none</td>
+                                    <td>none</td>
+                                    <td>
+                                      <button class="btn btn-sm btn-outline-secondary" disabled>No Link</button>
+                                    </td>
+                                    </tr>
+                                  <% } %>
+                                  </tbody>
+                                  
+                              </table>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
+                </div>
+              </div>
+              <div class="modal fade" tabindex="-1" id="selectPrefixModal">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <a href="#" class="close" data-bs-dismiss="modal" aria-label="Close">
+                            <em class="icon ni ni-cross"></em>
+                        </a>
+                        <div class="modal-body">
+                          <form id="documentForm1" class="form-validate is-alter">
+                            <div class="row g-gs">
+                              <div class="col-md-12">
+                                <div class="form-group">
+                                  <label class="form-label" for="doc_number">Select Prefix</label>
+                                  <div class="form-control-wrap">
+                                    <div class="input-group">
+                                      <select class="form-control" data-placeholder="Select Prefix" name="folder_prefix" id="folder_prefix">
+                                        
+                                      </select>
+                                      <div class="input-group-append">
+                                        <button id="savePrefixButton" class="btn btn-outline-primary btn-dim">Choose Prefix</button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </form>
+                        </div>
+                    </div>
                 </div>
               </div>
             </div>
@@ -211,36 +292,42 @@
         </div>
       </div>
     </div>
-    <div class="modal fade" tabindex="-1" id="selectPrefixModal">
-      <div class="modal-dialog" role="document">
-          <div class="modal-content">
-              <a href="#" class="close" data-bs-dismiss="modal" aria-label="Close">
+
+        <div class="modal fade" id="attachmentModal">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Add Attachment</h5>
+                <a href="#" class="close" data-bs-dismiss="modal" aria-label="Close">
                   <em class="icon ni ni-cross"></em>
-              </a>
-              <div class="modal-body">
-                <form id="documentForm1" class="form-validate is-alter">
-                  <div class="row g-gs">
-                    <div class="col-md-12">
-                      <div class="form-group">
-                        <label class="form-label" for="doc_number">Select Prefix</label>
-                        <div class="form-control-wrap">
-                          <div class="input-group">
-                            <select class="form-control" data-placeholder="Select Prefix" name="folder_prefix" id="folder_prefix">
-                              
-                            </select>
-                            <div class="input-group-append">
-                              <button id="savePrefixButton" class="btn btn-outline-primary btn-dim">Choose Prefix</button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                </a>
+              </div>
+              <div class="modal-body" style="padding: 1.25rem">
+                <form id="attachmentForm" class="form-validate is-alter">
+                  <!-- <div class="form-group displayNone">
+                    <label class="form-label" for="doc_attachment">Attachment Name</label>
+                    <div class="form-control-wrap">
+                      <input type="text" placeholder="Attachment Name" class="form-control" name="doc_attachment"
+                        id="doc_attachment" required />
                     </div>
+                  </div> -->
+                  <div class="form-group">
+                    <label class="form-label" for="doc_file">Upload PDF</label>
+                    <div class="form-control-wrap">
+                      <input type="file" class="form-control" placeholder="Upload File" id="doc_file" name="doc_file"
+                        required />
+                    </div>
+                  </div>
+                  <input type="hidden" name="doc_number" id="doc_number" value="<%=documentData.doc_number%>">
+                  <div class="form-group" style="display: flex; justify-content: space-between">
+                    <button data-bs-dismiss="modal" type="button" aria-label="Close" class="btn btn-light">Cancel</button>
+                    <button id="uploadAttachmentButton" class="btn btn-primary">Upload Attachment</button>
                   </div>
                 </form>
               </div>
+            </div>
           </div>
-      </div>
-    </div>
+        </div>
     <input type="hidden" id="doc_status" value="<%=documentData.doc_status%>">
     <script src="/app/assets/js/bundle.js"></script>
     <script src="/app/assets/js/scripts.js"></script>
@@ -421,7 +508,6 @@
           oldDocNumberInput?.toLocaleLowerCase().trim() !==
             newDocNumberInput?.toLocaleLowerCase().trim()
           ) {
-            console.log('working');
             formData["new_doc_number"] = newDocNumberInput;
             formData["doc_number"] = oldDocNumberInput;
             formData["insertedFlag"] = true;
@@ -452,6 +538,42 @@
           },
         });
       });
+
+      // attachmentForm
+      $(document).ready(function() {
+        const folderName = "<%= documentData.doc_folder %>"
+				$('#attachmentForm').on('submit', function(event) {
+          event.preventDefault();
+          const file = document.getElementById("doc_file").files[0]
+					var formData = new FormData(this);
+					formData.append("doc_folder", folderName);
+          formData.append("doc_attachment",file.name);
+					NioApp.handleButtonState("uploadAttachmentButton", "Uploading...", true);
+
+ 
+					$.ajax({
+						url: '/docs/upload-attachment',
+						type: 'POST',
+						data: formData,
+						contentType: false,
+						processData: false,
+						success: function(response) {
+							if (response.status === 1) {
+								location.reload();
+							} else {
+								alert('Upload failed: ' + response.message);
+							}
+						},
+						error: function(xhr, status, error) {
+							NioApp.handleButtonState("uploadAttachmentButton", "Upload File", false);
+							console.error('Error:', error);
+						}
+					});
+				});
+      })
+
+      
+        
     </script>
   </body>
 </html>

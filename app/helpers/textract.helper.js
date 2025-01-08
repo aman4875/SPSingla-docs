@@ -2,6 +2,9 @@ const { v4: uuidv4 } = require("uuid");
 const AWS = require("aws-sdk");
 const dotenv = require("dotenv").config();
 const { PDFDocument } = require("pdf-lib");
+const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
+
+const createPdfFromFirstPage = require('../utils/createPdfFromFirstPage')
 
 // AWS Config
 AWS.config.update({
@@ -13,19 +16,30 @@ AWS.config.update({
 const textract = new AWS.Textract();
 const s3 = new AWS.S3();
 
+const s3Client = new S3Client({
+	region: process.env.BUCKET_REGION,
+	credentials: {
+		accessKeyId: process.env.BUCKET_KEY,
+		secretAccessKey: process.env.BUCKET_SECRET
+	}
+});
+
 const processTextract = async (bucketName, fileKey, firstPageOnly) => {
 	try {
 		const fileExtension = fileKey.split(".").pop().toLowerCase();
 		let tempPdfKey;
 
 		// Helper function to create PDF from the first page of a PDF or an image
-		const createFirstPagePdf = async (originalFileBuffer, fileType) => {
-			const pdfDoc = await PDFDocument.create();
+		const createFirstPagePdf = async (originalFileBuffer, fileType, bucketName, fileKey) => {
+			console.log('started working for fileKey', fileKey);
+
 			if (fileType === "pdf") {
-				const originalPdf = await PDFDocument.load(originalFileBuffer);
-				const [firstPage] = await pdfDoc.copyPages(originalPdf, [0]);
-				pdfDoc.addPage(firstPage);
+				const command = new GetObjectCommand({ Bucket: bucketName, Key: fileKey });
+				const { Body } = await s3Client.send(command);
+				const newPdf = await createPdfFromFirstPage(Body);
+				return newPdf
 			} else {
+				const pdfDoc = await PDFDocument.create();
 				const image = fileType === "jpeg" || fileType === "jpg" ? await pdfDoc.embedJpg(originalFileBuffer) : await pdfDoc.embedPng(originalFileBuffer);
 				const page = pdfDoc.addPage();
 				page.drawImage(image, {
@@ -40,9 +54,9 @@ const processTextract = async (bucketName, fileKey, firstPageOnly) => {
 
 		if (firstPageOnly) {
 			if (["pdf", "jpeg", "jpg"].includes(fileExtension)) {
-				const originalFile = await s3.getObject({ Bucket: bucketName, Key: fileKey }).promise();
-				const firstPagePdfBytes = await createFirstPagePdf(originalFile.Body, fileExtension);
 
+				const originalFile = await s3.getObject({ Bucket: bucketName, Key: fileKey }).promise();
+				const firstPagePdfBytes = await createFirstPagePdf(originalFile.Body, fileExtension, bucketName, fileKey);
 				tempPdfKey = `temp_pdf/${uuidv4()}.pdf`;
 				await s3
 					.putObject({
@@ -53,7 +67,6 @@ const processTextract = async (bucketName, fileKey, firstPageOnly) => {
 					})
 					.promise();
 
-				// Process the new PDF with Textract
 				const textractResult = await extractTextFromPdf(bucketName, tempPdfKey);
 
 				// Delete the temporary PDF
