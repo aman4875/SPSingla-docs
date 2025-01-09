@@ -151,6 +151,7 @@ const ProcessDocument = async (cronJob) => {
         console.log("Content Update Successfully");
     }  catch (err) {
 		// Catch block updates for crons table
+        await pool.query(`UPDATE documents SET doc_ocr_proccessed = true , doc_proccessed_status = true WHERE doc_number = '${document.doc_number}';`);
 		const cronError = err.toString();
         const res = await pool.query(
             `UPDATE crons 
