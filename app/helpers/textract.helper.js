@@ -3,7 +3,6 @@ const AWS = require("aws-sdk");
 const dotenv = require("dotenv").config();
 const { PDFDocument } = require("pdf-lib");
 const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
-
 const createPdfFromFirstPage = require('../utils/createPdfFromFirstPage')
 
 // AWS Config
@@ -23,7 +22,7 @@ const s3Client = new S3Client({
 		secretAccessKey: process.env.BUCKET_SECRET
 	}
 });
-
+let tempPdfKey;
 const processTextract = async (bucketName, fileKey, firstPageOnly) => {
 	try {
 		const fileExtension = fileKey.split(".").pop().toLowerCase();
@@ -74,6 +73,7 @@ const processTextract = async (bucketName, fileKey, firstPageOnly) => {
 
 				return { textractResult, totalPagesProcessed: 1 };
 			} else {
+				await s3.deleteObject({ Bucket: bucketName, Key: tempPdfKey }).promise();
 				throw new Error("Unsupported file type for firstPageOnly processing.");
 			}
 		} else {
@@ -81,6 +81,7 @@ const processTextract = async (bucketName, fileKey, firstPageOnly) => {
 			return await startTextractJob(bucketName, fileKey);
 		}
 	} catch (error) {
+		await s3.deleteObject({ Bucket: bucketName, Key: tempPdfKey }).promise();
 		console.error("Error processing Textract job:", error);
 		throw error;
 	}

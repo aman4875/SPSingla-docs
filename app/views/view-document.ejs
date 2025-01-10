@@ -26,6 +26,12 @@
 				pointer-events: none;
 				cursor: none;
 			}
+			.custom-doc li.data-item > .data-col {
+				width: 100%;
+			}
+			.custom-doc li.data-item > .data-col .data-value {
+				word-break: break-word;
+			}
 		</style>
 		<div class="nk-app-root">
 			<!-- main @s -->
@@ -54,7 +60,7 @@
 									</div>
 									
 									<!-- .nk-block-head -->
-									<div class="nk-block">
+									<div class="nk-block custom-doc">
 										<div class="row gy-5">
 											<div class="col-lg-8">
 												<div class="nk-block-head">
@@ -282,8 +288,12 @@
 		<script src="/app/assets/js/bundle.js"></script>
 		<script src="/app/assets/js/scripts.js"></script>
 		<script>
+			let folders = `<%- JSON.stringify(documentData) %>`
+							// const folderName = "<%= documentData %>"
+							console.log(JSON.parse(folders));
 			$(document).ready(function() {
-				// const folderName = "<%= documentData.doc_folder %>"
+
+				
 				
 				// $('#attachmentForm').on('submit', function(event) {
 				// 	NioApp.handleButtonState("uploadAttachmentButton", "Uploading...", true);

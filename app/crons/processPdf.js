@@ -116,9 +116,9 @@ const processDocument = async (jobID) => {
 
 				let document = {};
 
-				document.doc_number = extractedOpenAIData.letter_number;
+				document.doc_number = extractedOpenAIData.letter_number && extractedOpenAIData?.letter_number?.trim();
 				document.doc_type = extractedOpenAIData.letter_number.includes("SPS/") ? "OUTGOING" : "INCOMING";
-				document.doc_reference = extractedOpenAIData.references.replace(/\s+/g, "");
+				document.doc_reference = extractedOpenAIData.references && extractedOpenAIData?.references.replace(/\s+/g, "")?.trim();
 				document.doc_created_at = extractedOpenAIData.date;
 				document.doc_subject = extractedOpenAIData.subject;
 				document.doc_source = "AI IMPORT";
