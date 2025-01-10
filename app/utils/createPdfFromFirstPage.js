@@ -67,7 +67,7 @@ async function renderFirstPageToImage(data) {
         // const imageBuffer = canvas.toBuffer();
         // fs.writeFileSync('firstPage.png', imageBuffer); // Save as PNG file
 
-        console.log('Genrated first page for PDF');
+        console.log('Made first page for PDF');
 
         // Return the image URL (Base64 string)
         return imageUrl;

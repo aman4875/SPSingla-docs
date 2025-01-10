@@ -5,6 +5,7 @@ const { v4: uuidv4 } = require("uuid");
 const cron = require("node-cron");
 const moment = require("moment");
 const AWS = require("aws-sdk");
+const checkFolderType = require('../helpers/checkFolderType.js')
 
 // AWS Config
 AWS.config.update({
@@ -117,7 +118,7 @@ const processDocument = async (jobID) => {
 				let document = {};
 
 				document.doc_number = extractedOpenAIData.letter_number && extractedOpenAIData?.letter_number?.trim();
-				document.doc_type = extractedOpenAIData.letter_number.includes("SPS/") ? "OUTGOING" : "INCOMING";
+				document.doc_type = checkFolderType(siteDataFromDb[0].site_name,extractedOpenAIData.letter_number)
 				document.doc_reference = extractedOpenAIData.references && extractedOpenAIData?.references.replace(/\s+/g, "")?.trim();
 				document.doc_created_at = extractedOpenAIData.date;
 				document.doc_subject = extractedOpenAIData.subject;

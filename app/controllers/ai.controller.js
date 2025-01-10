@@ -7,6 +7,7 @@ const { queue } = require('../helpers/queue.js')
 const checkFolderExists = require('../helpers/checkFolderExistsS3.js')
 const textractHelper = require("../helpers/textract.helper.js");
 const openAIHelper = require("../helpers/openai.helper.js");
+const checkFolderType = require("../helpers/checkFolderType.js")
 
 
 // AWS Config
@@ -79,6 +80,10 @@ aiController.addNewJob = async (req, res) => {
 aiController.processSingleFile = async (req, res) => {
     let { siteId } = req.body;
     let token = req.session.token;
+
+    let { rows: siteDataFromDb } = await pool.query(`SELECT * FROM sites WHERE site_id = $1`, [siteId]);
+
+
     if (!token) {
         return res.send({ status: 0, msg: "user not logged IN" });
     }
@@ -112,10 +117,12 @@ aiController.processSingleFile = async (req, res) => {
         let { rows: siteDataFromDb } = await pool.query(`SELECT * FROM sites WHERE site_id = $1`, [siteCode]);
         let { rows: parentSiteFromDb } = await pool.query(`SELECT * FROM sites WHERE site_id = ${siteDataFromDb[0].site_parent_id}`);
 
+        console.log(checkFolderType(siteDataFromDb[0].site_name,extractedOpenAIData.letter_number));
+
         let document = {};
 
         document.doc_number = extractedOpenAIData.letter_number && extractedOpenAIData?.letter_number?.trim();
-        document.doc_type = extractedOpenAIData.letter_number.includes("SPS/") ? "OUTGOING" : "INCOMING";
+        document.doc_type = checkFolderType(siteDataFromDb[0].site_name,extractedOpenAIData.letter_number);
         document.doc_reference = extractedOpenAIData.references && extractedOpenAIData?.references.replace(/\s+/g, "")?.trim();
         document.doc_created_at = extractedOpenAIData.date;
         document.doc_subject = extractedOpenAIData.subject;
@@ -128,6 +135,7 @@ aiController.processSingleFile = async (req, res) => {
         document.doc_uploaded_by = userDataFromDb[0].user_name;
         document.doc_pdf_link = pdfLocation;
         document.doc_ocr_status = false;
+        console.log("🚀 ~ aiController.processSingleFile= ~ document:", document)
 
         await pool.query(
             `INSERT INTO documents (
