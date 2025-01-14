@@ -36,7 +36,7 @@ const ProcessDocument = async (cronJob) => {
         `);
 
         // Returing previous cron is still running
-        if (activeCron.length > 0) {
+        if (activeCron.length > 30) {
             console.log(getElapsedMinutes(activeCron[0].cron_started_at));
             
             if (getElapsedMinutes(activeCron[0].cron_started_at) > 1) {
