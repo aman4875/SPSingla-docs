@@ -36,10 +36,10 @@ const ProcessDocument = async (cronJob) => {
         `);
 
         // Returing previous cron is still running
-        if (activeCron.length > 30) {
+        if (activeCron.length > 0) {
             console.log(getElapsedMinutes(activeCron[0].cron_started_at));
             
-            if (getElapsedMinutes(activeCron[0].cron_started_at) > 1) {
+            if (getElapsedMinutes(activeCron[0].cron_started_at) > 30) {
                 console.log("Cron job has exceeded 30 minutes, skipping file.");
 
                 await client.query(`
