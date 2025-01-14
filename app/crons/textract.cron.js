@@ -4,6 +4,7 @@ const cron = require('node-cron');
 const moment = require('moment');
 const AWS = require('aws-sdk');
 const dotenv = require("dotenv").config();
+const getElapsedMinutes = require('../utils/getElapsedMinutes')
 
 // AWS Config 
 AWS.config.update({
@@ -26,12 +27,42 @@ const ProcessDocument = async (cronJob) => {
     const client = await pool.connect();
     try {
 
-        const { rowCount: crons } = await client.query('SELECT * FROM crons WHERE cron_status = false');
+        const { rows: activeCron } = await client.query(`
+            SELECT * 
+            FROM crons 
+            WHERE cron_status = false 
+            ORDER BY cron_started_at ASC 
+            LIMIT 1
+        `);
 
         // Returing previous cron is still running
-        if (crons) {
-            console.log("Previous cron is still running")
-            return
+        if (activeCron.length > 0) {
+            console.log(getElapsedMinutes(activeCron[0].cron_started_at));
+            
+            if (getElapsedMinutes(activeCron[0].cron_started_at) > 1) {
+                console.log("Cron job has exceeded 30 minutes, skipping file.");
+
+                await client.query(`
+                    UPDATE crons 
+                    SET cron_flagged = true 
+                    WHERE cron_id = $1
+                `, [activeCron[0].cron_id]);
+
+                // Update the cron status
+                await client.query(`
+                    UPDATE crons 
+                    SET cron_status = true 
+                    WHERE cron_id = $1
+                `, [activeCron[0].cron_id]);
+
+                console.log("Skipped file and updated cron status.");
+                
+                await pool.query(`UPDATE documents SET doc_ocr_proccessed = true  WHERE doc_number = '${activeCron[0].cron_feed}'`);
+                  return
+            } else {
+                console.log("Previous cron is still running within the allowed time.");
+                return;
+            }
         }
 
         // Previous cron stopped running starting new
@@ -54,10 +85,12 @@ const ProcessDocument = async (cronJob) => {
 		cronId = uuidv4();
 
 		// Insert into crons table with generated cron_id
+        
         const res = await pool.query(
             "INSERT INTO crons (cron_id, cron_feed, cron_started_at, cron_type) VALUES ($1, $2, $3, $4) RETURNING *", 
             [cronId, document.doc_number, getCurrentDateTime(), "textract"]
-          );  
+        );
+
         const startTextractParams = {
             DocumentLocation: {
                 S3Object: {
@@ -150,8 +183,10 @@ const ProcessDocument = async (cronJob) => {
         await client.query(`UPDATE crons SET cron_stopped_at = '${getCurrentDateTime()}', cron_status = true`);
         console.log("Content Update Successfully");
     }  catch (err) {
+        console.log(err);
+        
 		// Catch block updates for crons table
-        await pool.query(`UPDATE documents SET doc_ocr_proccessed = true , doc_proccessed_status = true WHERE doc_number = '${document.doc_number}';`);
+        await pool.query(`UPDATE documents SET doc_ocr_proccessed = true  WHERE doc_number = '${document.doc_number}';`);
 		const cronError = err.toString();
         const res = await pool.query(
             `UPDATE crons 

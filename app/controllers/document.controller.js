@@ -144,7 +144,6 @@ documentController.saveDraft = async (req, res) => {
 documentController.editDocument = async (req, res) => {
 	try {
 		let inputs = req.body;	
-		console.log(inputs);
 
 					
 		let token = req.session.token;

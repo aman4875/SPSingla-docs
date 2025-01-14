@@ -118,8 +118,6 @@ aiController.processSingleFile = async (req, res) => {
         let { rows: siteDataFromDb } = await pool.query(`SELECT * FROM sites WHERE site_id = $1`, [siteCode]);
         let { rows: parentSiteFromDb } = await pool.query(`SELECT * FROM sites WHERE site_id = ${siteDataFromDb[0].site_parent_id}`);
 
-        console.log(checkFolderType(siteDataFromDb[0].site_name, extractedOpenAIData.letter_number));
-
         let document = {};
 
         document.doc_number = extractedOpenAIData.letter_number && extractedOpenAIData?.letter_number?.trim();

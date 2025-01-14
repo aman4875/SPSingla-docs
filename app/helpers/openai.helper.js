@@ -135,7 +135,6 @@ const processOpenAI = async (text) => {
             temperature: 0,
             response_format: { type: "json_object" },
         });
-        console.log(response.choices[0].message.content);
 
         return response;
     } catch (error) {
