@@ -1,7 +1,6 @@
 const moment = require('moment')
 
 function getElapsedMinutes(startTimeStr) {
-    console.log(startTimeStr);
     
     const startTime = moment(startTimeStr, "DD/MM/YYYY hh:mm:ss A");
     
