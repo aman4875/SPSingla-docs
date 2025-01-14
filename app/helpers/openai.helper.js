@@ -2,7 +2,7 @@ const OpenAIApi = require("openai");
 
 const openai = new OpenAIApi({ apiKey: process.env.OPENAI_API_KEY });
 
-const processOpenAI = async (text) => {
+const processOpenAI = async (text) => {    
     const prompt = `   
 
     NOTE:- Given the text extracted from the first page of a formal letter using Amazon Textract, transform it into a polished and professional letter format. The output should adhere to formal business communication standards, ensuring the following:
@@ -26,7 +26,8 @@ const processOpenAI = async (text) => {
     }
 
     Rules and Clarifications :- 
-    1. letter_number: Include only the first exact alphanumeric code in the specified format found in the document header. Ignore any prefixes like "Ref:" or "No:". Example: SPSCPL/BSRDCL/GANGAPATH/22-23/109 , AECOM-RODIC/BSRDCL/GANGAPATH/SPSCPL/23-24/0127.
+    1. letter_number: Include only the first exact alphanumeric code in the specified format found in the document header and above Recipient's Address or Addressee Details. Ignore any prefixes like "Ref:" or "No:". 
+    Example: SPSCPL/BSRDCL/GANGAPATH/22-23/109 , AECOM-RODIC/BSRDCL/GANGAPATH/SPSCPL/23-24/0127 , NH-12014/17/2023-RO Patna (218701)-15 etc.
     
     2. Extract only valid reference numbers found after the markers Ref:, ref:, or References: (case-insensitive). Reference numbers must not include prefixes, labels, or dates. Multiple references should be comma-separated without spaces. Exclude any prefixes or additional labels, and trim spaces within reference numbers if they exist. If no valid reference exists, return an empty string.
 

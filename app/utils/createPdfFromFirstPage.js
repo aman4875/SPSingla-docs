@@ -1,6 +1,7 @@
 const pdfjsLib = require('pdfjs-dist');
 const { createCanvas } = require('canvas');
 const { PDFDocument } = require("pdf-lib");
+const fs = require('fs')
 
 
 const fontUrl = 'node_modules/pdfjs-dist/standard_fonts/';
@@ -65,7 +66,7 @@ async function renderFirstPageToImage(data) {
 
 
         // const imageBuffer = canvas.toBuffer();
-        // fs.writeFileSync('firstPage.png', imageBuffer); // Save as PNG file
+        // fs.writeFileSync('firstPage.png', imageUrl); // Save as PNG file
 
         console.log('Made first page for PDF');
 

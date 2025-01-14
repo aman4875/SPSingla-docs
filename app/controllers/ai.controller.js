@@ -8,6 +8,7 @@ const checkFolderExists = require('../helpers/checkFolderExistsS3.js')
 const textractHelper = require("../helpers/textract.helper.js");
 const openAIHelper = require("../helpers/openai.helper.js");
 const checkFolderType = require("../helpers/checkFolderType.js")
+const generateAlphaNumericSuffix = require('../utils/generateRandomAlphanumeric.js')
 
 
 // AWS Config
@@ -117,12 +118,12 @@ aiController.processSingleFile = async (req, res) => {
         let { rows: siteDataFromDb } = await pool.query(`SELECT * FROM sites WHERE site_id = $1`, [siteCode]);
         let { rows: parentSiteFromDb } = await pool.query(`SELECT * FROM sites WHERE site_id = ${siteDataFromDb[0].site_parent_id}`);
 
-        console.log(checkFolderType(siteDataFromDb[0].site_name,extractedOpenAIData.letter_number));
+        console.log(checkFolderType(siteDataFromDb[0].site_name, extractedOpenAIData.letter_number));
 
         let document = {};
 
         document.doc_number = extractedOpenAIData.letter_number && extractedOpenAIData?.letter_number?.trim();
-        document.doc_type = checkFolderType(siteDataFromDb[0].site_name,extractedOpenAIData.letter_number);
+        document.doc_type = checkFolderType(siteDataFromDb[0].site_name, extractedOpenAIData.letter_number);
         document.doc_reference = extractedOpenAIData.references && extractedOpenAIData?.references.replace(/\s+/g, "")?.trim();
         document.doc_created_at = extractedOpenAIData.date;
         document.doc_subject = extractedOpenAIData.subject;
@@ -135,29 +136,45 @@ aiController.processSingleFile = async (req, res) => {
         document.doc_uploaded_by = userDataFromDb[0].user_name;
         document.doc_pdf_link = pdfLocation;
         document.doc_ocr_status = false;
-        console.log("🚀 ~ aiController.processSingleFile= ~ document:", document)
+
+        // Check if the document exists in the database
+        let { rows: matchedDoc } = await pool.query(
+            `SELECT COUNT(*) AS count FROM documents WHERE doc_number = $1`,
+            [extractedOpenAIData?.letter_number?.trim()]
+        )
+
+        if (matchedDoc[0]?.count > 0) {
+            console.log('found mached doc_number');
+
+            let isUnique = false;
+            let uniqueDocNumber
+            while (!isUnique) {
+                const randomSuffix = generateAlphaNumericSuffix();
+                uniqueDocNumber = `${document.doc_number}-${randomSuffix}`;
+
+                // Check if this doc_number already exists in the database
+                let { rows } = await pool.query(
+                    `SELECT COUNT(*) AS count FROM documents WHERE doc_number = $1`,
+                    [uniqueDocNumber]
+                );
+
+                // If no matching record is found, it is unique
+                if (parseInt(rows[0]?.count) === 0) {
+                    isUnique = true;
+                }
+            }
+            document.doc_number = uniqueDocNumber;
+        }
 
         await pool.query(
             `INSERT INTO documents (
-                doc_number, doc_type, doc_reference, doc_created_at, doc_subject, doc_source, doc_uploaded_at, doc_status, doc_site, doc_folder, doc_uploaded_by_id, doc_uploaded_by, doc_pdf_link, doc_ocr_status
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
-            ON CONFLICT (doc_number) 
-            DO UPDATE SET 
-                doc_type = EXCLUDED.doc_type,
-                doc_reference = EXCLUDED.doc_reference,
-                doc_created_at = EXCLUDED.doc_created_at,
-                doc_subject = EXCLUDED.doc_subject,
-                doc_source = EXCLUDED.doc_source,
-                doc_uploaded_at = EXCLUDED.doc_uploaded_at,
-                doc_status = EXCLUDED.doc_status,
-                doc_site = EXCLUDED.doc_site,
-                doc_folder = EXCLUDED.doc_folder,
-                doc_uploaded_by_id = EXCLUDED.doc_uploaded_by_id,
-                doc_uploaded_by = EXCLUDED.doc_uploaded_by,
-                doc_pdf_link = EXCLUDED.doc_pdf_link,
-                doc_ocr_status = EXCLUDED.doc_ocr_status;`,
-            [document.doc_number, document.doc_type, document.doc_reference, document.doc_created_at, document.doc_subject, document.doc_source, document.doc_uploaded_at, document.doc_status, document.doc_site, document.doc_folder, document.doc_uploaded_by_id, document.doc_uploaded_by, document.doc_pdf_link, document.doc_ocr_status]
+						doc_number, doc_type, doc_reference, doc_created_at, doc_subject, doc_source, doc_uploaded_at, doc_status, doc_site, doc_folder, doc_uploaded_by_id, doc_uploaded_by, doc_pdf_link, doc_ocr_status
+					) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
+            [
+                document.doc_number, document.doc_type, document.doc_reference, document.doc_created_at, document.doc_subject, document.doc_source, document.doc_uploaded_at, document.doc_status, document.doc_site, document.doc_folder, document.doc_uploaded_by_id, document.doc_uploaded_by, document.doc_pdf_link, document.doc_ocr_status
+            ]
         );
+
 
         const { rows: documentData } = await pool.query(
             `SELECT doc_folder, doc_site FROM documents WHERE doc_number = $1;`,

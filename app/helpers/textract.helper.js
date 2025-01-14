@@ -89,20 +89,25 @@ const processTextract = async (bucketName, fileKey, firstPageOnly) => {
 
 // Helper function to extract text from a PDF using Textract
 const extractTextFromPdf = async (bucketName, fileKey) => {
-	const textractResponse = await textract
-		.detectDocumentText({
-			Document: {
-				S3Object: {
-					Bucket: bucketName,
-					Name: fileKey,
+	try {
+		const textractResponse = await textract
+			.detectDocumentText({
+				Document: {
+					S3Object: {
+						Bucket: bucketName,
+						Name: fileKey,
+					},
 				},
-			},
-		})
-		.promise();
+			})
+			.promise();
 
-	return textractResponse.Blocks.filter((block) => block.BlockType === "LINE")
-		.map((block) => block.Text)
-		.join(" ");
+		return textractResponse.Blocks.filter((block) => block.BlockType === "LINE")
+			.map((block) => block.Text)
+			.join(" ");
+	} catch (error) {
+		console.log("🚀 ~ extractTextFromPdf ~ error:", error)
+	}
+
 };
 
 // Helper function to start a Textract job
