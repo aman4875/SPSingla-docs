@@ -144,6 +144,8 @@ documentController.saveDraft = async (req, res) => {
 documentController.editDocument = async (req, res) => {
 	try {
 		let inputs = req.body;
+		console.log(inputs);
+		
 
 
 		let token = req.session.token;
@@ -213,11 +215,31 @@ documentController.editDocument = async (req, res) => {
 			// const deleteQuery = `DELETE FROM documents WHERE doc_number = $1`;
 			// await pool.query(deleteQuery, [doc_data.doc_number]);
 
-			//Updating attachments related to old doc_number
+			//Updating refs in doc_attachment_junction
 			await pool.query(`
 				UPDATE doc_attachment_junction
 			    SET daj_doc_number = '${newDocNumber}'
 				WHERE daj_doc_number = '${doc_data.doc_number}'`);
+			;
+			// updateing refs in doc_metadata 
+			await pool.query(`
+				UPDATE doc_metadata
+			    SET dm_id = '${newDocNumber}'
+				WHERE dm_id = '${doc_data.doc_number}'`);
+			;
+
+			// updateing refs in doc_history_junction 
+			await pool.query(`
+				UPDATE doc_history_junction
+			    SET dhj_doc_number = '${newDocNumber}'
+				WHERE dhj_doc_number = '${doc_data.doc_number}'`);
+			;
+
+			// updateing refs in crons 
+			await pool.query(`
+				UPDATE crons
+			    SET cron_feed = '${newDocNumber}'
+				WHERE cron_feed = '${doc_data.doc_number}'`);
 			;
 		}
 
@@ -237,14 +259,7 @@ documentController.editDocument = async (req, res) => {
 				await pool.query(insertReferencesQuery, referenceValues);
 			}
 		}
-
-		// Update doc_history_junction with the new doc_number
-		await pool.query(
-			`INSERT INTO doc_history_junction (dhj_doc_number, dhj_history_type, dhj_timestamp, dhj_history_blame, dhj_history_blame_user) 
-			VALUES ($1, $2, $3, $4, $5)`,
-			[newDocNumber, "UPDATED", moment().format("MM/DD/YYYY HH:mm:ss"), token.user_id, token.user_name]
-		);
-
+		
 		await pool.query(
 			`
 			INSERT INTO folder_stats (doc_folder_name, doc_folder_id, last_updated) 
