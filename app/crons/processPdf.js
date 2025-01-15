@@ -7,6 +7,7 @@ const moment = require("moment");
 const AWS = require("aws-sdk");
 const checkFolderType = require('../helpers/checkFolderType.js')
 const generateAlphaNumericSuffix = require('../utils/generateRandomAlphanumeric.js')
+const parseSubject = require('../utils/parseSubject.js')
 
 // AWS Config
 AWS.config.update({
@@ -125,7 +126,7 @@ const processDocument = async (jobID) => {
 			document.doc_type = checkFolderType(siteDataFromDb[0].site_name, extractedOpenAIData.letter_number)
 			document.doc_reference = extractedOpenAIData.references && extractedOpenAIData?.references.replace(/\s+/g, "")?.trim();
 			document.doc_created_at = extractedOpenAIData.date;
-			document.doc_subject = extractedOpenAIData.subject;
+			document.doc_subject = parseSubject(extractedOpenAIData.subject);
 			document.doc_source = "AI IMPORT";
 			document.doc_uploaded_at = moment().format("MM/DD/YYYY");
 			document.doc_status = "UPLOADED";
@@ -135,7 +136,8 @@ const processDocument = async (jobID) => {
 			document.doc_uploaded_by = userDataFromDb[0].user_name;
 			document.doc_pdf_link = fileUrl;
 			document.doc_ocr_status = false;
-
+			console.log(parseSubject(extractedOpenAIData.subject));
+			
 			// Check if the document exists in the database
 			let { rows: matchedDoc } = await pool.query(
 				`SELECT COUNT(*) AS count FROM documents WHERE doc_number = $1`,
@@ -200,7 +202,7 @@ const processDocument = async (jobID) => {
 			// ADDING HISTORY
 			await pool.query(`INSERT INTO doc_history_junction (dhj_doc_number, dhj_history_type, dhj_timestamp,dhj_history_blame,dhj_history_blame_user) VALUES ($1,$2,$3,$4,$5)`, [extractedOpenAIData.letter_number, "UPLOADED", moment().format("MM/DD/YYYY HH:mm:ss"), uploadedById, userDataFromDb[0].user_name]);
 
-			console.log("Document processed and inserted successfully");
+			console.table({"Document processed":true,"inserted successfully":true})
 
 		} catch (error) {
 			console.error(`Error processing pdf -> ${file.Key}: ${error.message}`);

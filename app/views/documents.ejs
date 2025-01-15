@@ -480,9 +480,6 @@
       });
 
 
-
-
-
     $('.js-select2').select2({
         placeholder: 'Select an option',
         width: 'resolve'
@@ -504,71 +501,70 @@
           if (response.status == 1) {
             if (response.payload.documents && response.payload.documents.length > 0) {
               $("#table-status").empty();
+              let rowsHtml = "";
               response.payload.documents.forEach(function (document) {
-                let rowHtml = `<div class="nk-tb-item text-left table-content">
-                                  <%if(token.user_role !=3){%>
-                                  <div class="nk-tb-col text-start editDocument">
-                                      <span><a href="/edit-document/${btoa(document.doc_id)}"><em class="icon ni ni-edit-fill"></em></a></span>
-                                  </div>
-                                   <%}%>
-                                  <div class="nk-tb-col text-start">
-                                      <span>${document.doc_site || "-"}</span>
-                                  </div>
-                                 <div class="nk-tb-col text-start">
-                                    <span>${document.doc_folder || "-"}</span>
-                                </div>
-                                  <div class="nk-tb-col">
-                                      <span>
-                                          <div style="font-size: 10px; height: 20px; width: 20px; margin-right: 5px" class="nk-tnx-type-icon ${document.doc_type == "INCOMING" ? `text-primary bg-primary-dim` : `text-success bg-success-dim`} "><em class="icon ni ${document.doc_type == "INCOMING" ? `text-success bg-success-dim ni-arrow-down-left` : `text-primary bg-primary-dim ni-arrow-up-right`}"></em></div> 
-                                          ${document.doc_type || "-"}
-                                      </span>
-                                  </div>
-                                  <div class="nk-tb-col">
-                                      <span><a href="/documents/${btoa(document.doc_id)}">${document.doc_number || "-"}</a></span>
-                                  </div>
-                                  <div class="nk-tb-col">
-                                      <span${document.doc_status === "DRAFTED" ? ' class="text-warning"' : document.doc_status === "UPLOADED" ? ' class="text-primary"' : ""}>${document.doc_status || "-"}</span>
-                                  </div>
-                                  <div class="nk-tb-col">
-                                      <span>${document.doc_created_at || "-"}</span>
-                                  </div>
-                                  
-                                  <div class="nk-tb-col">
-                                    <span title="${document.doc_subject || "-"}">${document.doc_subject || "-"}</span>
-                                  </div>
-                                  
-                                  <div class="nk-tb-col">
-                                      ${document.doc_reference ?
-                    document.doc_reference.split(',').map((ref, index) => {
-                      const trimmedRef = ref.trim();
-                      return `<span style='margin-right : 4px' class="badge bg-outline-primary"><a target="_blank" href="/documents/${btoa(trimmedRef)}">${trimmedRef}</a></span>`;
-                    }).join('')
-                    : "-"}
-                                  </div>
-                                  <div class="nk-tb-col">
-                                      ${document.doc_replied_vide ?
-                    document.doc_replied_vide.split(',').map((reply, index) => {
-                      const trimmedReply = reply.trim();
-                      return `<span style='margin-right : 4px' class="badge bg-outline-primary"><a target="_blank" href="/documents/${btoa(trimmedReply)}">${trimmedReply}</a></span>`;
-                    }).join('')
-                    : "-"}
-                                  </div>
 
-                                  <div class="nk-tb-col">
-                                    <span title="${document.doc_purpose || "-"}">${document.doc_purpose || "-"}</span>
-                                  </div>
-                                  <div class="nk-tb-col">
-                                    <span title="${document.doc_from || "-"}">${document.doc_from || "-"}</span>
-                                  </div>
-                                  <div class="nk-tb-col">
-                                    <span title="${document.doc_to || "-"}">${document.doc_to || "-"}</span>
-                                  </div>
-                                  <div class="nk-tb-col">
-                                      <span title="${document.doc_storage_location || "-"}">${document.doc_storage_location || "-"}</span>
-                                  </div>
-                              </div>`;
-                $(rowHtml).insertAfter("#table-filters");
+                let rowHtml = `<div class="nk-tb-item text-left table-content">
+                    <%if(token.user_role != 3){%>
+                    <div class="nk-tb-col text-start editDocument">
+                        <span><a href="/edit-document/${btoa(document.doc_id)}"><em class="icon ni ni-edit-fill"></em></a></span>
+                    </div>
+                    <%}%>
+                    <div class="nk-tb-col text-start">
+                        <span>${document.doc_site || "-"}</span>
+                    </div>
+                    <div class="nk-tb-col text-start">
+                        <span>${document.doc_folder || "-"}</span>
+                    </div>
+                    <div class="nk-tb-col">
+                        <span>
+                            <div style="font-size: 10px; height: 20px; width: 20px; margin-right: 5px" class="nk-tnx-type-icon ${document.doc_type == "INCOMING" ? `text-primary bg-primary-dim` : `text-success bg-success-dim`} ">
+                                <em class="icon ni ${document.doc_type == "INCOMING" ? `text-success bg-success-dim ni-arrow-down-left` : `text-primary bg-primary-dim ni-arrow-up-right`}"></em>
+                            </div>
+                            ${document.doc_type || "-"}
+                        </span>
+                    </div>
+                    <div class="nk-tb-col">
+                        <span><a href="/documents/${btoa(document.doc_id)}">${document.doc_number || "-"}</a></span>
+                    </div>
+                    <div class="nk-tb-col">
+                        <span${document.doc_status === "DRAFTED" ? ' class="text-warning"' : document.doc_status === "UPLOADED" ? ' class="text-primary"' : ""}>${document.doc_status || "-"}</span>
+                    </div>
+                    <div class="nk-tb-col">
+                        <span>${document.doc_created_at || "-"}</span>
+                    </div>
+                    <div class="nk-tb-col">
+                        <span title="${document.doc_subject || "-"}">${document.doc_subject || "-"}</span>
+                    </div>
+                    <div class="nk-tb-col">
+                        ${document.doc_reference ? document.doc_reference.split(',').map((ref) => {
+                              const trimmedRef = ref.trim();
+                              return `<span style='margin-right: 4px' class="badge bg-outline-primary"><a target="_blank" href="/documents/${btoa(trimmedRef)}">${trimmedRef}</a></span>`;
+                            }).join('') : "-"}
+                    </div>
+                    <div class="nk-tb-col">
+                        ${document.doc_replied_vide ? document.doc_replied_vide.split(',').map((reply) => {
+                              const trimmedReply = reply.trim();
+                              return `<span style='margin-right: 4px' class="badge bg-outline-primary"><a target="_blank" href="/documents/${btoa(trimmedReply)}">${trimmedReply}</a></span>`;
+                            }).join('') : "-"}
+                    </div>
+                    <div class="nk-tb-col">
+                        <span title="${document.doc_purpose || "-"}">${document.doc_purpose || "-"}</span>
+                    </div>
+                    <div class="nk-tb-col">
+                        <span title="${document.doc_from || "-"}">${document.doc_from || "-"}</span>
+                    </div>
+                    <div class="nk-tb-col">
+                        <span title="${document.doc_to || "-"}">${document.doc_to || "-"}</span>
+                    </div>
+                    <div class="nk-tb-col">
+                        <span title="${document.doc_storage_location || "-"}">${document.doc_storage_location || "-"}</span>
+                    </div>
+                </div>`;
+                rowsHtml += rowHtml; 
               });
+
+              $("#table-filters").after(rowsHtml);
               totalPages = response.payload.totalPages || 1;
 
               

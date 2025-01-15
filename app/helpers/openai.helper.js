@@ -101,25 +101,9 @@ const processOpenAI = async (text) => {
 
     3. date : Strictly follow 'dd/mm/yyyy' format. Convert any other date formats encountered to this standard format.
 
-    4. If the feeded text in the "Subject" or "Sub" field contains underlined or bold text, ensure to extract that as the subject only. If no underlined or bold text is present, consider the entire text under the "Sub" field as the subject. The subject should typically include the entire section starting with "Subject:", "Sub:", or "Sub-"  Make sure to double-check everything for accuracy.
-
-     4a: Subject to be picked up after first "- " i.e a dash and a with or without space excluding double quotes if it is there otherwise full sentence
-
-        Here some examples:- 
-         4a-1 case with “- “: 1. Construction of 6 lane H.L./Extra-dosed Cable Bridge on River Ganga 
-                              parallel to Western side (180 meter upstream) of Digha- Sonepur Rail-
-                              cum-Road Bridge at Patna on Ganga River on NH-139W in the state of 
-                              Bihar on EPC mode- "Submission of Monthly Progress Report for the 
-                              month of October 2024"
-                              output :- Submission of Monthly Progress Report for the 
-                              month of October 2024
-
-                              2. Sub.:- Construction of 6 lane H.L./Extra-dosed Cable Bridge on River Ganga parallel to Western side (180 meter upstream) of Digha- Sonepur Rail-cum-Road Bridge at Patna on Ganga River on NH-139W in the state 1 of Bihar on EPC mode- "Appointment of Proof consultant reg"
-                              output:- Appointment of Proof consultant reg
-
-        4a-2. Case without any “- “ It should pick up the Bold Letters: Request for Joint inspection with concerned utility authorities to verify existing electrical utilities not included in Schedule-B1 of CA to be shifted under Change of Scope-reg
-
-        4a-3. Otherwise pick the whole sentence
+    4. The subject should include the entire section starting with "Subject:", "Sub:", or "Sub-". Ensure to pick only the text starting with "Subject:", "Sub:", or "Sub-" and do not include any extra text.
+    Examples: "Subject: Construction of 6 Lane H.L./Extra-dosed Cable bridge on River Ganga parallel to Western side (180 meter upstream) of Digha- Sonepur Rail-cum-Road bridge at Patna on Ganga River on NH-139W in the State of Bihar" , "Sub: Regarding day-to-day operation of cleaning& maintenance of road deck of Br"No. 7 (Digira Ganga
+Rail Cum Road Brtdge) between Dighaghat - Pahlezaghat near Patna, on the river Ganga".
 
     5. Letter Type - if Letter No starts with SPS then it's an outgoing document, otherwise it’s an incoming document.
 

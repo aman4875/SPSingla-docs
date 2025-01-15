@@ -9,6 +9,7 @@ const textractHelper = require("../helpers/textract.helper.js");
 const openAIHelper = require("../helpers/openai.helper.js");
 const checkFolderType = require("../helpers/checkFolderType.js")
 const generateAlphaNumericSuffix = require('../utils/generateRandomAlphanumeric.js')
+const parseSubject = require('../utils/parseSubject.js')
 
 
 // AWS Config
@@ -106,6 +107,9 @@ aiController.processSingleFile = async (req, res) => {
 
 
         let textractData = await textractHelper(process.env.BUCKET_NAME, s3Response.Key, true);
+        if (!textractData.textractResult || textractData.textractResult === 'undefined') {
+            return res.send({ status: 0, msg: "Invalid Pdf" }); 
+        }
         let extractData = await openAIHelper(textractData.textractResult);
         let extractedOpenAIData = JSON.parse(extractData.choices[0].message.content);
 
@@ -124,7 +128,7 @@ aiController.processSingleFile = async (req, res) => {
         document.doc_type = checkFolderType(siteDataFromDb[0].site_name, extractedOpenAIData.letter_number);
         document.doc_reference = extractedOpenAIData.references && extractedOpenAIData?.references.replace(/\s+/g, "")?.trim();
         document.doc_created_at = extractedOpenAIData.date;
-        document.doc_subject = extractedOpenAIData.subject;
+        document.doc_subject = parseSubject(extractedOpenAIData.subject);
         document.doc_source = "AI IMPORT";
         document.doc_uploaded_at = moment().format("MM/DD/YYYY");
         document.doc_status = "UPLOADED";
@@ -210,7 +214,7 @@ aiController.processSingleFile = async (req, res) => {
         // ADDING HISTORY
         await pool.query(`INSERT INTO doc_history_junction (dhj_doc_number, dhj_history_type, dhj_timestamp,dhj_history_blame,dhj_history_blame_user) VALUES ($1,$2,$3,$4,$5)`, [extractedOpenAIData.letter_number, "UPLOADED", moment().format("MM/DD/YYYY HH:mm:ss"), token.user_id, userDataFromDb[0].user_name]);
 
-        console.log("Document processed and inserted successfully");
+        console.table({ "Document processed": true, "inserted successfully": true })
 
         return res.send({ status: 1, msg: "File Processed Successfully" });
     } catch (error) {

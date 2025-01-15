@@ -143,9 +143,9 @@ documentController.saveDraft = async (req, res) => {
 
 documentController.editDocument = async (req, res) => {
 	try {
-		let inputs = req.body;	
+		let inputs = req.body;
 
-					
+
 		let token = req.session.token;
 		if (token.user_role === "3") {
 			return res.send({ status: 0, msg: "Access Denied: Insufficient Permissions." });
@@ -191,22 +191,22 @@ documentController.editDocument = async (req, res) => {
 			}
 
 			data["doc_reference"] = inputs.doc_reference;
-			let query		
-				const condition = `doc_id = ${doc_data.doc_ID}`;
-				const setClause = Object.keys(data)
+			let query
+			const condition = `doc_id = ${doc_data.doc_ID}`;
+			const setClause = Object.keys(data)
 				.map((key, index) => `${key} = $${index + 1}`)
 				.join(', ');
 
-				query = `UPDATE documents SET ${setClause} WHERE ${condition}`;
-		
+			query = `UPDATE documents SET ${setClause} WHERE ${condition}`;
+
 
 			return { query, values: Object.values(data) };
 		};
 		const { query: insertQuery, values: insertValues } = generateInsertQuery({
 			...inputs,
 			doc_number: newDocNumber,
-		});		
-	    await pool.query(insertQuery, insertValues);
+		});
+		await pool.query(insertQuery, insertValues);
 
 		//Delete the old record with the old doc_number
 		if (doc_data.new_doc_number) {
@@ -399,8 +399,7 @@ documentController.getFilteredDocuments = async (req, res) => {
 		let baseQuery = `
             SELECT d.*,string_agg(j.doc_junc_number, ', ') AS doc_replied_vide
             FROM documents d
-            LEFT JOIN doc_reference_junction j ON j.doc_junc_replied = d.doc_number
-        `;;
+            LEFT JOIN doc_reference_junction j ON j.doc_junc_replied = d.doc_number`;
 		let conditions = [];
 		let joins = "";
 		let folderQuery = ''
@@ -459,14 +458,25 @@ documentController.getFilteredDocuments = async (req, res) => {
 			}
 		}
 
-
-
 		// Handle sorting
 		let orderByClause = "";
 		if (inputs.sort && Object.keys(inputs.sort).length > 0) {
 			const sortFields = Object.entries(inputs.sort).map(([field, direction]) => {
 				const dir = direction.toLowerCase() === "asc" ? "ASC" : "DESC";
-				return `d.${field} ${dir}`;
+
+				// adding storing for date
+				if (field === 'doc_created_at') {
+					return `CASE
+						WHEN d.doc_created_at IS NULL OR d.doc_created_at = '' THEN 
+						CASE
+						WHEN '${dir}' = 'ASC' THEN NULL
+						ELSE TO_DATE('01/01/1900', 'DD/MM/YYYY')
+						END
+					    WHEN NOT d.doc_created_at ~ '^\\d{2}/\\d{2}/\\d{4}$' THEN NULL 
+						ELSE TO_DATE(d.doc_created_at, 'DD/MM/YYYY')
+						END ${dir} NULLS LAST`}
+					
+					return `d.${field} ${dir}`;
 			});
 			orderByClause = `ORDER BY ${sortFields.join(", ")}`;
 		} else {

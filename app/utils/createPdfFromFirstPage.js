@@ -45,7 +45,7 @@ async function renderFirstPageToImage(data) {
         });
 
         const pdfDocument = await loadingTask.promise;
-        console.log(`PDF Loaded: ${pdfDocument.numPages} pages`);
+        console.table({"PDF Loaded":true,"Total Pages":pdfDocument.numPages})
 
         const firstPage = await pdfDocument.getPage(1);
         const scale = 3;

@@ -30,7 +30,7 @@ const processTextract = async (bucketName, fileKey, firstPageOnly) => {
 
 		// Helper function to create PDF from the first page of a PDF or an image
 		const createFirstPagePdf = async (originalFileBuffer, fileType, bucketName, fileKey) => {
-			console.log('started working for fileKey', fileKey);
+			console.table({"processing pdf key": fileKey});
 
 			if (fileType === "pdf") {
 				const command = new GetObjectCommand({ Bucket: bucketName, Key: fileKey });
@@ -105,7 +105,7 @@ const extractTextFromPdf = async (bucketName, fileKey) => {
 			.map((block) => block.Text)
 			.join(" ");
 	} catch (error) {
-		console.log("🚀 ~ extractTextFromPdf ~ error:", error)
+		console.log("🚀 ~ extractTextFromPdf ~ error:", 'Textract -> invalid pdf')
 	}
 
 };
