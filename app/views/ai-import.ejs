@@ -179,7 +179,8 @@
                                                     <div class="card-head">
                                                         <div class="row">
                                                             <div class="col-12">
-                                                                <h5 class="card-title text-danger">File upload failed.</h5>
+                                                                <h5 class="card-title text-danger">File upload failed.
+                                                                </h5>
                                                             </div>
                                                             <div onclick="window.location.reload()" class="col-12 mt-4">
                                                                 <button class="btn btn-danger">Refresh</button>
@@ -198,10 +199,16 @@
                                         <div class="col">
                                             <h4>Failed Uploads</h4>
                                         </div>
-                                        <div id="clear-records" class="col text-end"> <button
-                                                class="btn btn-dim btn-outline-primary"><em
-                                                    class="icon ni ni-reload-alt"></em>
-                                                <span>Clear Records</span></button></div>
+                                        <div class="col text-end">
+                                            <button id="clear-records" class="btn btn-dim btn-outline-primary">
+                                                <em class="icon ni ni-reload-alt"></em>
+                                                <span>Clear Records</span>
+                                            </button>
+                                            <button id="fetch-failed-records" class="btn btn-dim btn-outline-primary">
+                                                <em class="icon ni ni-reload-alt"></em>
+                                                <span>Fetch Failed Records</span>
+                                            </button>
+                                        </div>
                                     </div>
                                     <div class="failed-docs-wrapper">
                                         <table class="table  mt-3">
@@ -232,6 +239,16 @@
     <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1103.0.min.js"></script>
 
     <script>
+        function toggleClassAndDisable(id, isHidden) {
+            const element = document.getElementById(id);
+
+            if (isHidden === "add") {
+                // Add the 'disabled' class
+                element.classList.add('disabled');
+            } else {
+                element.classList.remove('disabled');
+            }
+        }
         let folders = `<%- JSON.stringify(folders) %>`;
         let sites = `<%- JSON.stringify(sites) %>`;
         folders = folders ? JSON.parse(folders) : [];
@@ -269,7 +286,7 @@
                 return false;
             }
 
-            const file = document.getElementById("doc_file").files[0];            
+            const file = document.getElementById("doc_file").files[0];
             const fileExtension = file.name.split('.').filter(Boolean).slice(1).join('.')
             let fileName = `${Date.now()}${fileExtension === 'rar' ? '.rar' : '.zip'}`;
             const selectedFolderOption = $("#doc_folder").find("option:selected");
@@ -277,11 +294,12 @@
 
             const key = `uploads/${siteId}_${token.user_id}_${fileName}`;
             NioApp.handleButtonState("uploadZipButton", "Uploading...", true);
-
+            toggleClassAndDisable("fetch-failed-records", "add")
+            toggleClassAndDisable("clear-records", "add")
             if (file.name.endsWith(".pdf")) {
                 let formData = new FormData(this);
                 formData.append("siteId", siteId);
-                formData.append("name",file.name)
+                formData.append("name", file.name)
                 $.ajax({
                     type: "POST",
                     url: "/ai/process-single-file",
@@ -293,18 +311,24 @@
                             NioApp.Toast("<h5>Upload Success</h5><p>File Uploaded Successfully</p>", "success");
                             $("#card-2").removeClass("d-none");
                             $("#card-1").addClass("d-none");
+                            toggleClassAndDisable("fetch-failed-records", "remove")
+                            toggleClassAndDisable("clear-records", "remove")
                         } else {
                             console.error("Error uploading file:");
                             NioApp.handleButtonState("uploadZipButton", "Upload File", false);
                             NioApp.Toast(`<h5>Upload Failed</h5><p>${response.msg}</p>`, "error");
                             $("#card-3").removeClass("d-none");
                             $("#card-1").addClass("d-none");
+                            toggleClassAndDisable("fetch-failed-records", "remove")
+                            toggleClassAndDisable("clear-records", "remove")
                         }
                     },
                     error: function (xhr, status, error) {
                         console.error("Error uploading file:");
                         NioApp.handleButtonState("uploadZipButton", "Upload File", false);
                         NioApp.Toast("<h5>Upload Failed</h5><p>Error Uploading File</p>", "error");
+                        toggleClassAndDisable("fetch-failed-records", "remove")
+                        toggleClassAndDisable("clear-records", "remove")
                     },
                 });
 
@@ -332,11 +356,15 @@
                     console.error("Error uploading file:", err);
                     NioApp.handleButtonState("uploadZipButton", "Upload File", false);
                     NioApp.Toast("<h5>Upload Failed</h5><p>Error Uploading File</p>", "error");
+                    toggleClassAndDisable("fetch-failed-records", "remove")
+                    toggleClassAndDisable("clear-records", "remove")
                 } else {
                     $("#progress-percentage").addClass("d-none");
                     NioApp.Toast("<h5>Upload Success</h5><p>File Uploaded Successfully</p>", "success");
                     $("#card-2").removeClass("d-none");
                     $("#card-1").addClass("d-none");
+                    toggleClassAndDisable("fetch-failed-records", "remove")
+                    toggleClassAndDisable("clear-records", "remove")
                 }
             }).on("httpUploadProgress", function (progress) {
                 const percent = Math.round((progress.loaded / progress.total) * 100);
@@ -367,6 +395,9 @@
             });
 
         })
+        $("#fetch-failed-records").click(() => {
+            location.reload();
+        })
 
         function getFailedPdf() {
             $.ajax({
@@ -384,7 +415,7 @@
                             <th scope="row">${index ?? "-"}</th>
                             <td>${list.job_status || '-'}</td>
                             <td>${list.feed || "-"}</td>
-                            <td>${list?.failed_pdf?.split("-")[1] || '-'}</td>
+                            <td>${list?.failed_pdf?.split("_")[1] || '-'}</td>
                             <td>${list.end_at.split(" ")[0] || "-"}</td>
                         </tr>`
 
@@ -403,10 +434,10 @@
                               </td>
                         </tr>`
                         $("#failed_job_table").append(innerHtml);
-                        
+
                     }
 
-                    
+
                 },
 
                 error: function (xhr, status, error) {

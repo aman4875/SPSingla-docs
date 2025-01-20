@@ -3,7 +3,7 @@ const getCurrentDateTime = require('../utils/getCurrentDateTime.js')
 const moment = require('moment')
 
 const updateFailedStatus = async (fileName, s3, message, fileKey, user_id) => {
-    const newFileKey = `${moment().unix()}-${fileName}`;
+    const newFileKey = `${moment().unix()}_${fileName}`;
 
     await pool.query(
         `INSERT INTO failed_job_stats (flagged, feed, status, end_at, failed_pdf,job_status,user_id) 

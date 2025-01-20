@@ -56,22 +56,8 @@ const processDocument = async (jobID) => {
 
 			if (!extractedOpenAIData) {
 				console.log('Flagged pdf');
-				const newFileKey = `${moment().unix()}-${file.Key.split('/')[2]}`;
+				const newFileKey = `${moment().unix()}_${file.Key.split('/')[2]}`;
 
-				await s3
-					.copyObject({
-						Bucket: process.env.BUCKET_NAME,
-						CopySource: `${process.env.BUCKET_NAME}/${file.Key}`,
-						Key: newFileKey,
-					})
-					.promise();
-
-				await s3
-					.deleteObject({
-						Bucket: process.env.BUCKET_NAME,
-						Key: file.Key,
-					})
-					.promise();
 
 				await pool.query(
 					`INSERT INTO failed_job_stats (flagged, feed, status, end_at, failed_pdf,job_status,user_id) 
@@ -235,7 +221,7 @@ const processDocument = async (jobID) => {
 
 		} catch (error) {
 			console.error(`Error processing pdf -> ${file.Key}: ${error.message}`);
-			const newFileKey = `${moment().unix()}-${file.Key.split('/')[2]}`;
+			const newFileKey = `${moment().unix()}_${file.Key.split('/')[2]}`;
 
 			await pool.query(
 				`INSERT INTO failed_job_stats (flagged, feed, status, end_at, failed_pdf,job_status,user_id) 
