@@ -56,7 +56,7 @@ const processDocument = async (jobID) => {
 
 			if (!extractedOpenAIData) {
 				console.log('Flagged pdf');
-				const newFileKey = `flagged_uploads/${moment().unix()}-${file.Key.split('/')[2]}`;
+				const newFileKey = `${moment().unix()}-${file.Key.split('/')[2]}`;
 
 				await s3
 					.copyObject({
@@ -235,7 +235,7 @@ const processDocument = async (jobID) => {
 
 		} catch (error) {
 			console.error(`Error processing pdf -> ${file.Key}: ${error.message}`);
-			const newFileKey = `flagged_uploads/${moment().unix()}-${file.Key.split('/')[2]}`;
+			const newFileKey = `${moment().unix()}-${file.Key.split('/')[2]}`;
 
 			await pool.query(
 				`INSERT INTO failed_job_stats (flagged, feed, status, end_at, failed_pdf,job_status,user_id) 
