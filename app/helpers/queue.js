@@ -36,9 +36,12 @@ const worker = new Worker(
             await processDocument(job.data.jobID)
 
         } catch (error) {
+            console.log("🚀 ~ error:", error)
             await pool.query(
-                `INSERT INTO failed_job_stats (job_status,end_at,feed) VALUES ($1,$2,$3)`,
-                ["failed", getCurrentDateTime(), error.message]
+                `UPDATE jobs 
+                 SET job_status = $1, end_at = $2, feed = $3 
+                 WHERE job_id = $4`,
+                ["failed", getCurrentDateTime(), error, job.data.jobID]
             );
         }
     },
@@ -55,9 +58,9 @@ worker.on("completed", async (job) => {
     // update jobs stats
     await pool.query(
         `UPDATE jobs 
-         SET job_status = $1, end_at = $2
-         WHERE job_id = $3`,
-        ["completed", getCurrentDateTime(), job.data.jobID]
+         SET job_status = $1, end_at = $2 , feed = $3
+         WHERE job_id = $4`,
+        ["completed", getCurrentDateTime(), 'success', job.data.jobID]
     );
 
     // update folder_stats 

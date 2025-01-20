@@ -1,3 +1,4 @@
+"use strict"
 const { pool } = require("../helpers/database.helper.js");
 const textractHelper = require("../helpers/textract.helper.js");
 const openAIHelper = require("../helpers/openai.helper.js");
@@ -24,60 +25,53 @@ const processDocument = async (jobID) => {
 	let tempLetterNumber = false;
 	let pdfKey
 
-	console.log('job started for', jobID);
-
-
 	const params = {
 		Bucket: process.env.BUCKET_NAME,
 		Prefix: `unzipped_uploads/${jobID}/`,
 	};
 	const s3Data = await s3.listObjectsV2(params).promise();
 	const pdfFiles = s3Data.Contents.filter((file) => file.Key.endsWith(".pdf"));
-	console.log('total', pdfFiles.length, 'are in que');
 
-
-
-	if (!pdfFiles.length) {
-		throw new Error("No PDF files found");
+	console.table({ 'Job started for': jobID, 'total pdf': pdfFiles.length });
+	if (pdfFiles.length == 0) {
+		const error = new Error("No Pdf Found");
+		throw error;
 	}
 
 
 	for (const file of pdfFiles) {
-		console.log('Processing pdf ->', file.Key);
 		pdfKey = file.Key;
 
 		try {
 			// Process the document
 			let textractData = await textractHelper(process.env.BUCKET_NAME, file.Key, true);
 			if (!textractData.textractResult || textractData.textractResult === 'undefined') {
-				throw new Error("INVALID -> PDF", file.Key);
+				const error = new Error("Unsupported file type");
+				error.fileKey = file.Key;
+				throw error;
+
 			}
 			let extractData = await openAIHelper(textractData.textractResult);
-			let extractedOpenAIData = JSON.parse(extractData.choices[0].message.content);
+			let extractedOpenAIData = JSON.parse(extractData?.choices && extractData?.choices[0]?.message?.content);
 
 			if (!extractedOpenAIData) {
 				console.log('Flagged pdf');
+				const newFileKey = `${moment().unix()}_${file.Key.split('/')[2]}`;
+
 
 				await pool.query(
-					`INSERT INTO failed_job_stats (flagged, feed, status, stop_at, failed_pdf) 
-						 VALUES ($1, $2, $3, $4, $5)`,
-					[true, "Empty AI Response", "processing pdf failed", getCurrentDateTime(), file.Key]
+					`INSERT INTO failed_job_stats (flagged, feed, status, end_at, failed_pdf,job_status,user_id) 
+							 VALUES ($1, $2, $3, $4, $5, $6, 7$)`,
+					[
+						true,
+						"Empty AI Response",
+						"processing pdf failed",
+						getCurrentDateTime(),
+						newFileKey,
+						"failed",
+						(file.Key.replace("unzipped_uploads/", "").match(/^\d+_(\d+)_/) || [])[1]
+					]
 				);
-
-				await s3
-					.copyObject({
-						Bucket: process.env.BUCKET_NAME,
-						CopySource: `${process.env.BUCKET_NAME}/${file.Key}`,
-						Key: `flagged_uploads/${file.Key.split("/").pop()}`,
-					})
-					.promise();
-
-				await s3
-					.deleteObject({
-						Bucket: process.env.BUCKET_NAME,
-						Key: file.Key,
-					})
-					.promise();
 
 				continue; // Skip to the next file
 			}
@@ -136,30 +130,29 @@ const processDocument = async (jobID) => {
 			document.doc_uploaded_by = userDataFromDb[0].user_name;
 			document.doc_pdf_link = fileUrl;
 			document.doc_ocr_status = false;
-			console.log(parseSubject(extractedOpenAIData.subject));
-			
+
 			// Check if the document exists in the database
 			let { rows: matchedDoc } = await pool.query(
 				`SELECT COUNT(*) AS count FROM documents WHERE doc_number = $1`,
 				[extractedOpenAIData?.letter_number?.trim()]
 			)
-			
 
-			if (matchedDoc[0]?.count > 0 ) {
+
+			if (matchedDoc[0]?.count > 0) {
 				console.log('found mached doc_number');
-				
+
 				let isUnique = false;
 				let uniqueDocNumber
 				while (!isUnique) {
 					const randomSuffix = generateAlphaNumericSuffix();
 					uniqueDocNumber = `${document.doc_number}-${randomSuffix}`;
-				
+
 					// Check if this doc_number already exists in the database
 					let { rows } = await pool.query(
 						`SELECT COUNT(*) AS count FROM documents WHERE doc_number = $1`,
 						[uniqueDocNumber]
 					);
-				
+
 					// If no matching record is found, it is unique
 					if (parseInt(rows[0]?.count) === 0) {
 						isUnique = true;
@@ -173,7 +166,20 @@ const processDocument = async (jobID) => {
 						doc_number, doc_type, doc_reference, doc_created_at, doc_subject, doc_source, doc_uploaded_at, doc_status, doc_site, doc_folder, doc_uploaded_by_id, doc_uploaded_by, doc_pdf_link, doc_ocr_status
 					) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
 				[
-					document.doc_number, document.doc_type, document.doc_reference, document.doc_created_at, document.doc_subject, document.doc_source, document.doc_uploaded_at, document.doc_status, document.doc_site, document.doc_folder, document.doc_uploaded_by_id, document.doc_uploaded_by, document.doc_pdf_link, document.doc_ocr_status
+					document.doc_number,
+					document.doc_type,
+					document.doc_reference,
+					document.doc_created_at,
+					document.doc_subject,
+					document.doc_source,
+					document.doc_uploaded_at,
+					document.doc_status,
+					document.doc_site,
+					document.doc_folder,
+					document.doc_uploaded_by_id,
+					document.doc_uploaded_by,
+					document.doc_pdf_link,
+					document.doc_ocr_status,
 				]
 			);
 
@@ -200,17 +206,35 @@ const processDocument = async (jobID) => {
 			);
 
 			// ADDING HISTORY
-			await pool.query(`INSERT INTO doc_history_junction (dhj_doc_number, dhj_history_type, dhj_timestamp,dhj_history_blame,dhj_history_blame_user) VALUES ($1,$2,$3,$4,$5)`, [extractedOpenAIData.letter_number, "UPLOADED", moment().format("MM/DD/YYYY HH:mm:ss"), uploadedById, userDataFromDb[0].user_name]);
+			await pool.query(
+				`INSERT INTO doc_history_junction (dhj_doc_number, dhj_history_type, dhj_timestamp,dhj_history_blame,dhj_history_blame_user) VALUES ($1,$2,$3,$4,$5)`,
+				[
+					extractedOpenAIData.letter_number,
+					"UPLOADED",
+					moment().format("MM/DD/YYYY HH:mm:ss"),
+					uploadedById,
+					userDataFromDb[0].user_name,
+				]
+			);
 
-			console.table({"Document processed":true,"inserted successfully":true})
+			console.table({ "Document processed": true, "inserted successfully": true })
 
 		} catch (error) {
 			console.error(`Error processing pdf -> ${file.Key}: ${error.message}`);
+			const newFileKey = `${moment().unix()}_${file.Key.split('/')[2]}`;
 
 			await pool.query(
-				`INSERT INTO failed_job_stats (flagged, feed, status, stop_at, failed_pdf) 
-					 VALUES ($1, $2, $3, $4, $5)`,
-				[true, error.message, "processing pdf failed", getCurrentDateTime(), file.Key]
+				`INSERT INTO failed_job_stats (flagged, feed, status, end_at, failed_pdf,job_status,user_id) 
+					 VALUES ($1, $2, $3, $4, $5, $6, $7 )`,
+				[
+					true,
+					error.message,
+					"processing pdf failed",
+					getCurrentDateTime(),
+					newFileKey,
+					"failed",
+					(file.Key.replace("unzipped_uploads/", "").match(/^\d+_(\d+)_/) || [])[1]
+				]
 			);
 
 			// Continue with the next file even if this one fails

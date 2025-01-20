@@ -75,7 +75,6 @@ async function renderFirstPageToImage(data) {
 
     } catch (err) {
         console.error('Error rendering PDF page to image:', err);
-        throw err;
     }
 }
 
@@ -111,7 +110,6 @@ async function createPdfFromFirstPage(originalPdfData) {
         return pdfBytes
     } catch (err) {
         console.error('Error creating PDF from first page:', err);
-        throw err;
     }
 }
 

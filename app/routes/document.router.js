@@ -13,5 +13,7 @@ router.post("/create-document", upload.single("doc_file"), documentController.cr
 router.post("/upload-attachment", upload.single("doc_file"), documentController.uploadAttachment);
 router.post("/get-filtered-documents", documentController.getFilteredDocuments);
 router.post("/record-document-viewed", documentController.recordDocumentViewed);
+router.get("/view-failed-uploads", documentController.getFailedUploads);
+router.post("/clear-records", documentController.clearFailedPdfs);
 
 module.exports = router;
