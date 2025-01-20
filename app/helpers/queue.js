@@ -103,7 +103,7 @@ worker.on("failed", async (job, err) => {
 
 });
 
-worker.on("error", async (err) => {
+worker.on("error", async (job,err) => {
     const feedMessage = err?.message || "Unknown error";
 
     await pool.query(
