@@ -48,6 +48,21 @@
             min-width: 170px;
             max-width: 170px;
         }
+
+        tbody#failed_job_table tr:last-child td,
+        tbody#failed_job_table tr:last-child th {
+            border-bottom: 1px solid #dbdfea;
+        }
+
+        .failed-docs-wrapper {
+            max-height: 400px;
+            overflow: auto;
+        }
+
+        .disable {
+            pointer-events: none;
+            opacity: 0.8;
+        }
     </style>
 </head>
 
@@ -159,7 +174,51 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            <div class="card d-none" id="card-3">
+                                                <div class="card-inner">
+                                                    <div class="card-head">
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <h5 class="card-title text-danger">Failed To Upload File</h5>
+                                                            </div>
+                                                            <div onclick="window.location.reload()" class="col-12 mt-4">
+                                                                <button class="btn btn-primary">Refresh</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
+                                    </div>
+                                </div>
+
+                                <!-- failed upload table -->
+                                <div class="container-fluid p-4 mt-5" style="background-color: #fff">
+                                    <div class="row">
+                                        <div class="col">
+                                            <h4>Failed Uploads</h4>
+                                        </div>
+                                        <div id="clear-records" class="col text-end"> <button
+                                                class="btn btn-dim btn-outline-primary"><em
+                                                    class="icon ni ni-reload-alt"></em>
+                                                <span>Clear Records</span></button></div>
+                                    </div>
+                                    <div class="failed-docs-wrapper">
+                                        <table class="table  mt-3">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">#</th>
+                                                    <th scope="col">Status</th>
+                                                    <th scope="col">Feed</th>
+                                                    <th scope="col">File Name</th>
+                                                    <th scope="col">Date</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="failed_job_table">
+
+
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
                             </div>
@@ -190,10 +249,7 @@
         });
         const s3 = new AWS.S3();
         const bucketName = config.bucketName;
-
         const MAX_FILE_SIZE = 5 * 1024 * 1024 * 1024;
-
-
 
         $("#doc_site").on("change", function () {
             var selectedSiteParentId = $(this).find("option:selected").data("parent-id");
@@ -213,7 +269,7 @@
                 return false;
             }
 
-            const file = document.getElementById("doc_file").files[0];
+            const file = document.getElementById("doc_file").files[0];            
             const fileExtension = file.name.split('.').filter(Boolean).slice(1).join('.')
             let fileName = `${Date.now()}${fileExtension === 'rar' ? '.rar' : '.zip'}`;
             const selectedFolderOption = $("#doc_folder").find("option:selected");
@@ -222,11 +278,10 @@
             const key = `uploads/${siteId}_${token.user_id}_${fileName}`;
             NioApp.handleButtonState("uploadZipButton", "Uploading...", true);
 
-            
-
             if (file.name.endsWith(".pdf")) {
                 let formData = new FormData(this);
                 formData.append("siteId", siteId);
+                formData.append("name",file.name)
                 $.ajax({
                     type: "POST",
                     url: "/ai/process-single-file",
@@ -242,6 +297,8 @@
                             console.error("Error uploading file:");
                             NioApp.handleButtonState("uploadZipButton", "Upload File", false);
                             NioApp.Toast(`<h5>Upload Failed</h5><p>${response.msg}</p>`, "error");
+                            $("#card-3").removeClass("d-none");
+                            $("#card-1").addClass("d-none");
                         }
                     },
                     error: function (xhr, status, error) {
@@ -286,6 +343,78 @@
                 $("#progress-percentage").removeClass("d-none").html(`${percent}%`);
             });
         });
+
+        $("#clear-records").click(() => {
+            const disablebtn = document.getElementById("clear-records")
+            disablebtn.classList.add("disable")
+            $.ajax({
+                type: "POST",
+                url: "/docs/clear-records/",
+                data: "",
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    console.log("🚀 ~ $ ~ response:", response)
+                    if (response.status == 1) {
+                        NioApp.Toast("<h5>Upload Success</h5><p>Records Cleared Successfully</p>", "success");
+                        location.reload();
+                    }
+                },
+
+                error: function (xhr, status, error) {
+
+                },
+            });
+
+        })
+
+        function getFailedPdf() {
+            $.ajax({
+                type: "GET",
+                url: "/docs/view-failed-uploads",
+
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    console.log(response);
+                    let innerHtml = " "
+                    if (response.msg != null) {
+                        response.msg.forEach((list, index) => {
+                            const data = `<tr>
+                            <th scope="row">${index ?? "-"}</th>
+                            <td>${list.job_status || '-'}</td>
+                            <td>${list.feed || "-"}</td>
+                            <td>${list?.failed_pdf?.split("-")[1] || '-'}</td>
+                            <td>${list.end_at.split(" ")[0] || "-"}</td>
+                        </tr>`
+
+                            innerHtml += data;
+                        })
+                        $("#failed_job_table").append(innerHtml);
+                    } else {
+                        const disablebtn = document.getElementById("clear-records")
+                        disablebtn.classList.add("disable")
+                        innerHtml = `
+                        <tr>
+                            <td colspan="5" >
+                            <div class="text-center p-4">
+                            <p>No Recent Activity</p>
+                             </div>
+                              </td>
+                        </tr>`
+                        $("#failed_job_table").append(innerHtml);
+                        
+                    }
+
+                    
+                },
+
+                error: function (xhr, status, error) {
+
+                },
+            });
+        }
+        getFailedPdf()
     </script>
 </body>
 

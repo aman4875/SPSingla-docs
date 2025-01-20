@@ -10,6 +10,7 @@ const openAIHelper = require("../helpers/openai.helper.js");
 const checkFolderType = require("../helpers/checkFolderType.js")
 const generateAlphaNumericSuffix = require('../utils/generateRandomAlphanumeric.js')
 const parseSubject = require('../utils/parseSubject.js')
+const updateFailedStatus = require('../helpers/updateFailedStatus.js')
 
 
 // AWS Config
@@ -48,11 +49,12 @@ aiController.addNewJob = async (req, res) => {
 
         // checking File exists s3 Bucket
         const exists = await checkFolderExists(s3, params.Bucket, (params.key + jobID));
+        console.log("🚀 ~ aiController.addNewJob= ~ exists:", exists)
 
-        if (!exists) {
+        if (!exists.folderExists || !exists.filesExist) {
             await pool.query(
-                `INSERT INTO jobs (job_id,user_id,upload_status,job_type,job_status,started_at) VALUES ($1,$2,$3,$4,$5,$6)`,
-                [jobID, getUserID, false, 'open-ai', 'failed', getCurrentDateTime()]
+                `INSERT INTO jobs (job_id,user_id,upload_status,job_type,job_status,started_at,feed) VALUES ($1,$2,$3,$4,$5,$6,$7)`,
+                [jobID, getUserID, false, 'open-ai', 'failed', getCurrentDateTime(), "File or Folder Don't Exists In S3 Aws"]
             );
 
             return res.json({ status: 400, msg: "Zip not processed uccessfully or invalid" });
@@ -67,8 +69,8 @@ aiController.addNewJob = async (req, res) => {
         let dataFromDb
         if (response.id) {
             dataFromDb = await pool.query(
-                `INSERT INTO jobs (job_id,user_id,upload_status,job_type,job_status) VALUES ($1,$2,$3,$4,$5)`,
-                [jobID, getUserID, true, "open-ai", 'pending']
+                `INSERT INTO jobs (job_id,user_id,upload_status,job_type,job_status,started_at) VALUES ($1,$2,$3,$4,$5,$6)`,
+                [jobID, getUserID, true, "open-ai", 'pending', getCurrentDateTime()]
             );
         }
         res.json({ status: 200, msg: "Job Added Auccessfully" });
@@ -80,7 +82,7 @@ aiController.addNewJob = async (req, res) => {
 };
 
 aiController.processSingleFile = async (req, res) => {
-    let { siteId } = req.body;
+    let { siteId, name } = req.body;
     let token = req.session.token;
 
     let { rows: siteDataFromDb } = await pool.query(`SELECT * FROM sites WHERE site_id = $1`, [siteId]);
@@ -108,12 +110,14 @@ aiController.processSingleFile = async (req, res) => {
 
         let textractData = await textractHelper(process.env.BUCKET_NAME, s3Response.Key, true);
         if (!textractData.textractResult || textractData.textractResult === 'undefined') {
-            return res.send({ status: 0, msg: "Invalid Pdf" }); 
+            await updateFailedStatus(name, s3, "Unsupported file type", s3Response.Key, token.user_id)
+            return res.send({ status: 0, msg: "Unsupported file type" });
         }
         let extractData = await openAIHelper(textractData.textractResult);
-        let extractedOpenAIData = JSON.parse(extractData.choices[0].message.content);
+        let extractedOpenAIData = JSON.parse(extractData?.choices && extractData?.choices[0]?.message?.content);
 
         if (!extractedOpenAIData) {
+            await updateFailedStatus(name, s3, "No AI Response", s3Response.Key, token.user_id)
             return res.send({ status: 0, msg: "No AI Response" });
         }
 
@@ -219,6 +223,7 @@ aiController.processSingleFile = async (req, res) => {
         return res.send({ status: 1, msg: "File Processed Successfully" });
     } catch (error) {
         console.log(error);
+        await updateFailedStatus(name, s3, "Failed to process pdf", s3Response.Key)
         return res.send({ status: 0, msg: "error" });
     }
 }

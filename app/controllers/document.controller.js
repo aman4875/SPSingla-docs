@@ -145,7 +145,7 @@ documentController.editDocument = async (req, res) => {
 	try {
 		let inputs = req.body;
 		console.log(inputs);
-		
+
 
 
 		let token = req.session.token;
@@ -259,7 +259,7 @@ documentController.editDocument = async (req, res) => {
 				await pool.query(insertReferencesQuery, referenceValues);
 			}
 		}
-		
+
 		await pool.query(
 			`
 			INSERT INTO folder_stats (doc_folder_name, doc_folder_id, last_updated) 
@@ -489,9 +489,10 @@ documentController.getFilteredDocuments = async (req, res) => {
 						END
 					    WHEN NOT d.doc_created_at ~ '^\\d{2}/\\d{2}/\\d{4}$' THEN NULL 
 						ELSE TO_DATE(d.doc_created_at, 'DD/MM/YYYY')
-						END ${dir} NULLS LAST`}
-					
-					return `d.${field} ${dir}`;
+						END ${dir} NULLS LAST`
+				}
+
+				return `d.${field} ${dir}`;
 			});
 			orderByClause = `ORDER BY ${sortFields.join(", ")}`;
 		} else {
@@ -605,5 +606,32 @@ documentController.recordDocumentViewed = async (req, res) => {
 		res.json({ status: 0, msg: "Internal Server Error" });
 	}
 };
+
+documentController.getFailedUploads = async (req, res) => {
+	try {
+		const inputs = req.body;
+		const { user_id } = req.session.token;
+		let { rows: files } = await pool.query(`SELECT *  FROM failed_job_stats  WHERE user_id = $1`, [user_id]);
+
+		if (!files.length) {
+			return res.json({ status: 1, msg: null });
+		}
+
+		return res.json({ status: 1, msg: files });
+	} catch (error) {
+		return res.json({ status: 0, msg: "Internal Server Error" });
+	}
+}
+
+documentController.clearFailedPdfs = async (req, res) => {
+	try {
+		const inputs = req.body;
+		const { user_id } = req.session.token;
+		let { rows: files } = await pool.query(`DELETE FROM failed_job_stats WHERE user_id = $1`, [user_id]);
+		return res.json({ status: 1, msg: "success" });
+	} catch (error) {
+		return res.json({ status: 0, msg: "Internal Server Error" });
+	}
+}
 
 module.exports = documentController;

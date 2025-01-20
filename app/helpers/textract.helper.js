@@ -29,57 +29,30 @@ const processTextract = async (bucketName, fileKey, firstPageOnly) => {
 		let tempPdfKey;
 
 		// Helper function to create PDF from the first page of a PDF or an image
-		const createFirstPagePdf = async (originalFileBuffer, fileType, bucketName, fileKey) => {
-			console.table({"processing pdf key": fileKey});
+		if (["pdf", "jpeg", "jpg"].includes(fileExtension)) {
+			const originalFile = await s3.getObject({ Bucket: bucketName, Key: fileKey }).promise();
+			const firstPagePdfBytes = await createFirstPagePdf(originalFile.Body, fileExtension, bucketName, fileKey);
+			tempPdfKey = `temp_pdf/${uuidv4()}.pdf`;
+			await s3
+				.putObject({
+					Bucket: bucketName,
+					Key: tempPdfKey,
+					Body: firstPagePdfBytes,
+					ContentType: "application/pdf",
+				})
+				.promise();
 
-			if (fileType === "pdf") {
-				const command = new GetObjectCommand({ Bucket: bucketName, Key: fileKey });
-				const { Body } = await s3Client.send(command);
-				const newPdf = await createPdfFromFirstPage(Body);
-				return newPdf
-			} else {
-				const pdfDoc = await PDFDocument.create();
-				const image = fileType === "jpeg" || fileType === "jpg" ? await pdfDoc.embedJpg(originalFileBuffer) : await pdfDoc.embedPng(originalFileBuffer);
-				const page = pdfDoc.addPage();
-				page.drawImage(image, {
-					x: 0,
-					y: 0,
-					width: page.getWidth(),
-					height: page.getHeight(),
-				});
-			}
-			return pdfDoc.save();
-		};
+			const textractResult = await extractTextFromPdf(bucketName, tempPdfKey);
 
-		if (firstPageOnly) {
-			if (["pdf", "jpeg", "jpg"].includes(fileExtension)) {
+			// Delete the temporary PDF
+			await s3.deleteObject({ Bucket: bucketName, Key: tempPdfKey }).promise();
 
-				const originalFile = await s3.getObject({ Bucket: bucketName, Key: fileKey }).promise();
-				const firstPagePdfBytes = await createFirstPagePdf(originalFile.Body, fileExtension, bucketName, fileKey);
-				tempPdfKey = `temp_pdf/${uuidv4()}.pdf`;
-				await s3
-					.putObject({
-						Bucket: bucketName,
-						Key: tempPdfKey,
-						Body: firstPagePdfBytes,
-						ContentType: "application/pdf",
-					})
-					.promise();
+			return { textractResult, totalPagesProcessed: 1 };
 
-				const textractResult = await extractTextFromPdf(bucketName, tempPdfKey);
-
-				// Delete the temporary PDF
-				await s3.deleteObject({ Bucket: bucketName, Key: tempPdfKey }).promise();
-
-				return { textractResult, totalPagesProcessed: 1 };
-			} else {
-				await s3.deleteObject({ Bucket: bucketName, Key: tempPdfKey }).promise();
-				throw new Error("Unsupported file type for firstPageOnly processing.");
-			}
 		} else {
-			// Asynchronous Text Detection for all pages
-			return await startTextractJob(bucketName, fileKey);
+			throw new Error("Unsupported file type for firstPageOnly processing.");
 		}
+
 	} catch (error) {
 		await s3.deleteObject({ Bucket: bucketName, Key: tempPdfKey }).promise();
 		console.error("Error processing Textract job:", error);
@@ -105,6 +78,7 @@ const extractTextFromPdf = async (bucketName, fileKey) => {
 			.map((block) => block.Text)
 			.join(" ");
 	} catch (error) {
+		await s3.deleteObject({ Bucket: bucketName, Key: fileKey }).promise();
 		console.log("🚀 ~ extractTextFromPdf ~ error:", 'Textract -> invalid pdf')
 	}
 
@@ -164,4 +138,25 @@ const pollTextractJob = async (jobId, nextToken = null, textractResult = "", tot
 	}
 };
 
+const createFirstPagePdf = async (originalFileBuffer, fileType, bucketName, fileKey) => {
+	console.table({ "processing pdf key": fileKey });
+
+	if (fileType === "pdf") {
+		const command = new GetObjectCommand({ Bucket: bucketName, Key: fileKey });
+		const { Body } = await s3Client.send(command);
+		const newPdf = await createPdfFromFirstPage(Body);
+		return newPdf
+	} else {
+		const pdfDoc = await PDFDocument.create();
+		const image = fileType === "jpeg" || fileType === "jpg" ? await pdfDoc.embedJpg(originalFileBuffer) : await pdfDoc.embedPng(originalFileBuffer);
+		const page = pdfDoc.addPage();
+		page.drawImage(image, {
+			x: 0,
+			y: 0,
+			width: page.getWidth(),
+			height: page.getHeight(),
+		});
+	}
+	return pdfDoc.save();
+};
 module.exports = processTextract;
