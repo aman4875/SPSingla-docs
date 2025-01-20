@@ -110,7 +110,7 @@ worker.on("error", async (job,err) => {
         `UPDATE jobs 
          SET job_status = $1, end_at = $2, feed = $3 
          WHERE job_id = $4`,
-        ["failed", getCurrentDateTime(), feedMessage, job.data.jobID]
+        ["failed", getCurrentDateTime(), feedMessage, job?.data?.jobID]
     );
 });
 
