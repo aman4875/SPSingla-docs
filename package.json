@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon --max-old-space-size=2000 server.js"
+    "dev": "nodemon --max-old-space-size=2500 server.js"
   },
   "keywords": [],
   "author": "",
