@@ -241,6 +241,37 @@ documentController.editDocument = async (req, res) => {
 			    SET cron_feed = '${newDocNumber}'
 				WHERE cron_feed = '${doc_data.doc_number}'`);
 			;
+
+			// updateing refs in doc_replied_vide
+			const UpdateRepliedVide = `
+				UPDATE documents
+				SET doc_replied_vide = regexp_replace(
+				doc_replied_vide,
+				'(^|,)(${doc_data.doc_number})(,|$)',
+				'\\1${newDocNumber}\\3',
+				'g'
+				)
+				WHERE doc_replied_vide ~ '(^|,)(${doc_data.doc_number})(,|$)';
+				`;
+
+			await pool.query(UpdateRepliedVide);
+
+			// updateing refs in doc_reference
+			const updateRefs = `
+				UPDATE documents
+				SET doc_reference = regexp_replace(
+				doc_reference,
+				'(^|,)(${doc_data.doc_number})(,|$)',
+				'\\1${newDocNumber}\\3',
+				'g'
+				)
+				WHERE doc_reference ~ '(^|,)(${doc_data.doc_number})(,|$)';
+				`;
+
+			await pool.query(updateRefs);
+
+
+
 		}
 
 
@@ -412,9 +443,10 @@ documentController.getFilteredDocuments = async (req, res) => {
 		const pageSize = inputs.limit || 10;
 		const offset = (page - 1) * pageSize;
 		let baseQuery = `
-            SELECT d.*,string_agg(j.doc_junc_number, ', ') AS doc_replied_vide
+            SELECT d.*,string_agg(j.doc_junc_number, ', ') AS doc_vide
             FROM documents d
-            LEFT JOIN doc_reference_junction j ON j.doc_junc_replied = d.doc_number`;
+            LEFT JOIN doc_reference_junction j ON j.doc_junc_replied = d.doc_number
+        `;
 		let conditions = [];
 		let joins = "";
 		let folderQuery = ''
@@ -630,6 +662,41 @@ documentController.clearFailedPdfs = async (req, res) => {
 		let { rows: files } = await pool.query(`DELETE FROM failed_job_stats WHERE user_id = $1`, [user_id]);
 		return res.json({ status: 1, msg: "success" });
 	} catch (error) {
+		return res.json({ status: 0, msg: "Internal Server Error" });
+	}
+}
+documentController.getRepliedVide = async (req, res) => {
+	try {
+		const { folderId } = req.body;
+		const { user_id } = req.session.token;
+
+		if (!folderId) {
+			return res.json({ status: 0, msg: "Invalid Folder ID" });
+		}
+		const { rows: isfolderIdExist } = await pool.query(`SELECT * FROM sites WHERE site_id = $1`, [folderId]);
+		if (isfolderIdExist.length === 0) {
+			return res.json({ status: 0, msg: "Invalid Folder ID" });
+		}
+
+		const { rows: data } = await pool.query(
+			`
+			UPDATE documents t1
+			SET doc_replied_vide = (
+				SELECT STRING_AGG(t2.doc_number, ',')
+				FROM documents t2
+				WHERE TRIM(t2.doc_site) = TRIM($1) -- Match strict doc_site after trimming spaces
+				  AND TRIM(t1.doc_number) = ANY (
+					  SELECT TRIM(UNNEST(string_to_array(t2.doc_reference, ','))) -- Strict match for doc_number in doc_reference
+				  )
+			)
+			WHERE TRIM(t1.doc_site) = TRIM($1); -- Ensure strict match for t1 doc_site
+			`,
+			[isfolderIdExist[0].site_name.trim()]
+		)
+
+		return res.json({ status: 1, msg: "success" });
+	} catch (error) {
+		console.log("🚀 ~ documentController.getRepliedVide= ~ error:", error)
 		return res.json({ status: 0, msg: "Internal Server Error" });
 	}
 }

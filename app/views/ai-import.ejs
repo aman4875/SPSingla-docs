@@ -403,11 +403,9 @@
             $.ajax({
                 type: "GET",
                 url: "/docs/view-failed-uploads",
-
                 processData: false,
                 contentType: false,
                 success: function (response) {
-                    console.log(response);
                     let innerHtml = " "
                     if (response.msg != null) {
                         response.msg.forEach((list, index) => {
