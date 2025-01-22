@@ -1,3 +1,4 @@
+"use strict";
 const { pool } = require("../helpers/database.helper.js");
 const { v4: uuidv4 } = require("uuid");
 const moment = require("moment");
@@ -128,9 +129,9 @@ aiController.processSingleFile = async (req, res) => {
 
         let document = {};
 
-        document.doc_number = extractedOpenAIData.letter_number && extractedOpenAIData?.letter_number?.trim();
+        document.doc_number = extractedOpenAIData.letter_number && extractedOpenAIData?.letter_number?.replace(/\s+/g, "");
         document.doc_type = checkFolderType(siteDataFromDb[0].site_name, extractedOpenAIData.letter_number);
-        document.doc_reference = extractedOpenAIData.references && extractedOpenAIData?.references.replace(/\s+/g, "")?.trim();
+        document.doc_reference = extractedOpenAIData.references && extractedOpenAIData?.references?.replace(/\s+/g, "");
         document.doc_created_at = extractedOpenAIData.date;
         document.doc_subject = parseSubject(extractedOpenAIData.subject);
         document.doc_source = "AI IMPORT";
@@ -223,7 +224,7 @@ aiController.processSingleFile = async (req, res) => {
         return res.send({ status: 1, msg: "File Processed Successfully" });
     } catch (error) {
         console.log(error);
-        await updateFailedStatus(name, s3, "Failed to process pdf", s3Response.Key)
+        await updateFailedStatus(name, s3, "Failed to process pdf", "", token.user_id)
         return res.send({ status: 0, msg: "error" });
     }
 }
