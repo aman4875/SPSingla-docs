@@ -144,7 +144,17 @@ documentController.saveDraft = async (req, res) => {
 documentController.editDocument = async (req, res) => {
 	try {
 		let inputs = req.body;
-		console.log(inputs);
+
+		// Check if the new doc_number already exists
+		const { rows: doc } = await pool.query(
+			`SELECT * FROM documents WHERE doc_number = $1`,
+			[inputs.new_doc_number]
+		);
+
+
+		if (doc.length > 0) {
+			return res.send({ status: 0, msg: "Letter Number Already Exists" });
+		}
 
 
 

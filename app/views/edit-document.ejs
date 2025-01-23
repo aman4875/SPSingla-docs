@@ -528,7 +528,7 @@
 
             } else {
               NioApp.handleButtonState("uploadDocumentBtn", "Update", false);
-              NioApp.Toast("<h5>Something Went Wrong</h5><p>Error while updating document.</p>", "error");
+              NioApp.Toast(`<h5>Something Went Wrong</h5>${response.msg ||`<p>Error while updating document.</p>`}`, "error");
             }
           },
           error: function (xhr, status, error) {
