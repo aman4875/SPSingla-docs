@@ -123,6 +123,11 @@
       pointer-events: none;
       opacity: 0.5;
     }
+
+    .no-link {
+      color: #8094ae;
+      border-color: #8094ae
+    }
   </style>
 </head>
 
@@ -508,6 +513,22 @@
       sort: {},
       activeFilter: {},
     };
+    const renderReferencesLinks = (links) => {
+      console.log(links);
+      
+      let htmlRows = '';
+      links?.forEach(link => {
+        let row = `
+        <span class="${link.pdfLink ? 'badge bg-outline-primary' : 'badge bg-outline-primary no-link'}" style="margin-right: 4px">
+          ${link.exists ? `<a target="_blank" href="${link.pdfLink}">${link.ref}</a>` : `${link.ref || "-"}`}
+        </span>
+       `;
+        htmlRows += row;
+      });
+
+      return htmlRows;
+    }
+
 
     const folders = `<%- JSON.stringify(folders) %>`;
     let isFetching = false;
@@ -600,16 +621,10 @@
                         <span title="${document.doc_subject || "-"}">${document.doc_subject || "-"}</span>
                     </div>
                     <div class="nk-tb-col">
-                        ${document.doc_reference ? document.doc_reference.split(',').map((ref) => {
-                  const trimmedRef = ref.trim();
-                  return `<span style='margin-right: 4px' class="badge bg-outline-primary"><a target="_blank" href="/documents/${btoa(trimmedRef)}">${trimmedRef}</a></span>`;
-                }).join('') : "-"}
+                      ${renderReferencesLinks(document.references)}
                     </div>
                     <div class="nk-tb-col">
-                        ${document.doc_replied_vide ? document.doc_replied_vide.split(',').map((reply) => {
-                  const trimmedReply = reply.trim();
-                  return `<span style='margin-right: 4px' class="badge bg-outline-primary">${trimmedReply}</span>`;
-                }).join('') : "-"}
+                       ${renderReferencesLinks(document.repliedvide)}
                     </div>
                     <div class="nk-tb-col">
                         <span title="${document.doc_purpose || "-"}">${document.doc_purpose || "-"}</span>
@@ -843,7 +858,7 @@
       $(".table-content").remove();
       $("#table-status").html(`<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>`);
       $.ajax({
-        
+
         type: "POST",
         url: "/docs/get-replied-vide/",
         data: { folderId: siteId },

@@ -443,10 +443,57 @@ documentController.getFilteredDocuments = async (req, res) => {
 		const pageSize = inputs.limit || 10;
 		const offset = (page - 1) * pageSize;
 		let baseQuery = `
-            SELECT d.*,string_agg(j.doc_junc_number, ', ') AS doc_vide
-            FROM documents d
-            LEFT JOIN doc_reference_junction j ON j.doc_junc_replied = d.doc_number
-        `;
+					SELECT 
+						d.*,
+						(
+							SELECT JSON_AGG(
+									JSON_BUILD_OBJECT(
+										'ref', ref,
+										'exists', EXISTS (
+											SELECT 1 
+											FROM documents AS sub_docs
+											WHERE sub_docs.doc_number = ref
+										),
+										'pdfLink', (
+											SELECT sub_docs.doc_pdf_link
+											FROM documents AS sub_docs
+											WHERE sub_docs.doc_number = ref
+											LIMIT 1
+										)
+									)
+								)
+							FROM UNNEST(
+								ARRAY(
+									SELECT REGEXP_REPLACE(TRIM(ref), '\s*/\s*', '/', 'g') 
+									FROM UNNEST(STRING_TO_ARRAY(d.doc_reference, ',')) AS ref
+								)
+							) AS ref
+						) AS references,
+						(
+							SELECT JSON_AGG(
+									JSON_BUILD_OBJECT(
+										'ref', ref,
+										'exists', EXISTS (
+											SELECT 1 
+											FROM documents AS sub_docs
+											WHERE sub_docs.doc_number = ref
+										),
+										'pdfLink', (
+											SELECT sub_docs.doc_pdf_link
+											FROM documents AS sub_docs
+											WHERE sub_docs.doc_number = ref
+											LIMIT 1
+										)
+									)
+								)
+							FROM UNNEST(
+								ARRAY(
+									SELECT REGEXP_REPLACE(TRIM(ref), '\s*/\s*', '/', 'g') 
+									FROM UNNEST(STRING_TO_ARRAY(d.doc_replied_vide, ',')) AS ref
+								)
+							) AS ref
+						) AS repliedvide
+					FROM documents d`;
 		let conditions = [];
 		let joins = "";
 		let folderQuery = ''
