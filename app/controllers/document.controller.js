@@ -144,7 +144,17 @@ documentController.saveDraft = async (req, res) => {
 documentController.editDocument = async (req, res) => {
 	try {
 		let inputs = req.body;
-		console.log(inputs);
+
+		// Check if the new doc_number already exists
+		const { rows: doc } = await pool.query(
+			`SELECT * FROM documents WHERE doc_number = $1`,
+			[inputs.new_doc_number]
+		);
+
+
+		if (doc.length > 0) {
+			return res.send({ status: 0, msg: "Letter Number Already Exists" });
+		}
 
 
 
@@ -241,6 +251,37 @@ documentController.editDocument = async (req, res) => {
 			    SET cron_feed = '${newDocNumber}'
 				WHERE cron_feed = '${doc_data.doc_number}'`);
 			;
+
+			// updateing refs in doc_replied_vide
+			const UpdateRepliedVide = `
+				UPDATE documents
+				SET doc_replied_vide = regexp_replace(
+				doc_replied_vide,
+				'(^|,)(${doc_data.doc_number})(,|$)',
+				'\\1${newDocNumber}\\3',
+				'g'
+				)
+				WHERE doc_replied_vide ~ '(^|,)(${doc_data.doc_number})(,|$)';
+				`;
+
+			await pool.query(UpdateRepliedVide);
+
+			// updateing refs in doc_reference
+			const updateRefs = `
+				UPDATE documents
+				SET doc_reference = regexp_replace(
+				doc_reference,
+				'(^|,)(${doc_data.doc_number})(,|$)',
+				'\\1${newDocNumber}\\3',
+				'g'
+				)
+				WHERE doc_reference ~ '(^|,)(${doc_data.doc_number})(,|$)';
+				`;
+
+			await pool.query(updateRefs);
+
+
+
 		}
 
 
@@ -396,8 +437,8 @@ documentController.createDocument = async (req, res) => {
 
 		// ADDING HISTORY
 		await pool.query(`INSERT INTO doc_history_junction (dhj_doc_number, dhj_history_type, dhj_timestamp,dhj_history_blame,dhj_history_blame_user) VALUES ($1,$2,$3,$4,$5)`, [inputs.doc_number, "UPDATED", moment().format("MM/DD/YYYY HH:mm:ss"), token.user_id, token.user_name]);
-
-		res.send({ status: 1, msg: "Success", payload: inputs.doc_number });
+		let { rows: newDoc } = await pool.query(`SELECT *  FROM documents  WHERE doc_number = $1`, [inputs.doc_number]);
+		res.send({ status: 1, msg: "Success", payload: newDoc[0].doc_id ?? null });
 	} catch (error) {
 		res.send({ status: 0, msg: "Something Went Wrong" });
 		console.error(error);
@@ -412,9 +453,57 @@ documentController.getFilteredDocuments = async (req, res) => {
 		const pageSize = inputs.limit || 10;
 		const offset = (page - 1) * pageSize;
 		let baseQuery = `
-            SELECT d.*,string_agg(j.doc_junc_number, ', ') AS doc_replied_vide
-            FROM documents d
-            LEFT JOIN doc_reference_junction j ON j.doc_junc_replied = d.doc_number`;
+					SELECT 
+						d.*,
+						(
+							SELECT JSON_AGG(
+									JSON_BUILD_OBJECT(
+										'ref', ref,
+										'exists', EXISTS (
+											SELECT 1 
+											FROM documents AS sub_docs
+											WHERE sub_docs.doc_number = ref
+										),
+										'pdfLink', (
+											SELECT sub_docs.doc_pdf_link
+											FROM documents AS sub_docs
+											WHERE sub_docs.doc_number = ref
+											LIMIT 1
+										)
+									)
+								)
+							FROM UNNEST(
+								ARRAY(
+									SELECT REGEXP_REPLACE(TRIM(ref), '\s*/\s*', '/', 'g') 
+									FROM UNNEST(STRING_TO_ARRAY(d.doc_reference, ',')) AS ref
+								)
+							) AS ref
+						) AS references,
+						(
+							SELECT JSON_AGG(
+									JSON_BUILD_OBJECT(
+										'ref', ref,
+										'exists', EXISTS (
+											SELECT 1 
+											FROM documents AS sub_docs
+											WHERE sub_docs.doc_number = ref
+										),
+										'pdfLink', (
+											SELECT sub_docs.doc_pdf_link
+											FROM documents AS sub_docs
+											WHERE sub_docs.doc_number = ref
+											LIMIT 1
+										)
+									)
+								)
+							FROM UNNEST(
+								ARRAY(
+									SELECT REGEXP_REPLACE(TRIM(ref), '\s*/\s*', '/', 'g') 
+									FROM UNNEST(STRING_TO_ARRAY(d.doc_replied_vide, ',')) AS ref
+								)
+							) AS ref
+						) AS repliedvide
+					FROM documents d`;
 		let conditions = [];
 		let joins = "";
 		let folderQuery = ''
@@ -630,6 +719,41 @@ documentController.clearFailedPdfs = async (req, res) => {
 		let { rows: files } = await pool.query(`DELETE FROM failed_job_stats WHERE user_id = $1`, [user_id]);
 		return res.json({ status: 1, msg: "success" });
 	} catch (error) {
+		return res.json({ status: 0, msg: "Internal Server Error" });
+	}
+}
+documentController.getRepliedVide = async (req, res) => {
+	try {
+		const { folderId } = req.body;
+		const { user_id } = req.session.token;
+
+		if (!folderId) {
+			return res.json({ status: 0, msg: "Invalid Folder ID" });
+		}
+		const { rows: isfolderIdExist } = await pool.query(`SELECT * FROM sites WHERE site_id = $1`, [folderId]);
+		if (isfolderIdExist.length === 0) {
+			return res.json({ status: 0, msg: "Invalid Folder ID" });
+		}
+
+		const { rows: data } = await pool.query(
+			`
+			UPDATE documents t1
+			SET doc_replied_vide = (
+				SELECT STRING_AGG(t2.doc_number, ',')
+				FROM documents t2
+				WHERE TRIM(t2.doc_site) = TRIM($1) -- Match strict doc_site after trimming spaces
+				  AND TRIM(t1.doc_number) = ANY (
+					  SELECT TRIM(UNNEST(string_to_array(t2.doc_reference, ','))) -- Strict match for doc_number in doc_reference
+				  )
+			)
+			WHERE TRIM(t1.doc_site) = TRIM($1); -- Ensure strict match for t1 doc_site
+			`,
+			[isfolderIdExist[0].site_name.trim()]
+		)
+
+		return res.json({ status: 1, msg: "success" });
+	} catch (error) {
+		console.log("🚀 ~ documentController.getRepliedVide= ~ error:", error)
 		return res.json({ status: 0, msg: "Internal Server Error" });
 	}
 }

@@ -16,7 +16,7 @@ const { BullMQAdapter } = require('@bull-board/api/bullMQAdapter');
 const devEnvivronment = process.env.NODE_ENV;
 
 require("./app/crons/textract.cron.js");
-//require("./app/crons/openai.cron.js");
+// require("./app/crons/openai.cron.js");
 
 // Creating Express Application
 const app = express();
@@ -100,5 +100,5 @@ app.use("/", router);
 
 // Starting server on port
 app.listen(port, function () {
-	console.log("Server listening on port....", port);
+	console.log(`http://localhost:${port}/`);
 });
