@@ -487,7 +487,7 @@
             if (response.status == 1) {
               NioApp.handleButtonState("uploadDocumentBtn", "Upload", false);
               NioApp.Toast("<h5>Document Uploaded</h5><p>Document Uploaded Successfully</p>", "success");
-              window.location.href = `/documents/${btoa(response.payload)}`;
+              window.location.href = response.payload != null ? `/documents/${btoa(response.payload)}` : "/documents";
             } else {
               NioApp.Toast("<h5>Something Went Wrong</h5><p>Error while uploading Document</p>", "error");
             }
