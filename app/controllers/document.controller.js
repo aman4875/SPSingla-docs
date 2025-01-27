@@ -648,7 +648,6 @@ documentController.getFilteredDocuments = async (req, res) => {
       `;
 		// Execute the main query
 		let { rows: documents } = await pool.query(query);
-		console.log("🚀 ~ documentController.getFilteredDocuments= ~ query:", query)
 		res.json({
 			status: 1,
 			msg: "Success",
