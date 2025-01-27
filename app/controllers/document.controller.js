@@ -437,8 +437,8 @@ documentController.createDocument = async (req, res) => {
 
 		// ADDING HISTORY
 		await pool.query(`INSERT INTO doc_history_junction (dhj_doc_number, dhj_history_type, dhj_timestamp,dhj_history_blame,dhj_history_blame_user) VALUES ($1,$2,$3,$4,$5)`, [inputs.doc_number, "UPDATED", moment().format("MM/DD/YYYY HH:mm:ss"), token.user_id, token.user_name]);
-
-		res.send({ status: 1, msg: "Success", payload: inputs.doc_number });
+		let { rows: newDoc } = await pool.query(`SELECT *  FROM documents  WHERE doc_number = $1`, [inputs.doc_number]);
+		res.send({ status: 1, msg: "Success", payload: newDoc[0].doc_id ?? null });
 	} catch (error) {
 		res.send({ status: 0, msg: "Something Went Wrong" });
 		console.error(error);

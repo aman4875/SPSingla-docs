@@ -337,7 +337,7 @@
       let documentData = `<%- JSON.stringify(documentData) %>`;
       let selectedPrefix = "";
       let oldDocNumberInput = $("#doc_number").val();
-      const doc_ID = JSON.parse(documentData)
+      const doc_ID = "<%=documentData.doc_id%>"
 
       let NewURl = null  
       folders = folders ? JSON.parse(folders) : [];
@@ -514,7 +514,7 @@
            
             NewURl = newDocNumberInput
           }
-          formData["doc_ID"] = doc_ID.doc_id
+          formData["doc_ID"] = doc_ID
         $.ajax({
           type: "POST",
           url: "/docs/edit-document",

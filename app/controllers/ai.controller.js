@@ -146,9 +146,11 @@ aiController.processSingleFile = async (req, res) => {
 
         // Check if the document exists in the database
         let { rows: matchedDoc } = await pool.query(
-            `SELECT COUNT(*) AS count FROM documents WHERE doc_number = $1`,
-            [extractedOpenAIData?.letter_number?.trim()]
-        )
+            `SELECT COUNT(*) AS count 
+             FROM documents 
+             WHERE REPLACE(doc_number, ' ', '') = $1`,
+            [extractedOpenAIData?.letter_number?.replace(/\s+/g, "")]
+        );
 
         if (matchedDoc[0]?.count > 0) {
             console.log('found mached doc_number');
