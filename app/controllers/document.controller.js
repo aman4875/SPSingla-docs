@@ -502,8 +502,28 @@ documentController.getFilteredDocuments = async (req, res) => {
 									FROM UNNEST(STRING_TO_ARRAY(d.doc_replied_vide, ',')) AS ref
 								)
 							) AS ref
-						) AS repliedvide
-					FROM documents d`;
+						) AS repliedvide,
+						 (
+							CASE
+								WHEN EXISTS (
+									SELECT 1
+									FROM documents AS sub_docs
+									WHERE 
+										sub_docs.doc_number IN (
+											SELECT REGEXP_REPLACE(TRIM(ref), '\s+', '', 'g')
+											FROM UNNEST(STRING_TO_ARRAY(d.doc_replied_vide, ',')) AS ref
+										)
+										AND (
+											(sub_docs.doc_type = 'OUTGOING' AND d.doc_type = 'INCOMING') OR
+											(sub_docs.doc_type = 'INCOMING' AND d.doc_type = 'OUTGOING')
+										)
+										AND TO_DATE(d.doc_created_at, 'DD/MM/YYYY') <= TO_DATE(sub_docs.doc_created_at, 'DD/MM/YYYY')
+								)
+								THEN TRUE
+								ELSE FALSE
+							END
+						) AS highlightrow
+						 FROM documents d`;
 		let conditions = [];
 		let joins = "";
 		let folderQuery = ''
