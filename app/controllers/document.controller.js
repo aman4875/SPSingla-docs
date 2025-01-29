@@ -778,4 +778,27 @@ documentController.getRepliedVide = async (req, res) => {
 	}
 }
 
+documentController.deleteDoc = async (req, res) => {
+	const { docId } = req.body;
+	console.log("🚀 ~ documentController.deleteDoc ~ docId:", docId)
+	const { user_id } = req.session.token;
+
+	try {
+		if (!user_id) {
+			return res.json({ status: 0, msg: "User not logged In" });
+		}
+		const result = await pool.query(
+			`DELETE FROM documents WHERE doc_id = ${docId}`,
+		);
+		console.log("🚀 ~ documentController.deleteDoc ~ result:", result);
+		if (result.rows.length === 0) {
+			return res.json({ status: 0, msg: "Document not found" });
+		}
+		return res.json({ status: 1, msg: "Document Deleted" });
+	} catch (error) {
+		console.log("🚀 ~ documentController.deleteDoc ~ error:", error)
+		return res.json({ status: 0, msg: "Internal Server Error" });
+	}
+}
+
 module.exports = documentController;
