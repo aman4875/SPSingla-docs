@@ -128,6 +128,10 @@
       color: #8094ae;
       border-color: #8094ae
     }
+
+    .highlightrow {
+      background-color: beige;
+    }
   </style>
 </head>
 
@@ -513,7 +517,7 @@
       sort: {},
       activeFilter: {},
     };
-    const renderReferencesLinks = (links) => {      
+    const renderReferencesLinks = (links) => {
       let htmlRows = '';
       links?.forEach(link => {
         let row = `
@@ -586,7 +590,7 @@
               let rowsHtml = "";
               response.payload.documents.forEach(function (document) {
 
-                let rowHtml = `<div class="nk-tb-item text-left table-content">
+                let rowHtml = `<div class=" ${document.highlightrow ? 'highlightrow nk-tb-item text-left table-content' : 'nk-tb-item text-left table-content'}" >
                     <%if(token.user_role != 3){%>
                     <div class="nk-tb-col text-start editDocument">
                         <span><a href="/edit-document/${btoa(document.doc_id)}"><em class="icon ni ni-edit-fill"></em></a></span>
