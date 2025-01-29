@@ -780,7 +780,6 @@ documentController.getRepliedVide = async (req, res) => {
 
 documentController.deleteDoc = async (req, res) => {
 	const { docId } = req.body;
-	console.log("🚀 ~ documentController.deleteDoc ~ docId:", docId)
 	const { user_id } = req.session.token;
 
 	try {
@@ -790,7 +789,6 @@ documentController.deleteDoc = async (req, res) => {
 		const result = await pool.query(
 			`DELETE FROM documents WHERE doc_id = ${docId}`,
 		);
-		console.log("🚀 ~ documentController.deleteDoc ~ result:", result);
 		if (result.rows.length === 0) {
 			return res.json({ status: 0, msg: "Document not found" });
 		}
