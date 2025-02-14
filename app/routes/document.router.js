@@ -16,5 +16,7 @@ router.post("/record-document-viewed", documentController.recordDocumentViewed);
 router.get("/view-failed-uploads", documentController.getFailedUploads);
 router.post("/clear-records", documentController.clearFailedPdfs);
 router.post("/get-replied-vide", documentController.getRepliedVide);
+router.post("/delete-doc", documentController.deleteDoc);
+router.post("/delete-attachment", documentController.deleteAttachment);
 
 module.exports = router;
