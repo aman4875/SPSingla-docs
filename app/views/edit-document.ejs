@@ -220,7 +220,7 @@
                                     <th scope="col">#</th>
                                     <th scope="col">Attachment Name</th>
                                     <th scope="col">Upload Date</th>
-                                    <th scope="col">Actions</th>
+                                    <th scope="col" width="160">Actions</th>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -232,6 +232,7 @@
                                       <td><%= attachment.daj_attachment_upload_date %></td>
                                       <td>
                                       <a href="<%= attachment.daj_attachment_link %>" target="_blank" class="btn btn-sm btn-outline-primary">View</a>
+                                      <button data-id=<%= attachment.id %>   id="deleteDoc" class="btn btn-sm btn-outline-danger">Delete</button>
                                       </td>
                                     </tr>
                                     <% }); %>
@@ -287,6 +288,28 @@
                 </div>
               </div>
             </div>
+            <button style="display: none" id="open-modal" type="button" class="btn btn-primary" data-bs-toggle="modal"
+              data-bs-target="#staticBackdrop">
+              Launch static backdrop modal
+            </button> 
+            <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+              aria-labelledby="staticBackdropLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Delete Attachment</h5>
+                    <button type="button" id="closeModal" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <p>Are you sure you want to delete this attachment ? </p>
+                  </div>
+                  <div class="modal-footer" id="modalAction">
+                    <button type="button" class="btn btn-secondary" id="rejectModelBtn" data-bs-dismiss="modal">No</button>
+                    <button type="button" id="deleteDocument" class="btn btn-primary">Yes</button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
           <%- include('./common/footer'); -%>
         </div>
@@ -338,7 +361,7 @@
       let selectedPrefix = "";
       let oldDocNumberInput = $("#doc_number").val();
       const doc_ID = "<%=documentData.doc_id%>"
-
+      let docIdToDelete = null;
       let NewURl = null  
       folders = folders ? JSON.parse(folders) : [];
       $(document).ready(function () {
@@ -572,7 +595,48 @@
 				});
       })
 
-      
+        $(document).on('click', '#deleteDoc', function (event) {
+          console.log('wqdkp');
+
+          event.preventDefault();
+          let openModal = document.getElementById('open-modal')
+
+          docIdToDelete = $(this).data('id');
+          console.log(docIdToDelete);
+          if (docIdToDelete) {
+            openModal.click();
+          }
+        });
+        $(document).on('click', '#deleteDocument', function (event) {
+          const modalCloseBtn = document.querySelector('#closeModal');
+          event.preventDefault();
+          $(`#modalAction`).addClass('disable');
+          $.ajax({
+            type: "POST",
+            url: "/docs/delete-attachment/",
+            data: { docId: docIdToDelete },
+            success: function (response) {
+              if (response.status == 0) {
+                NioApp.Toast("<h5>Deleted Successfully</h5><p>Document deleted successfully!</p>", "success");
+                modalCloseBtn.click();
+                location.reload()
+                $(`#modalAction`).removeClass('disable');
+
+              } else {
+                NioApp.Toast(`<h5>Something Went Wrong</h5>${response.msg || `<p>Error while Document deleted</p>`}`, "error");
+                modalCloseBtn.click();
+                $(`#modalAction`).removeClass('disable');
+
+              }
+            },
+
+            error: function (xhr, status, error) {
+              NioApp.Toast(`<h5>Something Went Wrong</h5>${response.msg || `<p>Error while Document deleted</p>`}`, "error");
+              modalCloseBtn.click();
+              $(`#modalAction`).removeClass('disable');
+            },
+          });
+        });
         
     </script>
   </body>
