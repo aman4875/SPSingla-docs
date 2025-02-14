@@ -358,7 +358,6 @@ renderController.editDoc = async (req, res) => {
 		} else {
 			let { rows: docHistory } = await pool.query(`SELECT * FROM doc_history_junction WHERE dhj_doc_number = $1`, [documentData.doc_number]);
 			let { rows: docAttachments } = await pool.query(`SELECT * FROM doc_attachment_junction WHERE daj_doc_number = $1`, [documentData.doc_number]);
-			console.log(docAttachments)
 			res.render("edit-document.ejs", { token, sites, folders, documentData, docHistory, docAttachments });
 		}
 	} catch (error) {
