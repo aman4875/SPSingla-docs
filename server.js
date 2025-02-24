@@ -80,11 +80,11 @@ const serverAdapter = new ExpressAdapter();
 serverAdapter.setBasePath('/admin/queues');
 createBullBoard({
 	queues: [
-	  new BullMQAdapter(queue) 
+		new BullMQAdapter(queue)
 	],
 	serverAdapter: serverAdapter,
 });
-  
+
 
 // Allowing CORS
 app.use(function (req, res, next) {
@@ -96,7 +96,7 @@ process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 
 // Listening on routes
 app.use('/admin/queues', serverAdapter.getRouter());
-app.use("/", router);  
+app.use("/", router);
 
 // Starting server on port
 app.listen(port, function () {
