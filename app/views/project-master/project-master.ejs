@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zxx" class="js">
+
+<head>
+	<base href="../" />
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+	<meta name="description" />
+	<!-- Fav Icon  -->
+	<link rel="shortcut icon" href="/app/assets/images/favicon.png" />
+	<!-- Page Title  -->
+	<title>Dashboard | ProjectMaster</title>
+	<!-- StyleSheets  -->
+	<link rel="stylesheet" href="/app/assets/css/dashlite.css" />
+	<link id="skin-default" rel="stylesheet" href="/app/assets/css/theme.css" />
+	<link rel="stylesheet" href="/app/views/project-master/style.css" />
+	<style>
+	</style>
+</head>
+
+<body class="nk-body bg-lighter npc-general has-sidebar">
+	<div class="nk-app-root">
+		<div class="nk-main">
+			<%- include('./common/sidebar' , {subItems:{active:"projectMaster"} }); -%>
+				<div class="nk-wrap">
+
+					<div class="nk-content">
+						<div class="container-fluid">
+							<div class="nk-content-inner">
+								<div class="nk-content-body">
+									<div class="nk-block">
+										<div class="nk-block-head nk-block-head-sm">
+											<div class="nk-block-between g-3">
+												<div class="nk-block-head-content">
+													<div class="row align-items-center">
+														<div class="col">
+															<h3 class="nk-block-title page-title">Projects Master</h3>
+														</div>
+														<div class="col  px-0 ">
+															<div class="nk-tb-col px-0 py-0 replied-vide-select">
+																<span>
+
+																</span>
+															</div>
+
+														</div>
+													</div>
+												</div>
+												<%if(token.user_role !=3){%>
+													<div class="nk-block-head-content">
+														<%if(token.user_role==0 || token.user_role==1 ||
+															token.user_role==2){%>
+															<%if(token.user_role!=2){%>
+																<%}%>
+																	<%}%>
+																		<a href="/project/create-project"
+																			class="btn btn-white btn-dim btn-outline-light"><em
+																				class="icon ni ni-plus-sm"></em><span>Add
+																				Document</span></a>
+													</div>
+													<%}%>
+											</div>
+										</div>
+										<div class="card card-bordered card-stretch">
+											<div class="card-inner-group">
+												<div class="card-inner position-relative card-tools-toggle">
+													<div class="card-title-group">
+														<div class="card-tools"></div>
+														<div class="card-tools me-n1">
+															<ul class="btn-toolbar gx-1">
+																<li>
+																	<a href="#"
+																		class="btn btn-icon search-toggle toggle-search"
+																		data-target="search"><em
+																			class="icon ni ni-search"></em></a>
+																</li>
+																<li class="btn-toolbar-sep"></li>
+																<li>
+																	<div class="toggle-wrap">
+																		<a href="#"
+																			class="btn btn-icon btn-trigger toggle"
+																			data-target="cardTools"><em
+																				class="icon ni ni-menu-right"></em></a>
+																		<div class="toggle-content"
+																			data-content="cardTools">
+																			<ul class="btn-toolbar gx-1">
+																				<li class="toggle-close">
+																					<a href="#"
+																						class="btn btn-icon btn-trigger toggle"
+																						data-target="cardTools"><em
+																							class="icon ni ni-arrow-left"></em></a>
+																				</li>
+																				<li>
+																					<div class="dropdown">
+																						<a href="#"
+																							class="btn btn-trigger btn-icon dropdown-toggle"
+																							data-bs-toggle="dropdown">
+																							<em
+																								class="icon ni ni-setting"></em>
+																						</a>
+																						<div
+																							class="dropdown-menu dropdown-menu-xs dropdown-menu-end">
+																							<ul
+																								class="filter-limit link-check">
+																								<li><span>Show</span>
+																								</li>
+																								<li class="active"><a
+																										href="#"
+																										data-limit="10">10</a>
+																								</li>
+																								<li><a href="#"
+																										data-limit="20">20</a>
+																								</li>
+																								<li><a href="#"
+																										data-limit="50">50</a>
+																								</li>
+																								<li><a href="#"
+																										data-limit="100">100</a>
+																								</li>
+																							</ul>
+																						</div>
+
+																					</div>
+																				</li>
+																			</ul>
+																		</div>
+
+																	</div>
+																</li>
+																<li>
+																	<a id="resetFilters"
+																		class="btn btn-dim btn-outline-primary">
+																		<em class="icon ni ni-reload-alt"></em>
+																		<span>Reset Filter</span>
+																	</a>
+																</li>
+																<li>
+																	<div class="scroll-buttons">
+																		<a id="scroll-left"
+																			class="btn btn-icon btn-primary"><em
+																				class="icon ni ni-chevron-left"></em></a>
+																		<a id="scroll-right"
+																			class="btn btn-icon btn-primary"><em
+																				class="icon ni ni-chevron-right"></em></a>
+																	</div>
+																</li>
+															</ul>
+														</div>
+													</div>
+													<div class="card-search search-wrap" data-search="search">
+														<div class="card-body">
+															<div class="search-content">
+																<a href="#"
+																	class="search-back btn btn-icon toggle-search"
+																	data-target="search"><em
+																		class="icon ni ni-arrow-left"></em></a>
+																<input type="text" id="doc_ocr_content"
+																	class="form-control border-transparent form-focus-none filter-input"
+																	data-filter="keyword"
+																	placeholder="Search Keywords" />
+																<button id="searchDocumentButton"
+																	class="search-submit btn btn-icon"><em
+																		class="icon ni ni-search"></em></button>
+															</div>
+														</div>
+													</div>
+												</div>
+												<div class="card-inner p-0 scrollable-datatable">
+													<div class="nk-tb-list nk-tb-ulist is-compact">
+														<div class="nk-tb-item nk-tb-head grid-header" id="table-head">
+															<%if(token.user_role !=3){%>
+																<div class="nk-tb-col no-click  text-start">
+																	<span data-field="edit_doc">ACTIONS</span><span
+																		class="sort-indicator"></span>
+																</div>
+																<%}%>
+																	<div class="nk-tb-col ">
+																		<span data-field="doc_code">CODE</span><span
+																			class="sort-indicator"></span>
+																	</div>
+																	<div class="nk-tb-col">
+																		<span data-field="doc_work_name">Name of
+																			Work</span><span
+																			class="sort-indicator"></span>
+																	</div>
+																	<div class="nk-tb-col">
+																		<span data-field="doc_department">Department
+																			Name</span><span
+																			class="sort-indicator"></span>
+																	</div>
+																	<div class="nk-tb-col">
+																		<span data-field="doc_financial_date">Financial
+																			Opening
+																			Date</span><span
+																			class="sort-indicator"></span>
+																	</div>
+																	<div class="nk-tb-col">
+																		<span data-field="doc_agreement_no">Agreement
+																			No</span><span
+																			class="sort-indicator"></span>
+																	</div>
+																	<div class="nk-tb-col">
+																		<span data-field="doc_agreement_date">Agreement
+																			Date</span><span
+																			class="sort-indicator"></span>
+																	</div>
+
+																	<div class="nk-tb-col">
+																		<span data-field="doc_completion_date">Date of
+																			Completion</span><span
+																			class="sort-indicator"></span>
+																	</div>
+																	<div class="nk-tb-col">
+																		<span
+																			data-field="doc_awarded">Awarded</span><span
+																			class="sort-indicator"></span>
+																	</div>
+																	<div class="nk-tb-col">
+																		<span data-field="doc_DLP_period">DLP Period
+																			(in months)</span><span
+																			class="sort-indicator"></span>
+																	</div>
+
+																	<div class="nk-tb-col">
+																		<span data-field="doc_revised_date">Revised
+																			Completion Date</span><span
+																			class="sort-indicator"></span>
+																	</div>
+																	<div class="nk-tb-col">
+																		<span data-field="doc_DLP_ending">DLP Ending
+																			on</span><span
+																			class="sort-indicator"></span>
+																	</div>
+																	<div class="nk-tb-col">
+																		<span data-field="doc_mobilisation_amount">Total
+																			Mobilisation
+																			Amount</span><span
+																			class="sort-indicator"></span>
+																	</div>
+																	<div class="nk-tb-col">
+																		<span
+																			data-field="doc_bal_mobilisation_amount">Balance
+																			Mobilisation Amount</span><span
+																			class="sort-indicator"></span>
+																	</div>
+																	<div class="nk-tb-col">
+																		<span
+																			data-field="doc_retention_amount">Retention
+																			Amount as on Date</span><span
+																			class="sort-indicator"></span>
+																	</div>
+																	<div class="nk-tb-col">
+																		<span data-field="doc_agreement_pdfs">Upload
+																			Agreement</span><span
+																			class="sort-indicator"></span>
+																	</div>
+														</div>
+
+														<div class="nk-tb-item nk-tb-head" id="table-filters">
+															<%if(token.user_role !=3){%>
+																<div class="nk-tb-col text-start">
+																	<span>
+																	</span>
+																</div>
+																<%}%>
+																	<div class="nk-tb-col">
+																		<span>
+																			<input type="text"
+																				class="form-control filter-input"
+																				data-filter="text" id="doc_code"
+																				placeholder="CODE">
+																		</span>
+																	</div>
+																	<div class="nk-tb-col">
+																		<span>
+																			<input type="text"
+																				class="form-control filter-input"
+																				data-filter="text" id="doc_work_name"
+																				placeholder="Name of Work">
+																		</span>
+																	</div>
+																	<div class="nk-tb-col">
+																		<span>
+																			<input type="text"
+																				class="form-control filter-input"
+																				data-filter="text" id="doc_department"
+																				placeholder="Department Name">
+																		</span>
+																	</div>
+																	<div class="nk-tb-col">
+																		<span>
+																			<div class="form-group">
+																				<div class="form-control-wrap">
+																					<input placeholder="Date"
+																						id="doc_date" type="text"
+																						class="form-control date-picker filter-input"
+																						data-filter="date">
+																				</div>
+																			</div>
+																		</span>
+																	</div>
+
+																	<div class="nk-tb-col">
+																		<span>
+																			<input type="number"
+																				class="form-control filter-input"
+																				data-filter="text" id="doc_subject"
+																				placeholder="Agreement No">
+																		</span>
+																	</div>
+
+
+																	<div class="nk-tb-col">
+																		<span>
+																			<div class="form-group">
+																				<div class="form-control-wrap">
+																					<input placeholder="Date"
+																						id="doc_date" type="text"
+																						class="form-control date-picker filter-input"
+																						data-filter="date">
+																				</div>
+																			</div>
+																		</span>
+																	</div>
+																	<div class="nk-tb-col">
+																		<span>
+																			<div class="form-group">
+																				<div class="form-control-wrap">
+																					<input placeholder="Date"
+																						id="doc_date" type="text"
+																						class="form-control date-picker filter-input"
+																						data-filter="date">
+																				</div>
+																			</div>
+																		</span>
+																	</div>
+
+																	<div class="nk-tb-col">
+																		<span>
+																			<select
+																				class="form-select form-control js-select2 filter-input"
+																				data-filter="text" id="doc_purpose"
+																				name="doc_purpose"
+																				data-placeholder="Awarded">
+																				<option label="empty" value=""></option>
+																				<option label="Yes" value="Yes">Yes
+																				</option>
+																				<option label="No" value="No">No
+																				</option>
+																			</select>
+																		</span>
+																	</div>
+																	<div class="nk-tb-col">
+																		<span>
+																			<div class="form-group">
+																				<div class="form-control-wrap">
+																					<input type="month"
+																						id="doc_DLP_period"
+																						placeholder="DLP period">
+
+																				</div>
+																			</div>
+																		</span>
+																	</div>
+																	<div class="nk-tb-col">
+																		<span>
+																			<div class="form-group">
+																				<div class="form-control-wrap">
+																					<input placeholder="Date"
+																						id="doc_date" type="text"
+																						class="form-control date-picker filter-input"
+																						data-filter="date">
+																				</div>
+																			</div>
+																		</span>
+																	</div>
+																	<div class="nk-tb-col">
+																		<span>
+																			<div class="form-group">
+																				<div class="form-control-wrap">
+																					<input placeholder="Date"
+																						id="doc_date" type="text"
+																						class="form-control date-picker filter-input"
+																						data-filter="date">
+																				</div>
+																			</div>
+																		</span>
+																	</div>
+																	<div class="nk-tb-col">
+																		<span>
+																			<input type="number"
+																				class="form-control filter-input"
+																				data-filter="text" id="doc_subject"
+																				placeholder="Total Mobilisation Amount">
+																		</span>
+																	</div>
+																	<div class="nk-tb-col">
+																		<span>
+																			<input type="number"
+																				class="form-control filter-input"
+																				data-filter="text" id="doc_subject"
+																				placeholder="Balance Mobilisation Amount">
+																		</span>
+																	</div>
+																	<div class="nk-tb-col">
+																		<span>
+																			<input type="number"
+																				class="form-control filter-input"
+																				data-filter="text" id="doc_subject"
+																				placeholder="Retention Amount">
+																		</span>
+																	</div>
+														</div>
+													</div>
+												</div>
+												<div id="table-status" class="card-inner text-center">
+													<div class="text-center">
+														<p>No Data Found</p>
+													</div>
+												</div>
+												<!-- Pagination numbers will be dynamically inserted here -->
+												<!-- <div id="table-pagination" class="card-inner">
+										  <ul class="pagination">
+											<li class="paginate_button page-item previous disabled" id="DataTables_Table_2_previous">
+											  <a aria-controls="DataTables_Table_2" aria-disabled="true" role="link"
+												data-dt-idx="previous" tabindex="0" class="page-link">Prev</a>
+											</li>
+						
+											<li class="paginate_button page-item next" id="DataTables_Table_2_next">
+											  <a aria-controls="DataTables_Table_2" role="link" data-dt-idx="next" tabindex="0"
+												class="page-link">Next</a>
+											</li>
+										  </ul>
+										</div> -->
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<%- include('./common/footer'); -%>
+				</div>
+		</div>
+	</div>
+	<script src="/app/assets/js/bundle.js"></script>
+	<script src="/app/assets/js/scripts.js"></script>
+	<script src="/app/assets/js/charts/gd-default.js"></script>
+	<script>
+		$(document).ready(function () {
+
+			$(".nk-menu-sub .nk-menu-item ").each(function () {
+				if ($(this).hasClass("active")) {
+					let parentMenu = $(this).closest(".nk-menu-item.has-sub");
+					parentMenu.addClass("active current-page");
+					parentMenu.find(".nk-menu-sub").show();
+				}
+			});
+		});
+
+
+
+	</script>
+</body>
+
+</html>

@@ -10,6 +10,7 @@ router.get("/get-document-reference", documentController.getDocumentReference);
 router.post("/save-draft", documentController.saveDraft);
 router.post("/edit-document", documentController.editDocument);
 router.post("/create-document", upload.single("doc_file"), documentController.createDocument);
+router.post("/create-project", upload.single("doc_file"), documentController.createProject);
 router.post("/upload-attachment", upload.single("doc_file"), documentController.uploadAttachment);
 router.post("/get-filtered-documents", documentController.getFilteredDocuments);
 router.post("/record-document-viewed", documentController.recordDocumentViewed);

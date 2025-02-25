@@ -444,6 +444,130 @@ documentController.createDocument = async (req, res) => {
 		console.error(error);
 	}
 };
+documentController.createProject = async (req, res) => {
+	try {
+		let inputs = req.body;
+		console.log("🚀 ~ documentController.createProject= ~ inputs:", inputs)
+		console.log("🚀 ~ documentController.createProject= ~ inputs:", req.file.buffer)
+		let token = req.session.token;
+		if (token.user_role == "3") {
+			return res.send({ status: 0, msg: "Access Denied Insufficient Permissions." });
+		}
+
+		if (!req.file) {
+			return res.send({ status: 0, msg: "No file uploaded" });
+		}
+
+		// inputs.doc_number = inputs.doc_number.replace(/\s/g, "");
+
+		// if (inputs.doc_reference && Array.isArray(inputs.doc_reference)) {
+		// 	inputs.doc_reference = inputs.doc_reference.join(",");
+		// }
+
+		// const fileName = uuidv4();
+
+		// const s3Params = {
+		// 	Bucket: process.env.BUCKET_NAME,
+		// 	Key: `docs/${fileName}.pdf`,
+		// 	Body: req.file.buffer,
+		// 	ContentType: req.file.mimetype,
+		// };
+
+		// const s3Response = await s3.upload(s3Params).promise();
+		// const pdfLocation = s3Response.Location;
+
+		// const generateInsertQuery = (data) => {
+		// 	const keys = Object.keys(data);
+		// 	const nonEmptyKeys = keys.filter((key) => {
+		// 		const value = data[key];
+		// 		return value !== undefined && value !== null && (Array.isArray(value) ? value.length > 0 : typeof value === "string" ? value.trim() !== "" : true);
+		// 	});
+
+		// 	nonEmptyKeys.push("doc_uploaded_by", "doc_uploaded_at", "doc_status", "doc_pdf_link", "doc_uploaded_by_id", "doc_source");
+		// 	const currentDate = moment().format("MM/DD/YYYY");
+		// 	data["doc_uploaded_by"] = token.user_name;
+		// 	data["doc_uploaded_by_id"] = token.user_id;
+		// 	data["doc_uploaded_at"] = currentDate;
+		// 	data["doc_status"] = "UPLOADED";
+		// 	data["doc_pdf_link"] = pdfLocation;
+		// 	data["doc_source"] = "FORM";
+		// 	const columns = nonEmptyKeys.join(", ");
+		// 	const valuesPlaceholder = nonEmptyKeys.map((_, i) => `$${i + 1}`).join(", ");
+		// 	const values = nonEmptyKeys.map((key) => data[key]);
+		// 	const updateValues = nonEmptyKeys
+		// 		.map((key, i) => {
+		// 			if (key !== "id") {
+		// 				return `${key} = EXCLUDED.${key}`;
+		// 			}
+		// 			return null;
+		// 		})
+		// 		.filter((value) => value !== null)
+		// 		.join(", ");
+
+		// 	const query = `INSERT INTO documents (${columns}) VALUES (${valuesPlaceholder}) ON CONFLICT (doc_number) DO UPDATE SET ${updateValues};`;
+		// 	return { query, values };
+		// };
+
+		// const { query, values } = generateInsertQuery(inputs);
+
+		// // Check if the document already exists
+		// let selectQuery = `SELECT COUNT(*) FROM documents WHERE doc_number = $1`;
+		// let selectResult = await pool.query(selectQuery, [inputs.doc_number]);
+		// let count = selectResult?.rows[0]?.count;
+
+		// // Execute the insert/update query
+		// await pool.query(query, values);
+
+		// // Maintaining site record to auto-generate document numbers
+		// if (count == 0 && inputs.doc_type == "OUTGOING") {
+		// 	const updateSiteRecordQuery = `
+		//         UPDATE sites
+		//         SET site_record_value = site_record_value + 1
+		//         WHERE site_name = $1
+		//     `;
+		// 	await pool.query(updateSiteRecordQuery, [inputs.doc_folder]);
+		// }
+
+		// // UPDATING REFERNCES
+		// if (inputs.doc_reference) {
+		// 	let references = Array.isArray(inputs.doc_reference) ? inputs.doc_reference : [inputs.doc_reference];
+		// 	references = references.filter((reference) => reference.trim() !== "");
+
+		// 	if (references.length > 0) {
+		// 		// Delete existing references for the document
+		// 		const deleteQuery = `DELETE FROM doc_reference_junction WHERE doc_junc_number = $1`;
+		// 		await pool.query(deleteQuery, [inputs.doc_number]);
+
+		// 		// Insert new references with the current document number as the replied value
+		// 		const valuesString = references.map((_, i) => `($1, $${i + 2})`).join(", ");
+		// 		const referenceValues = [inputs.doc_number, ...references.map((ref) => ref.trim())];
+		// 		const refQuery = `INSERT INTO doc_reference_junction (doc_junc_number, doc_junc_replied) VALUES ${valuesString}`;
+		// 		await pool.query(refQuery, referenceValues);
+		// 	}
+		// }
+
+		// // updating folder stats
+		// await pool.query(
+		// 	`
+		// 	INSERT INTO folder_stats (doc_folder_name, doc_folder_id, last_updated) 
+		// 	VALUES ($1, $2, $3) 
+		// 	ON CONFLICT (doc_folder_name) 
+		// 	DO UPDATE SET
+		// 	  last_updated = EXCLUDED.last_updated,
+		// 	  doc_folder_id = EXCLUDED.doc_folder_id;
+		// 	`,
+		// 	[inputs.doc_folder, folderId[0].site_id, getCurrentDateTime()]
+		// );
+
+		// // ADDING HISTORY
+		// await pool.query(`INSERT INTO doc_history_junction (dhj_doc_number, dhj_history_type, dhj_timestamp,dhj_history_blame,dhj_history_blame_user) VALUES ($1,$2,$3,$4,$5)`, [inputs.doc_number, "UPDATED", moment().format("MM/DD/YYYY HH:mm:ss"), token.user_id, token.user_name]);
+		// let { rows: newDoc } = await pool.query(`SELECT *  FROM documents  WHERE doc_number = $1`, [inputs.doc_number]);
+		res.send({ status: 1, msg: "Success" });
+	} catch (error) {
+		res.send({ status: 0, msg: "Something Went Wrong" });
+		console.error(error);
+	}
+};
 
 documentController.getFilteredDocuments = async (req, res) => {
 	try {

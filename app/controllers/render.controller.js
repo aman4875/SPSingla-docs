@@ -408,4 +408,12 @@ renderController.renderCreateDocument = async (req, res) => {
 	}
 };
 
+renderController.renderProjectMaster = async (req, res) => {
+	let token = req.session.token;
+	res.render("project-master/project-master", { token });
+}
+renderController.renderCreateProjectMaster = async (req, res) => {
+	let token = req.session.token;
+	res.render("project-master/create-project", { token });
+}
 module.exports = renderController;
