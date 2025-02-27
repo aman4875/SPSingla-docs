@@ -56,7 +56,7 @@
                                                                 <div class="form-control-wrap">
                                                                     <input type="text" class="form-control"
                                                                         placeholder="Document Code" id="doc_code"
-                                                                        name="doc_subject" value="" required />
+                                                                        name="doc_code" value="" required />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -160,13 +160,13 @@
                                                         </div>
                                                         <div class="col-md-4">
                                                             <div class="form-group">
-                                                                <label class="form-label" for="doc_DLP_ending">DLP
+                                                                <label class="form-label" for="doc_DLP_period">DLP
                                                                     Period
                                                                     (in months)</label>
                                                                 <div class="form-control-wrap">
-                                                                    <input type="text" class="form-control"
-                                                                        placeholder="DLP Period" id="doc_DLP_ending"
-                                                                        name="doc_DLP_ending" value="" required />
+                                                                    <input type="number" class="form-control"
+                                                                        placeholder="DLP Period" id="doc_DLP_period"
+                                                                        name="doc_DLP_period" value="" required />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -201,13 +201,13 @@
                                                         <div class="col-md-4">
                                                             <div class="form-group">
                                                                 <label class="form-label"
-                                                                    for="doc_mobilisation_amount">Total
+                                                                    for="doc_total_mobilisation_amount">Total
                                                                     Mobilisation Amount</label>
                                                                 <div class="form-control-wrap">
                                                                     <input type="number" class="form-control"
                                                                         placeholder="Tota Mobilisation Amount"
-                                                                        id="doc_mobilisation_amount"
-                                                                        name="doc_mobilisation_amount" value="" />
+                                                                        id="doc_total_mobilisation_amount"
+                                                                        name="doc_total_mobilisation_amount" value="" />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -227,13 +227,13 @@
                                                         <div class="col-md-4">
                                                             <div class="form-group">
                                                                 <label class="form-label"
-                                                                    for="doc_retention_amount_date">Retention Amount
+                                                                    for="doc_retention_amount">Retention Amount
                                                                     as on Date</label>
                                                                 <div class="form-control-wrap">
                                                                     <input type="number" class="form-control"
                                                                         placeholder="Retention Amount as on Date"
-                                                                        id="doc_retention_amount_date"
-                                                                        name="doc_retention_amount_date" value="" />
+                                                                        id="doc_retention_amount"
+                                                                        name="doc_retention_amount" value="" />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -295,7 +295,7 @@
 
             let formData = new FormData(this);
             console.log("🚀 ~ formData:", [...formData])
-            let isDocNumber = false;
+            // let isDocNumber = false;
             // for (let pair of formData.entries()) {
             //     if (pair[0] == "doc_number") {
             //         isDocNumber = true;
@@ -313,6 +313,7 @@
                     if (response.status == 1) {
                         NioApp.handleButtonState("uploadDocumentBtn", "Upload", false);
                         NioApp.Toast("<h5>Document Uploaded</h5><p>Document Uploaded Successfully</p>", "success");
+                        document.getElementById("documentForm").reset();
                     } else {
                         NioApp.Toast("<h5>Something Went Wrong</h5><p>Error while uploading Document</p>", "error");
                     }

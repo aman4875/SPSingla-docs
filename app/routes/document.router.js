@@ -13,11 +13,13 @@ router.post("/create-document", upload.single("doc_file"), documentController.cr
 router.post("/create-project", upload.single("doc_file"), documentController.createProject);
 router.post("/upload-attachment", upload.single("doc_file"), documentController.uploadAttachment);
 router.post("/get-filtered-documents", documentController.getFilteredDocuments);
+router.post("/get-filtered-projects", documentController.getFilteredProjects);
 router.post("/record-document-viewed", documentController.recordDocumentViewed);
 router.get("/view-failed-uploads", documentController.getFailedUploads);
 router.post("/clear-records", documentController.clearFailedPdfs);
 router.post("/get-replied-vide", documentController.getRepliedVide);
 router.post("/delete-doc", documentController.deleteDoc);
+router.post("/delete-project", documentController.deleteProject);
 router.post("/delete-attachment", documentController.deleteAttachment);
 
 module.exports = router;

@@ -447,125 +447,76 @@ documentController.createDocument = async (req, res) => {
 documentController.createProject = async (req, res) => {
 	try {
 		let inputs = req.body;
-		console.log("🚀 ~ documentController.createProject= ~ inputs:", inputs)
-		console.log("🚀 ~ documentController.createProject= ~ inputs:", req.file.buffer)
 		let token = req.session.token;
 		if (token.user_role == "3") {
 			return res.send({ status: 0, msg: "Access Denied Insufficient Permissions." });
 		}
+		let pdfLocation = ''
 
-		if (!req.file) {
-			return res.send({ status: 0, msg: "No file uploaded" });
+		if (req.file && req.file) {
+			const fileName = uuidv4();
+
+			const s3Params = {
+				Bucket: process.env.BUCKET_NAME,
+				Key: `docs/${fileName}.pdf`,
+				Body: req.file.buffer,
+				ContentType: req.file.mimetype,
+			};
+			const s3Response = await s3.upload(s3Params).promise();
+			pdfLocation = s3Response.Location;
 		}
 
-		// inputs.doc_number = inputs.doc_number.replace(/\s/g, "");
 
-		// if (inputs.doc_reference && Array.isArray(inputs.doc_reference)) {
-		// 	inputs.doc_reference = inputs.doc_reference.join(",");
-		// }
+		const generateInsertQuery = (data) => {
+			const keys = Object.keys(data);
+			const nonEmptyKeys = keys.filter((key) => {
+				const value = data[key];
+				return value !== undefined && value !== null && (Array.isArray(value) ? value.length > 0 : typeof value === "string" ? value.trim() !== "" : true);
+			});
 
-		// const fileName = uuidv4();
+			nonEmptyKeys.push("doc_uploaded_by", "doc_uploaded_at", "doc_agreement_pdfs", "doc_uploaded_by_id", "doc_status");
+			data["doc_uploaded_by"] = token.user_name;
+			data["doc_uploaded_by_id"] = token.user_id;
+			data["doc_uploaded_at"] = getCurrentDateTime();
+			data["doc_status"] = "UPLOADED";
+			data["doc_agreement_pdfs"] = pdfLocation;
+			const columns = nonEmptyKeys.join(", ");
+			console.log("🚀 ~ generateInsertQuery ~ columns:", columns)
+			const valuesPlaceholder = nonEmptyKeys.map((_, i) => `$${i + 1}`).join(", ");
+			const values = nonEmptyKeys.map((key) => data[key]);
+			const updateValues = nonEmptyKeys
+				.map((key, i) => {
+					if (key !== "id") {
+						return `${key} = EXCLUDED.${key}`;
+					}
+					return null;
+				})
+				.filter((value) => value !== null)
+				.join(", ");
 
-		// const s3Params = {
-		// 	Bucket: process.env.BUCKET_NAME,
-		// 	Key: `docs/${fileName}.pdf`,
-		// 	Body: req.file.buffer,
-		// 	ContentType: req.file.mimetype,
-		// };
+			const query = `INSERT INTO projects_master (${columns}) VALUES (${valuesPlaceholder});`;
 
-		// const s3Response = await s3.upload(s3Params).promise();
-		// const pdfLocation = s3Response.Location;
+			return { query, values };
+		};
 
-		// const generateInsertQuery = (data) => {
-		// 	const keys = Object.keys(data);
-		// 	const nonEmptyKeys = keys.filter((key) => {
-		// 		const value = data[key];
-		// 		return value !== undefined && value !== null && (Array.isArray(value) ? value.length > 0 : typeof value === "string" ? value.trim() !== "" : true);
-		// 	});
-
-		// 	nonEmptyKeys.push("doc_uploaded_by", "doc_uploaded_at", "doc_status", "doc_pdf_link", "doc_uploaded_by_id", "doc_source");
-		// 	const currentDate = moment().format("MM/DD/YYYY");
-		// 	data["doc_uploaded_by"] = token.user_name;
-		// 	data["doc_uploaded_by_id"] = token.user_id;
-		// 	data["doc_uploaded_at"] = currentDate;
-		// 	data["doc_status"] = "UPLOADED";
-		// 	data["doc_pdf_link"] = pdfLocation;
-		// 	data["doc_source"] = "FORM";
-		// 	const columns = nonEmptyKeys.join(", ");
-		// 	const valuesPlaceholder = nonEmptyKeys.map((_, i) => `$${i + 1}`).join(", ");
-		// 	const values = nonEmptyKeys.map((key) => data[key]);
-		// 	const updateValues = nonEmptyKeys
-		// 		.map((key, i) => {
-		// 			if (key !== "id") {
-		// 				return `${key} = EXCLUDED.${key}`;
-		// 			}
-		// 			return null;
-		// 		})
-		// 		.filter((value) => value !== null)
-		// 		.join(", ");
-
-		// 	const query = `INSERT INTO documents (${columns}) VALUES (${valuesPlaceholder}) ON CONFLICT (doc_number) DO UPDATE SET ${updateValues};`;
-		// 	return { query, values };
-		// };
-
-		// const { query, values } = generateInsertQuery(inputs);
+		const { query, values } = generateInsertQuery(inputs);
 
 		// // Check if the document already exists
-		// let selectQuery = `SELECT COUNT(*) FROM documents WHERE doc_number = $1`;
-		// let selectResult = await pool.query(selectQuery, [inputs.doc_number]);
+		// let selectQuery = `SELECT COUNT(*) FROM projects_master WHERE doc_code = $1`;
+		// let selectResult = await pool.query(selectQuery, [inputs.doc_code]);
 		// let count = selectResult?.rows[0]?.count;
 
-		// // Execute the insert/update query
-		// await pool.query(query, values);
+		// Execute the insert / update query
+		const createProject = await pool.query(query, values);
+		if (createProject.rowCount > 0) {
+			return res.send({ status: 1, msg: "Success" });
+		}
 
-		// // Maintaining site record to auto-generate document numbers
-		// if (count == 0 && inputs.doc_type == "OUTGOING") {
-		// 	const updateSiteRecordQuery = `
-		//         UPDATE sites
-		//         SET site_record_value = site_record_value + 1
-		//         WHERE site_name = $1
-		//     `;
-		// 	await pool.query(updateSiteRecordQuery, [inputs.doc_folder]);
-		// }
+		return res.send({ status: 0, msg: "Something Went Wrong" });
 
-		// // UPDATING REFERNCES
-		// if (inputs.doc_reference) {
-		// 	let references = Array.isArray(inputs.doc_reference) ? inputs.doc_reference : [inputs.doc_reference];
-		// 	references = references.filter((reference) => reference.trim() !== "");
-
-		// 	if (references.length > 0) {
-		// 		// Delete existing references for the document
-		// 		const deleteQuery = `DELETE FROM doc_reference_junction WHERE doc_junc_number = $1`;
-		// 		await pool.query(deleteQuery, [inputs.doc_number]);
-
-		// 		// Insert new references with the current document number as the replied value
-		// 		const valuesString = references.map((_, i) => `($1, $${i + 2})`).join(", ");
-		// 		const referenceValues = [inputs.doc_number, ...references.map((ref) => ref.trim())];
-		// 		const refQuery = `INSERT INTO doc_reference_junction (doc_junc_number, doc_junc_replied) VALUES ${valuesString}`;
-		// 		await pool.query(refQuery, referenceValues);
-		// 	}
-		// }
-
-		// // updating folder stats
-		// await pool.query(
-		// 	`
-		// 	INSERT INTO folder_stats (doc_folder_name, doc_folder_id, last_updated) 
-		// 	VALUES ($1, $2, $3) 
-		// 	ON CONFLICT (doc_folder_name) 
-		// 	DO UPDATE SET
-		// 	  last_updated = EXCLUDED.last_updated,
-		// 	  doc_folder_id = EXCLUDED.doc_folder_id;
-		// 	`,
-		// 	[inputs.doc_folder, folderId[0].site_id, getCurrentDateTime()]
-		// );
-
-		// // ADDING HISTORY
-		// await pool.query(`INSERT INTO doc_history_junction (dhj_doc_number, dhj_history_type, dhj_timestamp,dhj_history_blame,dhj_history_blame_user) VALUES ($1,$2,$3,$4,$5)`, [inputs.doc_number, "UPDATED", moment().format("MM/DD/YYYY HH:mm:ss"), token.user_id, token.user_name]);
-		// let { rows: newDoc } = await pool.query(`SELECT *  FROM documents  WHERE doc_number = $1`, [inputs.doc_number]);
-		res.send({ status: 1, msg: "Success" });
 	} catch (error) {
-		res.send({ status: 0, msg: "Something Went Wrong" });
 		console.error(error);
+		return res.send({ status: 0, msg: "Something Went Wrong" });
 	}
 };
 
@@ -729,7 +680,7 @@ documentController.getFilteredDocuments = async (req, res) => {
 			});
 			orderByClause = `ORDER BY ${sortFields.join(", ")}`;
 		} else {
-			orderByClause = `ORDER BY d.doc_number DESC`;
+			orderByClause = `ORDER BY d.doc_id DESC`;
 		}
 		// Build the WHERE clause
 		if (conditions.length > 0) {
@@ -766,6 +717,111 @@ documentController.getFilteredDocuments = async (req, res) => {
           d.doc_storage_location,
           d.doc_reference,
           d.doc_created_at
+        ${orderByClause}
+        LIMIT ${pageSize}
+        OFFSET ${offset}
+      `;
+		// Execute the main query
+		let { rows: documents } = await pool.query(query);
+		res.json({
+			status: 1,
+			msg: "Success",
+			payload: {
+				documents,
+				totalPages,
+				currentPage: page,
+			},
+		});
+	} catch (err) {
+		console.error("Error fetching filtered documents:", err);
+		res.json({ status: 0, msg: "Internal Server Error" });
+	}
+};
+documentController.getFilteredProjects = async (req, res) => {
+	try {
+		let inputs = req.body;
+		let token = req.session.token;
+		const page = inputs.page || 1;
+		const pageSize = inputs.limit || 10;
+		const offset = (page - 1) * pageSize;
+		let orderByClause = "ORDER BY d.doc_id DESC";
+		let baseQuery = `
+		SELECT d.* 
+		FROM projects_master AS d`;
+		let conditions = [];
+		let joins = "";
+
+
+		// Handle filters from inputs.activeFilter
+		// for (const [field, filter] of Object.entries(inputs.activeFilter)) {
+		// 	if (filter.type === "multiple") {
+		// 		const values = filter.value.map((val) => `'${val.replace(/'/g, "''")}'`).join(", ");
+		// 		values && conditions.push(`d.${field} IN (${values})`);
+		// 	} else if (filter.type === "text") {
+		// 		filter?.value && conditions.push(`LOWER(d.${field}) LIKE LOWER('%${filter.value.replace(/'/g, "''")}%')`);
+		// 	} else if (filter.type === "keyword") {
+		// 		baseQuery += `
+		// 		JOIN doc_metadata dm 
+		// 		ON d.doc_number = dm.dm_id 
+		// 		AND (
+		// 		 LOWER(dm.dm_id) LIKE LOWER('%${filter.value}%')
+		// 		  OR d.doc_storage_location = '${filter.value}'
+		// 		  OR d.doc_from = '${filter.value}'
+		// 		  OR d.doc_to = '${filter.value}'
+		// 		  OR LOWER(dm.dm_ocr_content) LIKE LOWER('%${filter.value}%')
+		// 		  )
+		// 	  `;
+
+		// 	}
+		// }
+
+		// // Handle sorting
+		// let orderByClause = "";
+		// if (inputs.sort && Object.keys(inputs.sort).length > 0) {
+		// 	const sortFields = Object.entries(inputs.sort).map(([field, direction]) => {
+		// 		const dir = direction.toLowerCase() === "asc" ? "ASC" : "DESC";
+
+		// 		// adding storing for date
+		// 		if (field === 'doc_created_at') {
+		// 			return `CASE
+		// 				WHEN d.doc_created_at IS NULL OR d.doc_created_at = '' THEN 
+		// 				CASE
+		// 				WHEN '${dir}' = 'ASC' THEN NULL
+		// 				ELSE TO_DATE('01/01/1900', 'DD/MM/YYYY')
+		// 				END
+		// 			    WHEN NOT d.doc_created_at ~ '^\\d{2}/\\d{2}/\\d{4}$' THEN NULL 
+		// 				ELSE TO_DATE(d.doc_created_at, 'DD/MM/YYYY')
+		// 				END ${dir} NULLS LAST`
+		// 		}
+
+		// 		return `d.${field} ${dir}`;
+		// 	});
+		// 	orderByClause = `ORDER BY ${sortFields.join(", ")}`;
+		// } else {
+		// 	orderByClause = `ORDER BY d.doc_number DESC`;
+		// }
+		// // Build the WHERE clause
+		// if (conditions.length > 0) {
+		// 	baseQuery += " WHERE " + conditions.join(" AND ");
+		// }
+
+		// Query to get the total count of documents
+		let countQuery = `
+		SELECT COUNT(DISTINCT d.doc_id) as total
+		FROM projects_master d
+		${joins}
+		${conditions.length ? " WHERE " + conditions.join(" AND ") : ""}
+	  `;
+
+		let { rows: countResult } = await pool.query(countQuery);
+
+		const totalDocuments = countResult[0].total;
+		const totalPages = Math.ceil(totalDocuments / pageSize);
+		// Main query with pagination
+		let query = `
+        ${baseQuery}
+        GROUP BY
+          d.doc_id
         ${orderByClause}
         LIMIT ${pageSize}
         OFFSET ${offset}
@@ -922,6 +978,28 @@ documentController.deleteDoc = async (req, res) => {
 		return res.json({ status: 0, msg: "Internal Server Error" });
 	}
 }
+
+documentController.deleteProject = async (req, res) => {
+	const { docId } = req.body;
+	const { user_id } = req.session.token;
+
+	try {
+		if (!user_id) {
+			return res.json({ status: 0, msg: "User not logged In" });
+		}
+		const result = await pool.query(
+			`DELETE FROM projects_master WHERE doc_id = ${docId}`,
+		);
+		if (result.rows.length === 0) {
+			return res.json({ status: 0, msg: "Document not found" });
+		}
+		return res.json({ status: 1, msg: "Document Deleted" });
+	} catch (error) {
+		console.log("🚀 ~ documentController.deleteDoc ~ error:", error)
+		return res.json({ status: 0, msg: "Internal Server Error" });
+	}
+}
+
 documentController.deleteAttachment = async (req, res) => {
 	const { docId } = req.body;
 	const { user_id } = req.session.token;
