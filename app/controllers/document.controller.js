@@ -319,6 +319,71 @@ documentController.editDocument = async (req, res) => {
 		res.send({ status: 0, msg: "Internal Server Error" });
 	}
 };
+documentController.editProject = async (req, res) => {
+	try {
+		let { newFormDataEntries, doc_id } = req.body;
+		let token = req.session.token;
+
+		if (!token) {
+			return res.json({ status: 0, msg: "User not logged In" });
+		}
+
+		if (token.user_role === "3") {
+			return res.send({ status: 0, msg: "Access Denied: Insufficient Permissions." });
+		}
+
+		const { rows: doc } = await pool.query(
+			`SELECT * FROM documents WHERE doc_number = $1`,
+			[newFormDataEntries.new_doc_number]
+		);
+
+		if (doc.length > 0) {
+			return res.send({ status: 0, msg: "Doc Number Already Exists" });
+		}
+
+		const generateInsertQuery = (data) => {
+
+			data["doc_uploaded_by"] = token.user_name;
+			data["doc_uploaded_by_id"] = token.user_id;
+			data["doc_uploaded_at"] = moment().format("MM/DD/YYYY");
+
+			const keys = Object.keys(data);
+			// const columns = keys.join(", ");
+			// const values = keys.map((_, i) => `$${i + 1}`).join(", ");
+			// const updateValues = keys.map((key) => `${key} = EXCLUDED.${key}`).join(", ");
+			Object.values(data)
+			if (newFormDataEntries.doc_reference && Array.isArray(newFormDataEntries.doc_reference)) {
+				newFormDataEntries.doc_reference = newFormDataEntries.doc_reference.map((item) =>
+					typeof item === "string" && item.startsWith('"') && item.endsWith('"')
+						? JSON.parse(item)
+						: item
+				).join(",");
+			}
+
+			let query
+			const condition = `doc_id = ${doc_id}`;
+			const setClause = Object.keys(data)
+				.map((key, index) => `${key} = $${index + 1}`)
+				.join(', ');
+
+			query = `UPDATE projects_master SET ${setClause} WHERE ${condition}`;
+
+
+			return { query, values: Object.values(data) };
+		};
+		const { query: insertQuery, values: insertValues } = generateInsertQuery({
+			...newFormDataEntries,
+		});
+
+		await pool.query(insertQuery, insertValues);
+
+
+		res.send({ status: 1, msg: "Success" });
+	} catch (error) {
+		console.error(error);
+		res.send({ status: 0, msg: "Internal Server Error" });
+	}
+};
 
 documentController.createDocument = async (req, res) => {
 	try {
@@ -447,10 +512,13 @@ documentController.createDocument = async (req, res) => {
 documentController.createProject = async (req, res) => {
 	try {
 		let inputs = req.body;
+		const pdfName = req.body.doc_pdf_name
+
 		let token = req.session.token;
 		if (token.user_role == "3") {
 			return res.send({ status: 0, msg: "Access Denied Insufficient Permissions." });
 		}
+
 		let pdfLocation = ''
 
 		if (req.file && req.file) {
@@ -468,20 +536,19 @@ documentController.createProject = async (req, res) => {
 
 
 		const generateInsertQuery = (data) => {
+			delete inputs.doc_pdf_name
 			const keys = Object.keys(data);
 			const nonEmptyKeys = keys.filter((key) => {
 				const value = data[key];
 				return value !== undefined && value !== null && (Array.isArray(value) ? value.length > 0 : typeof value === "string" ? value.trim() !== "" : true);
 			});
 
-			nonEmptyKeys.push("doc_uploaded_by", "doc_uploaded_at", "doc_agreement_pdfs", "doc_uploaded_by_id", "doc_status");
+			nonEmptyKeys.push("doc_uploaded_by", "doc_uploaded_at", "doc_uploaded_by_id", "doc_status");
 			data["doc_uploaded_by"] = token.user_name;
 			data["doc_uploaded_by_id"] = token.user_id;
 			data["doc_uploaded_at"] = getCurrentDateTime();
 			data["doc_status"] = "UPLOADED";
-			data["doc_agreement_pdfs"] = pdfLocation;
 			const columns = nonEmptyKeys.join(", ");
-			console.log("🚀 ~ generateInsertQuery ~ columns:", columns)
 			const valuesPlaceholder = nonEmptyKeys.map((_, i) => `$${i + 1}`).join(", ");
 			const values = nonEmptyKeys.map((key) => data[key]);
 			const updateValues = nonEmptyKeys
@@ -494,20 +561,43 @@ documentController.createProject = async (req, res) => {
 				.filter((value) => value !== null)
 				.join(", ");
 
-			const query = `INSERT INTO projects_master (${columns}) VALUES (${valuesPlaceholder});`;
+			const query = `INSERT INTO projects_master (${columns}) VALUES (${valuesPlaceholder}) RETURNING doc_id;`;
 
+			console.log("🚀 ~ generateInsertQuery ~ columns:", columns)
+			console.log("🚀 ~ generateInsertQuery ~ valuesPlaceholder:", valuesPlaceholder)
 			return { query, values };
 		};
 
 		const { query, values } = generateInsertQuery(inputs);
-
-		// // Check if the document already exists
-		// let selectQuery = `SELECT COUNT(*) FROM projects_master WHERE doc_code = $1`;
-		// let selectResult = await pool.query(selectQuery, [inputs.doc_code]);
-		// let count = selectResult?.rows[0]?.count;
-
-		// Execute the insert / update query
 		const createProject = await pool.query(query, values);
+		console.log("🚀 ~ documentController.createProject= ~ values:", values.length)
+		const createdDocId = createProject.rows[0].doc_id;
+
+		if (req.file && req.file) {
+			const fileName = uuidv4();
+
+			const s3Params = {
+				Bucket: process.env.BUCKET_NAME,
+				Key: `docs/${fileName}.pdf`,
+				Body: req.file.buffer,
+				ContentType: req.file.mimetype,
+			};
+			const s3Response = await s3.upload(s3Params).promise();
+			pdfLocation = s3Response.Location;
+			await pool.query(
+				`INSERT INTO project_attachments (
+				project_pdf_name, 
+				project_pdf_link,
+				project_code,
+				project_id,
+				attchment_uploaded_by_id,
+				created_at
+				) 
+				VALUES ($1, $2, $3, $4, $5, $6)`,
+				[pdfName, pdfLocation, inputs.doc_code, createdDocId, token.user_id, getCurrentDateTime()]
+			);
+
+		}
 		if (createProject.rowCount > 0) {
 			return res.send({ status: 1, msg: "Success" });
 		}
@@ -746,8 +836,14 @@ documentController.getFilteredProjects = async (req, res) => {
 		const offset = (page - 1) * pageSize;
 		let orderByClause = "ORDER BY d.doc_id DESC";
 		let baseQuery = `
-		SELECT d.* 
-		FROM projects_master AS d`;
+		SELECT    d.*,
+				COALESCE(Json_agg( Jsonb_build_object( 
+				'project_pdf_link', pa.project_pdf_link, 
+				'project_pdf_name', pa.project_pdf_name, 
+				'doc_id', pa.doc_id ) ) filter (WHERE pa.project_id IS NOT NULL), '[]') AS attachments
+		FROM      projects_master                                                                                                                                                                                      AS d
+		LEFT JOIN project_attachments                                                                                                                                                                                  AS pa
+		ON        d.doc_id = pa.project_id`;
 		let conditions = [];
 		let joins = "";
 
@@ -884,6 +980,47 @@ documentController.uploadAttachment = async (req, res) => {
 		res.json({ status: 0, msg: "Internal Server Error" });
 	}
 };
+documentController.uploadProjectAttachments = async (req, res) => {
+	try {
+		let inputs = req.body;
+		let token = req.session.token;
+
+		if (!req.file) {
+			return res.send({ status: 0, msg: "No file uploaded" });
+		}
+
+		const fileExtension = path.extname(req.file.originalname);
+		const fileName = uuidv4();
+
+		const s3Params = {
+			Bucket: process.env.BUCKET_NAME,
+			Key: `docs/${fileName}${fileExtension}`,
+			Body: req.file.buffer,
+			ContentType: req.file.mimetype,
+		};
+
+		const s3Response = await s3.upload(s3Params).promise();
+		const attachmentLocation = s3Response.Location;
+
+		await pool.query(
+			`INSERT INTO project_attachments (
+			project_pdf_name, 
+			project_pdf_link,
+			project_code,
+			project_id,
+			attchment_uploaded_by_id,
+			created_at
+			) 
+			VALUES ($1, $2, $3, $4, $5, $6)`,
+			[inputs.pdfFileName, attachmentLocation, inputs.doc_code, inputs.project_id, token.user_id, getCurrentDateTime()]
+		);
+
+		res.send({ status: 1, msg: "Attachment Uploaded" });
+	} catch (err) {
+		console.error("Error Uploading Attachments", err);
+		res.json({ status: 0, msg: "Internal Server Error" });
+	}
+};
 
 documentController.recordDocumentViewed = async (req, res) => {
 	try {
@@ -1002,10 +1139,10 @@ documentController.deleteProject = async (req, res) => {
 
 documentController.deleteAttachment = async (req, res) => {
 	const { docId } = req.body;
-	const { user_id } = req.session.token;
+	const token = req.session.token;
 
 	try {
-		if (!user_id) {
+		if (!token) {
 			return res.json({ status: 0, msg: "User not logged In" });
 		}
 		const result = await pool.query(
@@ -1016,6 +1153,27 @@ documentController.deleteAttachment = async (req, res) => {
 		}
 		return res.json({ status: 1, msg: "Document Deleted" });
 	} catch (error) {
+		return res.json({ status: 0, msg: "Internal Server Error" });
+	}
+}
+documentController.deleteProjectPdf = async (req, res) => {
+	const { docId } = req.query;
+	console.log("🚀 ~ documentController.deleteProjectPdf ~ docId:", docId)
+	const token = req?.session?.token;
+
+	try {
+		if (!token) {
+			return res.json({ status: 0, msg: "User not logged In" });
+		}
+		const result = await pool.query(
+			`DELETE FROM project_attachments WHERE doc_id = ${docId}`,
+		);
+		if (result.rows.length === 0) {
+			return res.json({ status: 0, msg: "Document not found" });
+		}
+		return res.json({ status: 1, msg: "Document Deleted" });
+	} catch (error) {
+		console.log("🚀 ~ documentController.deleteProjectPdf ~ error:", error)
 		return res.json({ status: 0, msg: "Internal Server Error" });
 	}
 }

@@ -364,7 +364,7 @@
 																			<span>
 																				<div class="form-group">
 																					<div class="form-control-wrap">
-																						<input type="text	"
+																						<input type="text"
 																							class="form-control filter-input"
 																							id="doc_DLP_period"
 																							placeholder="DLP period">
@@ -420,6 +420,9 @@
 																					data-filter="text" id="doc_subject"
 																					placeholder="Retention Amount">
 																			</span>
+																		</div>
+																		<div class="nk-tb-col">
+
 																		</div>
 															</div>
 														</div>
@@ -500,18 +503,26 @@
 				}
 			});
 		});
+		function renderPdfLinks(attachments) {
+			let links = ''
+			if (attachments && attachments.length > 0) {
+				attachments.forEach((attachment) => {
+					links += `<a class="badge bg-outline-primary" href="${attachment.project_pdf_link}">${attachment.project_pdf_name}</a>`
+				})
+			} else return `-`
+			return links;
+		}
 		function renderTabledata(response) {
 			if (response.payload.documents && response.payload.documents.length > 0) {
 				$("#table-status").empty();
 				let rowsHtml = "";
 				response.payload.documents.forEach((data) => {
-					console.log(data);
 					let rowHtml = `
 					<div class="nk-tb-item text-left table-content">
 					<%if(token.user_role != 3){%>
 					<div class="nk-tb-col text-start editDocument">
 						<span style="margin-right: 8px;">
-							<a href="/edit-document/${btoa(data.doc_id)}">
+							<a href="/edit-project/${btoa(data.doc_id)}">
 								<em class="icon ni ni-edit-fill"></em>
 							</a>
 						</span>
@@ -563,13 +574,18 @@
 						<span>${data.doc_retention_amount || "-"}</span>
 					</div>
 					<div class="nk-tb-col text-start">
-						<span>${"-"}</span>
+						<span>
+						  ${renderPdfLinks(data?.attachments)} 
+						</span>
 					</div>
 				</div>`
 					rowsHtml += rowHtml;
 				})
 				$("#table-filters").after(rowsHtml);
 
+			} else {
+				console.log("No Records Found");
+				$("#table-status").html(`<div class="text-center"><p>No Records Found</p></div>`);
 			}
 		}
 
@@ -708,15 +724,16 @@
 			});
 		});
 
-		document.getElementById("doc_DLP_period").addEventListener("blur", function () {
-			if (!this.value) this.type = "text"; // Reset if no date selected
-		});
-		document.getElementById("doc_DLP_period").addEventListener("click", function () {
-			this.type = "month";  // Change type to 'date' to open the calendar
-			this.showPicker();   // Open the calendar programmatically
-		});
-
-
+		$(document).ready(function () {
+			$("#doc_DLP_period").on("input", function () {
+				let value = $(this).val();
+				value = value.replace(/\D/g, "");
+				if (value.length > 2) {
+					value = value.substring(0, 2);
+				}
+				$(this).val(value);
+			})
+		});;
 	</script>
 </body>
 

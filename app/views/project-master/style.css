@@ -125,25 +125,8 @@
 .highlightrow {
   background-color: beige;
 }
-input#doc_DLP_period {
-  appearance: textfield;
-  -moz-appearance: textfield;
-}
-input#doc_DLP_period::-webkit-calendar-picker-indicator {
-  display: none;
-  -webkit-appearance: none;
-}
-input[type="date"]::-webkit-calendar-picker-indicator {
-  display: none;
-  -webkit-appearance: none;
-}
-/* Hide placeholder text */
-input#doc_DLP_period[type="month"]::placeholder {
-  opacity: 0 !important;
-}
-input[type="month"]:in-range::-webkit-datetime-edit-year-field,
-input[type="month"]:in-range::-webkit-datetime-edit-month-field,
-input[type="month"]:in-range::-webkit-datetime-edit-day-field,
-input[type="month"]:in-range::-webkit-datetime-edit-text {
-  color: transparent;
+
+.disable {
+  pointer-events: none;
+  opacity: 0.5;
 }

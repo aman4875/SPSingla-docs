@@ -32,7 +32,7 @@
                                         <div class="nk-block-head nk-block-head-sm">
                                             <div class="nk-block-between g-3">
                                                 <div class="nk-block-head-content d-flex">
-                                                    <h3 class="nk-block-title page-title">Add Document</h3>
+                                                    <h3 class="nk-block-title page-title">Add Project</h3>
                                                     <button id="saveDraftButton"
                                                         style="margin: -5px 20px 5px 20px; min-width: 88px"
                                                         class="btn btn-sm btn-dim btn-outline-primary d-none text-center">Save
@@ -40,7 +40,7 @@
                                                 </div>
 
                                                 <div class="nk-block-head-content">
-                                                    <a href="/documents"
+                                                    <a href="/project-master"
                                                         class="btn btn-outline-light bg-white d-none d-sm-inline-flex"><em
                                                             class="icon ni ni-arrow-left"></em><span>Back</span></a>
                                                 </div>
@@ -168,6 +168,8 @@
                                                                         placeholder="DLP Period" id="doc_DLP_period"
                                                                         name="doc_DLP_period" value="" required />
                                                                 </div>
+                                                                <small id="error-msg" class="text-danger"
+                                                                    style="display:none;"></small>
                                                             </div>
                                                         </div>
                                                         <div class="col-md-4">
@@ -272,6 +274,11 @@
     <script src="/app/assets/js/scripts.js"></script>
     <script src="/app/assets/js/charts/gd-default.js"></script>
     <script>
+        let fileName = null
+        $("#doc_file").on("change", function () {
+            fileName = this.files[0].name;
+        });
+
         $(document).ready(function () {
 
             $(".nk-menu-sub .nk-menu-item ").each(function () {
@@ -283,6 +290,30 @@
             });
         });
 
+        $(document).ready(function () {
+            $("#doc_DLP_period").on("input", function () {
+                let value = $(this).val();
+                value = value.replace(/\D/g, "");
+                if (value.length > 2) {
+                    value = value.substring(0, 2);
+                }
+
+                $(this).val(value); // Update the field with the cleaned value
+            });
+
+            $("#doc_DLP_period").on("blur", function () {
+                let value = $(this).val();
+                let numericValue = parseInt(value, 10);
+
+                if (numericValue < 1 || numericValue > 12 || isNaN(numericValue)) {
+                    $("#error-msg").text("Please enter a valid month (1-12)").show();
+                    $(this).addClass("is-invalid"); // Bootstrap error styling
+                } else {
+                    $("#error-msg").hide();
+                    $(this).removeClass("is-invalid");
+                }
+            });
+        });
 
 
         $("#documentForm").submit(function (event) {
@@ -294,13 +325,7 @@
             NioApp.handleButtonState("uploadDocumentBtn", "Upload", true);
 
             let formData = new FormData(this);
-            console.log("🚀 ~ formData:", [...formData])
-            // let isDocNumber = false;
-            // for (let pair of formData.entries()) {
-            //     if (pair[0] == "doc_number") {
-            //         isDocNumber = true;
-            //     }
-            // }
+            formData.append("doc_pdf_name", fileName);
 
             // Your AJAX request
             $.ajax({
@@ -325,6 +350,7 @@
                 },
             });
         });
+
     </script>
 </body>
 
