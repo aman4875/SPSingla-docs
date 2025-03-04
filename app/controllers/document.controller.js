@@ -563,14 +563,11 @@ documentController.createProject = async (req, res) => {
 
 			const query = `INSERT INTO projects_master (${columns}) VALUES (${valuesPlaceholder}) RETURNING doc_id;`;
 
-			console.log("🚀 ~ generateInsertQuery ~ columns:", columns)
-			console.log("🚀 ~ generateInsertQuery ~ valuesPlaceholder:", valuesPlaceholder)
 			return { query, values };
 		};
 
 		const { query, values } = generateInsertQuery(inputs);
 		const createProject = await pool.query(query, values);
-		console.log("🚀 ~ documentController.createProject= ~ values:", values.length)
 		const createdDocId = createProject.rows[0].doc_id;
 
 		if (req.file && req.file) {
@@ -830,11 +827,12 @@ documentController.getFilteredDocuments = async (req, res) => {
 documentController.getFilteredProjects = async (req, res) => {
 	try {
 		let inputs = req.body;
+		console.log("🚀 ~ documentController.getFilteredProjects= ~ inputs:", inputs)
 		let token = req.session.token;
 		const page = inputs.page || 1;
 		const pageSize = inputs.limit || 10;
 		const offset = (page - 1) * pageSize;
-		let orderByClause = "ORDER BY d.doc_id DESC";
+		let orderByClause = "";
 		let baseQuery = `
 		SELECT    d.*,
 				COALESCE(Json_agg( Jsonb_build_object( 
@@ -849,57 +847,64 @@ documentController.getFilteredProjects = async (req, res) => {
 
 
 		// Handle filters from inputs.activeFilter
-		// for (const [field, filter] of Object.entries(inputs.activeFilter)) {
-		// 	if (filter.type === "multiple") {
-		// 		const values = filter.value.map((val) => `'${val.replace(/'/g, "''")}'`).join(", ");
-		// 		values && conditions.push(`d.${field} IN (${values})`);
-		// 	} else if (filter.type === "text") {
-		// 		filter?.value && conditions.push(`LOWER(d.${field}) LIKE LOWER('%${filter.value.replace(/'/g, "''")}%')`);
-		// 	} else if (filter.type === "keyword") {
-		// 		baseQuery += `
-		// 		JOIN doc_metadata dm 
-		// 		ON d.doc_number = dm.dm_id 
-		// 		AND (
-		// 		 LOWER(dm.dm_id) LIKE LOWER('%${filter.value}%')
-		// 		  OR d.doc_storage_location = '${filter.value}'
-		// 		  OR d.doc_from = '${filter.value}'
-		// 		  OR d.doc_to = '${filter.value}'
-		// 		  OR LOWER(dm.dm_ocr_content) LIKE LOWER('%${filter.value}%')
-		// 		  )
-		// 	  `;
+		for (const [field, filter] of Object.entries(inputs.activeFilter)) {
+			if (filter.type === "multiple") {
+				const values = filter.value.map((val) => `'${val.replace(/'/g, "''")}'`).join(", ");
+				values && conditions.push(`d.${field} IN (${values})`);
+			} else if (filter.type === "text") {
+				filter?.value && conditions.push(`LOWER(d.${field}) LIKE LOWER('%${filter.value.replace(/'/g, "''")}%')`);
+			} else if (filter.type === "boolean") {
+				filter?.value && conditions.push(`d.${field} =  ${filter.value.replace(/'/g, "''") === "Yes" ? 'TRUE' : 'FALSE'}`);
+			} else if (filter.type === "date") {
+				filter?.value && conditions.push(`LOWER(d.${field}) LIKE LOWER('%${filter.value.replace(/'/g, "''")}%')`);
+			} else if (filter.type === "number") {
+				filter?.value && conditions.push(`d.${field}::TEXT LIKE '${filter.value.replace(/'/g, "''")}%'`);
+			} else if (filter.type === "keyword") {
+				baseQuery += `
+				JOIN doc_metadata dm 
+				ON d.doc_number = dm.dm_id 
+				AND (
+				 LOWER(dm.dm_id) LIKE LOWER('%${filter.value}%')
+				  OR d.doc_storage_location = '${filter.value}'
+				  OR d.doc_from = '${filter.value}'
+				  OR d.doc_to = '${filter.value}'
+				  OR LOWER(dm.dm_ocr_content) LIKE LOWER('%${filter.value}%')
+				  )
+			  `;
 
-		// 	}
-		// }
+			}
+		}
 
 		// // Handle sorting
-		// let orderByClause = "";
-		// if (inputs.sort && Object.keys(inputs.sort).length > 0) {
-		// 	const sortFields = Object.entries(inputs.sort).map(([field, direction]) => {
-		// 		const dir = direction.toLowerCase() === "asc" ? "ASC" : "DESC";
+		if (inputs.sort && Object.keys(inputs.sort).length > 0) {
+			const sortFields = Object.entries(inputs.sort).map(([field, direction]) => {
+				const dir = direction.toLowerCase() === "asc" ? "ASC" : "DESC";
 
-		// 		// adding storing for date
-		// 		if (field === 'doc_created_at') {
-		// 			return `CASE
-		// 				WHEN d.doc_created_at IS NULL OR d.doc_created_at = '' THEN 
-		// 				CASE
-		// 				WHEN '${dir}' = 'ASC' THEN NULL
-		// 				ELSE TO_DATE('01/01/1900', 'DD/MM/YYYY')
-		// 				END
-		// 			    WHEN NOT d.doc_created_at ~ '^\\d{2}/\\d{2}/\\d{4}$' THEN NULL 
-		// 				ELSE TO_DATE(d.doc_created_at, 'DD/MM/YYYY')
-		// 				END ${dir} NULLS LAST`
-		// 		}
+				// adding storing for date
+				if (inputs.isDate === true) {
+					return `CASE
+						WHEN d.${field} IS NULL OR d.${field} = '' THEN 
+						CASE
+						WHEN '${dir}' = 'ASC' THEN NULL
+						ELSE TO_DATE('01/01/1900', 'DD/MM/YYYY')
+						END
+					    WHEN NOT d.${field} ~ '^\\d{2}/\\d{2}/\\d{4}$' THEN NULL 
+						ELSE TO_DATE(d.${field}, 'DD/MM/YYYY')
+						END ${dir} NULLS LAST`
+				}
 
-		// 		return `d.${field} ${dir}`;
-		// 	});
-		// 	orderByClause = `ORDER BY ${sortFields.join(", ")}`;
-		// } else {
-		// 	orderByClause = `ORDER BY d.doc_number DESC`;
-		// }
+				return `d.${field} ${dir}`;
+			});
+			orderByClause = `ORDER BY ${sortFields.join(", ")}`;
+
+		} else {
+			orderByClause = `ORDER BY d.doc_id DESC`;
+		}
 		// // Build the WHERE clause
-		// if (conditions.length > 0) {
-		// 	baseQuery += " WHERE " + conditions.join(" AND ");
-		// }
+		if (conditions.length > 0) {
+			console.log("🚀 ~ documentController.getFilteredProjects= ~ conditions:", conditions)
+			baseQuery += " WHERE " + conditions.join(" AND ");
+		}
 
 		// Query to get the total count of documents
 		let countQuery = `
@@ -922,9 +927,11 @@ documentController.getFilteredProjects = async (req, res) => {
         LIMIT ${pageSize}
         OFFSET ${offset}
       `;
+
+		console.log("🚀 ~ documentController.getFilteredProjects= ~ query:", query)
 		// Execute the main query
 		let { rows: documents } = await pool.query(query);
-		res.json({
+		return res.json({
 			status: 1,
 			msg: "Success",
 			payload: {
@@ -933,9 +940,10 @@ documentController.getFilteredProjects = async (req, res) => {
 				currentPage: page,
 			},
 		});
+
 	} catch (err) {
 		console.error("Error fetching filtered documents:", err);
-		res.json({ status: 0, msg: "Internal Server Error" });
+		return res.json({ status: 0, msg: "Internal Server Error" });
 	}
 };
 
@@ -1158,7 +1166,6 @@ documentController.deleteAttachment = async (req, res) => {
 }
 documentController.deleteProjectPdf = async (req, res) => {
 	const { docId } = req.query;
-	console.log("🚀 ~ documentController.deleteProjectPdf ~ docId:", docId)
 	const token = req?.session?.token;
 
 	try {

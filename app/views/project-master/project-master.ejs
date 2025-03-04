@@ -190,7 +190,7 @@
 																				Name</span><span
 																				class="sort-indicator"></span>
 																		</div>
-																		<div class="nk-tb-col">
+																		<div class="nk-tb-col date">
 																			<span
 																				data-field="doc_financial_date">Financial
 																				Opening
@@ -203,14 +203,14 @@
 																				No</span><span
 																				class="sort-indicator"></span>
 																		</div>
-																		<div class="nk-tb-col">
+																		<div class="nk-tb-col date">
 																			<span
 																				data-field="doc_agreement_date">Agreement
 																				Date</span><span
 																				class="sort-indicator"></span>
 																		</div>
 
-																		<div class="nk-tb-col">
+																		<div class="nk-tb-col date">
 																			<span data-field="doc_completion_date">Date
 																				of
 																				Completion</span><span
@@ -227,8 +227,9 @@
 																				class="sort-indicator"></span>
 																		</div>
 
-																		<div class="nk-tb-col">
-																			<span data-field="doc_revised_date">Revised
+																		<div class="nk-tb-col date">
+																			<span
+																				data-field="doc_revised_date date">Revised
 																				Completion Date</span><span
 																				class="sort-indicator"></span>
 																		</div>
@@ -256,10 +257,11 @@
 																				Amount as on Date</span><span
 																				class="sort-indicator"></span>
 																		</div>
-																		<div class="nk-tb-col">
-																			<span data-field="doc_agreement_pdfs">Upload
+																		<div class="nk-tb-col no-click">
+																			<span
+																				data-field="doc_agreement_pdfs ">Upload
 																				Agreement</span><span
-																				class="sort-indicator"></span>
+																				class="sort-indicator "></span>
 																		</div>
 															</div>
 
@@ -301,7 +303,8 @@
 																				<div class="form-group">
 																					<div class="form-control-wrap">
 																						<input placeholder="Date"
-																							id="doc_date" type="text"
+																							id="doc_financial_date"
+																							type="text"
 																							class="form-control date-picker filter-input"
 																							data-filter="date">
 																					</div>
@@ -313,7 +316,8 @@
 																			<span>
 																				<input type="number"
 																					class="form-control filter-input"
-																					data-filter="text" id="doc_subject"
+																					data-filter="number"
+																					id="doc_agreement_no"
 																					placeholder="Agreement No">
 																			</span>
 																		</div>
@@ -324,7 +328,8 @@
 																				<div class="form-group">
 																					<div class="form-control-wrap">
 																						<input placeholder="Date"
-																							id="doc_date" type="text"
+																							id="doc_agreement_date"
+																							type="text"
 																							class="form-control date-picker filter-input"
 																							data-filter="date">
 																					</div>
@@ -336,7 +341,8 @@
 																				<div class="form-group">
 																					<div class="form-control-wrap">
 																						<input placeholder="Date"
-																							id="doc_date" type="text"
+																							id="doc_completion_date"
+																							type="text"
 																							class="form-control date-picker filter-input"
 																							data-filter="date">
 																					</div>
@@ -348,8 +354,8 @@
 																			<span>
 																				<select
 																					class="form-select form-control js-select2 filter-input"
-																					data-filter="text" id="doc_purpose"
-																					name="doc_purpose"
+																					data-filter="boolean"
+																					id="doc_awarded" name="doc_awarded"
 																					data-placeholder="Awarded">
 																					<option label="empty" value="">
 																					</option>
@@ -364,11 +370,11 @@
 																			<span>
 																				<div class="form-group">
 																					<div class="form-control-wrap">
-																						<input type="text"
+																						<input type="number"
+																							data-filter="number"
 																							class="form-control filter-input"
-																							id="doc_DLP_period"
+																							id="doc_dlp_period"
 																							placeholder="DLP period">
-
 																					</div>
 																				</div>
 																			</span>
@@ -378,7 +384,8 @@
 																				<div class="form-group">
 																					<div class="form-control-wrap">
 																						<input placeholder="Date"
-																							id="doc_date" type="text"
+																							id="doc_revised_date"
+																							type="text"
 																							class="form-control date-picker filter-input"
 																							data-filter="date">
 																					</div>
@@ -390,7 +397,8 @@
 																				<div class="form-group">
 																					<div class="form-control-wrap">
 																						<input placeholder="Date"
-																							id="doc_date" type="text"
+																							id="doc_dlp_ending"
+																							type="text"
 																							class="form-control date-picker filter-input"
 																							data-filter="date">
 																					</div>
@@ -401,7 +409,8 @@
 																			<span>
 																				<input type="number"
 																					class="form-control filter-input"
-																					data-filter="text" id="doc_subject"
+																					data-filter="number"
+																					id="doc_total_mobilisation_amount"
 																					placeholder="Total Mobilisation Amount">
 																			</span>
 																		</div>
@@ -409,7 +418,8 @@
 																			<span>
 																				<input type="number"
 																					class="form-control filter-input"
-																					data-filter="text" id="doc_subject"
+																					data-filter="number"
+																					id="doc_bal_mobilisation_amount"
 																					placeholder="Balance Mobilisation Amount">
 																			</span>
 																		</div>
@@ -417,11 +427,12 @@
 																			<span>
 																				<input type="number"
 																					class="form-control filter-input"
-																					data-filter="text" id="doc_subject"
+																					data-filter="number"
+																					id="doc_retention_amount"
 																					placeholder="Retention Amount">
 																			</span>
 																		</div>
-																		<div class="nk-tb-col">
+																		<div class="nk-tb-col no-click">
 
 																		</div>
 															</div>
@@ -493,6 +504,14 @@
 	<script>
 		let isFetching = false;
 		let docIdToDelete = null;
+		let totalPages
+		let filters = {
+			limit: 10,
+			page: 1,
+			sort: {},
+			activeFilter: {},
+			isDate: false
+		};
 
 		$(document).ready(function () {
 			$(".nk-menu-sub .nk-menu-item ").each(function () {
@@ -599,14 +618,14 @@
 			$.ajax({
 				type: "POST",
 				url: "/docs/get-filtered-projects",
-				// data: JSON.stringify(filters),
+				data: JSON.stringify(filters),
 				contentType: "application/json",
 				success: function (response) {
 					isFetching = false; // Reset flag
 					if (response.status == 1) {
 						renderTabledata(response)
 						totalPages = response.payload.totalPages || 1;
-						updatePagination(totalPages, 1);
+						updatePagination(totalPages, filters.page);
 					} else {
 						$("#table-status").html(`<div class="text-center"><p>Something Went Wrong</p></div>`);
 						$(".scrollable-datatable").css({ 'overflow': 'none !important' });
@@ -683,6 +702,31 @@
 			$pagination.append(`<li class="paginate_button page-item ${currentPage === totalPages ? 'disabled' : 'next'}" id="DataTables_Table_2_next"><a aria-controls="DataTables_Table_2" role="link" data-dt-idx="next" tabindex="0" class="page-link">Next</a></li>`);
 		}
 
+		function handlePaginationClick(event) {
+			event.preventDefault();
+			const $target = $(event.target).closest('li');
+			let newPage = filters.page;
+
+			if ($target.hasClass('previous') && filters.page > 1) {
+				newPage--;
+			} else if ($target.hasClass('next') && filters.page < totalPages) {
+				newPage++;
+			} else {
+				const clickedPage = parseInt($target.find('a').text());
+				if (!isNaN(clickedPage)) {
+					newPage = clickedPage;
+				}
+			}
+
+			if (newPage !== filters.page) {
+				filters.page = newPage;
+				fetchProjects()
+			}
+		}
+
+
+		$('#table-pagination').on('click', 'a', handlePaginationClick);
+
 		$(document).on('click', '#deleteDoc', function (event) {
 			event.preventDefault();
 			let openModal = document.getElementById('open-modal')
@@ -734,6 +778,84 @@
 				$(this).val(value);
 			})
 		});;
+
+		$('.filter-limit a').click(function (event) {
+			event.preventDefault();
+			var selectedLimit = $(this).data('limit');
+			filters.limit = selectedLimit;
+			$('.filter-limit li').removeClass('active');
+			$(this).parent().addClass('active');
+			fetchProjects()
+		});
+
+		$(".filter-input").change((e) => {
+			let value = e.target.value.trim();
+			let id = e.target.id;
+			let dataFilter = e.target.dataset.filter;
+			console.log("🚀 ~ $ ~ dataFilter:", dataFilter)
+
+			if (e.target.multiple) {
+				value = Array.from(e.target.selectedOptions).map(option => option.value);
+			}
+
+			if (filters.activeFilter.hasOwnProperty(id)) {
+				delete filters.activeFilter[id];
+			}
+
+			if (value.length > 0) {
+				filters.activeFilter[id] = {
+					type: dataFilter,
+					value: value
+				};
+			}
+			fetchProjects()
+		});
+
+		$('.js-select2').select2({
+			placeholder: 'Select an option',
+			width: 'resolve'
+		});
+
+		$("#table-head .nk-tb-col").click(function () {
+			const column = $(this);
+
+			if (column.hasClass("date")) {
+				filters.isDate = true;
+			} else {
+				filters.isDate = false;
+			}
+
+			const columnName = column.find("span").data("field")
+			let newSortClass = "";
+
+			if (column.hasClass("sort-asc")) {
+				newSortClass = "sort-dsc";
+			} else if (column.hasClass("sort-dsc")) {
+				newSortClass = "";
+			} else {
+				newSortClass = "sort-asc";
+			}
+			filters.sort = {};
+
+			// If there's a new sorting order, update the filter and apply class
+			if (newSortClass) {
+				filters.sort[columnName] = newSortClass === "sort-dsc" ? "DSC" : "ASC";
+				column.addClass(newSortClass).addClass("active");
+			}
+
+			// Update sorting styles for all columns based on filters.sort
+			$("#table-head .nk-tb-col").removeClass("sort-dsc sort-asc active");
+			$("#table-head .nk-tb-col").each(function () {
+				const field = $(this).find("span").data("field");
+				if (filters.sort[field]) {
+					$(this).addClass(filters.sort[field] === "DSC" ? "sort-dsc" : "sort-asc").addClass("active");
+				}
+			});
+
+			fetchProjects();
+		});
+
+
 	</script>
 </body>
 

@@ -130,3 +130,7 @@
   pointer-events: none;
   opacity: 0.5;
 }
+.project-master span.sort-indicator {
+  display: inline-block;
+  margin-left: 15px;
+}
