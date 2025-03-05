@@ -160,13 +160,13 @@
                                                         </div>
                                                         <div class="col-md-4">
                                                             <div class="form-group">
-                                                                <label class="form-label" for="doc_DLP_period">DLP
+                                                                <label class="form-label" for="doc_dlp_period">DLP
                                                                     Period
                                                                     (in months)</label>
                                                                 <div class="form-control-wrap">
                                                                     <input type="number" class="form-control"
-                                                                        placeholder="DLP Period" id="doc_DLP_period"
-                                                                        name="doc_DLP_period" value="" required />
+                                                                        placeholder="DLP Period" id="doc_dlp_period"
+                                                                        name="doc_dlp_period" value="" required />
                                                                 </div>
                                                                 <small id="error-msg" class="text-danger"
                                                                     style="display:none;"></small>
@@ -291,7 +291,7 @@
         });
 
         $(document).ready(function () {
-            $("#doc_DLP_period").on("input", function () {
+            $("#doc_dlp_period").on("input", function () {
                 let value = $(this).val();
                 value = value.replace(/\D/g, "");
                 if (value.length > 2) {
@@ -301,7 +301,7 @@
                 $(this).val(value); // Update the field with the cleaned value
             });
 
-            $("#doc_DLP_period").on("blur", function () {
+            $("#doc_dlp_period").on("blur", function () {
                 let value = $(this).val();
                 let numericValue = parseInt(value, 10);
 
@@ -339,9 +339,10 @@
                         NioApp.handleButtonState("uploadDocumentBtn", "Upload", false);
                         NioApp.Toast("<h5>Document Uploaded</h5><p>Document Uploaded Successfully</p>", "success");
                         document.getElementById("documentForm").reset();
-                    } else {
-                        NioApp.Toast("<h5>Something Went Wrong</h5><p>Error while uploading Document</p>", "error");
-                    }
+                    } else if (response.status == 0) {
+                        NioApp.handleButtonState("uploadDocumentBtn", "Upload", false);
+                        NioApp.Toast(`<h5>Error Occurred</h5><p>${response.msg}</p>`, "error");
+                    } else NioApp.Toast("<h5>Something Went Wrong</h5><p>Error while uploading Document</p>", "error");
                 },
                 error: function (xhr, status, error) {
                     NioApp.handleButtonState("uploadDocumentBtn", "Upload", false);

@@ -188,6 +188,8 @@
                                                                         name="doc_dlp_period"
                                                                         value="<%= projectData ? projectData.doc_dlp_period : '' %>"
                                                                         required />
+                                                                    <small id="error-msg" class="text-danger"
+                                                                        style="display:none;"></small>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -202,8 +204,7 @@
                                                                         autocomplete="off" name="doc_revised_date"
                                                                         placeholder="Revised Completion Date"
                                                                         class="form-control date-picker"
-                                                                        value="<%= projectData ? projectData.doc_revised_date : '' %>"
-                                                                        required />
+                                                                        value="<%= projectData ? projectData.doc_revised_date : '' %>" />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -218,8 +219,7 @@
                                                                         autocomplete="off" name="doc_dlp_ending"
                                                                         placeholder="DLP Ending on"
                                                                         class="form-control date-picker"
-                                                                        value="<%= projectData ? projectData.doc_dlp_ending : '' %>"
-                                                                        required />
+                                                                        value="<%= projectData ? projectData.doc_dlp_ending : '' %>" />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -233,8 +233,7 @@
                                                                         placeholder="Tota Mobilisation Amount"
                                                                         id="doc_total_mobilisation_amount"
                                                                         name="doc_total_mobilisation_amount"
-                                                                        value="<%= projectData ? projectData.doc_total_mobilisation_amount : '' %>"
-                                                                        required />
+                                                                        value="<%= projectData ? projectData.doc_total_mobilisation_amount : '' %>" />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -248,8 +247,7 @@
                                                                         placeholder="Balance Mobilisation Amount"
                                                                         id="doc_bal_mobilisation_amount"
                                                                         name="doc_bal_mobilisation_amount"
-                                                                        value="<%= projectData ? projectData.doc_bal_mobilisation_amount : '' %>"
-                                                                        required />
+                                                                        value="<%= projectData ? projectData.doc_bal_mobilisation_amount : '' %>" />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -263,17 +261,13 @@
                                                                         placeholder="Retention Amount as on Date"
                                                                         id="doc_retention_amount"
                                                                         name="doc_retention_amount"
-                                                                        value="<%= projectData ? projectData.doc_retention_amount : '' %>"
-                                                                        required />
+                                                                        value="<%= projectData ? projectData.doc_retention_amount : '' %>" />
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="col-md-4" id="pdfUploadContainer">
-
-                                                        </div>
                                                         <div class="col-md-12">
                                                             <div class="form-group">
-                                                                <button id="uploadDocumentBtn" type="submit"
+                                                                <button id="uploadDocumentBtn"
                                                                     class="btn btn-lg btn-primary ">Update</button>
                                                             </div>
                                                         </div>
@@ -441,6 +435,11 @@
         let docIdToDelete = null
         let initialFormData = new FormData($("#documentForm")[0]);
         let initialFormDataEntries = {};
+        let validationFlag = {
+            isFlag: false,
+            msg: ""
+        };
+
         initialFormData.forEach((value, key) => {
             initialFormDataEntries[key] = value;
         });
@@ -508,7 +507,6 @@
             event.preventDefault();
             let formData = new FormData();
             formData.append("docId", docIdToDelete);
-            console.log("🚀 ~ docIdToDelete:", docIdToDelete)
             $.ajax({
                 url: '/docs/delete-project-pdf?docId=' + docIdToDelete,
                 type: 'DELETE',
@@ -531,9 +529,12 @@
         });
 
 
-        $("#uploadDocumentBtn").click(function () {
-            const doc_id = "<%= projectData.doc_id %>"
+        $("#documentForm").submit(function () {
             event.preventDefault();
+            if (validationFlag.isFlag) {
+                return NioApp.Toast(`${validationFlag.msg}`, "error");
+            }
+            const doc_id = "<%= projectData.doc_id %>"
             toastr.clear();
             let form = $(this).closest("form")[0];
             let formData = new FormData(form);
@@ -544,7 +545,7 @@
                 newFormDataEntries[key] = value;
             });
 
-            let hasChanges = Object.keys(newFormDataEntries).some(key => newFormDataEntries[key] !== initialFormDataEntries[key]);
+            let hasChanges = Object.keys(newFormDataEntries).some(key => newFormDataEntries[key].trim() !== initialFormDataEntries[key].trim());
             if (!hasChanges) {
                 return NioApp.Toast("<h5>No Changes</h5><p>No changes to save</p>", "info");
             }
@@ -575,6 +576,34 @@
             });
         });
 
+        $(document).ready(function () {
+            $("#doc_dlp_period").on("input", function () {
+                let value = $(this).val();
+                value = value.replace(/\D/g, "");
+                if (value.length > 2) {
+                    value = value.substring(0, 2);
+                }
+
+                $(this).val(value); // Update the field with the cleaned value
+            });
+
+            $("#doc_dlp_period").on("blur", function () {
+                let value = $(this).val();
+                let numericValue = parseInt(value, 10);
+
+                if (numericValue < 1 || numericValue > 12 || isNaN(numericValue)) {
+                    $("#error-msg").text("Please enter a valid month (1-12)").show();
+                    $(this).addClass("is-invalid");
+                    validationFlag.isFlag = true
+                    validationFlag.msg = "<h5>Invalid Input</h5><p>Please enter a valid month (1-12)</p>"
+                } else {
+                    $("#error-msg").hide();
+                    $(this).removeClass("is-invalid");
+                    validationFlag.isFlag = false
+                    validationFlag.msg = ""
+                }
+            });
+        });
 
     </script>
 </body>

@@ -323,6 +323,7 @@ documentController.editProject = async (req, res) => {
 	try {
 		let { newFormDataEntries, doc_id } = req.body;
 		let token = req.session.token;
+		console.log("🚀 ~ documentController.getFilteredProjects= ~ inputs:", newFormDataEntries)
 
 		if (!token) {
 			return res.json({ status: 0, msg: "User not logged In" });
@@ -342,35 +343,27 @@ documentController.editProject = async (req, res) => {
 		}
 
 		const generateInsertQuery = (data) => {
-
+			let query
+			const keys = Object.keys(data);
 			data["doc_uploaded_by"] = token.user_name;
 			data["doc_uploaded_by_id"] = token.user_id;
 			data["doc_uploaded_at"] = moment().format("MM/DD/YYYY");
 
-			const keys = Object.keys(data);
-			// const columns = keys.join(", ");
-			// const values = keys.map((_, i) => `$${i + 1}`).join(", ");
-			// const updateValues = keys.map((key) => `${key} = EXCLUDED.${key}`).join(", ");
-			Object.values(data)
-			if (newFormDataEntries.doc_reference && Array.isArray(newFormDataEntries.doc_reference)) {
-				newFormDataEntries.doc_reference = newFormDataEntries.doc_reference.map((item) =>
-					typeof item === "string" && item.startsWith('"') && item.endsWith('"')
-						? JSON.parse(item)
-						: item
-				).join(",");
-			}
+			const nonEmptyKeys = keys.filter((key) => {
+				const value = data[key];
+				return value !== undefined && value !== null && (Array.isArray(value) ? value.length > 0 : typeof value === "string" ? value.trim() !== "" : true);
+			});
 
-			let query
 			const condition = `doc_id = ${doc_id}`;
-			const setClause = Object.keys(data)
-				.map((key, index) => `${key} = $${index + 1}`)
-				.join(', ');
+			const setClause = nonEmptyKeys.map((key, index) => `${key} = $${index + 1}`).join(', ');
+			const values = nonEmptyKeys.map((key) => data[key]);
 
 			query = `UPDATE projects_master SET ${setClause} WHERE ${condition}`;
 
 
-			return { query, values: Object.values(data) };
+			return { query, values: values };
 		};
+
 		const { query: insertQuery, values: insertValues } = generateInsertQuery({
 			...newFormDataEntries,
 		});
@@ -513,10 +506,20 @@ documentController.createProject = async (req, res) => {
 	try {
 		let inputs = req.body;
 		const pdfName = req.body.doc_pdf_name
-
 		let token = req.session.token;
+
 		if (token.user_role == "3") {
 			return res.send({ status: 0, msg: "Access Denied Insufficient Permissions." });
+		}
+
+		let { rows: projectCode } = await pool.query(
+			`SELECT doc_code FROM projects_master WHERE doc_code = $1`,
+			[inputs.doc_code]
+		);
+
+		if (projectCode.length > 0) {
+			return res.send({ status: 0, msg: "Project code already exists !" });
+
 		}
 
 		let pdfLocation = ''
@@ -827,7 +830,6 @@ documentController.getFilteredDocuments = async (req, res) => {
 documentController.getFilteredProjects = async (req, res) => {
 	try {
 		let inputs = req.body;
-		console.log("🚀 ~ documentController.getFilteredProjects= ~ inputs:", inputs)
 		let token = req.session.token;
 		const page = inputs.page || 1;
 		const pageSize = inputs.limit || 10;
@@ -860,17 +862,21 @@ documentController.getFilteredProjects = async (req, res) => {
 			} else if (filter.type === "number") {
 				filter?.value && conditions.push(`d.${field}::TEXT LIKE '${filter.value.replace(/'/g, "''")}%'`);
 			} else if (filter.type === "keyword") {
-				baseQuery += `
-				JOIN doc_metadata dm 
-				ON d.doc_number = dm.dm_id 
-				AND (
-				 LOWER(dm.dm_id) LIKE LOWER('%${filter.value}%')
-				  OR d.doc_storage_location = '${filter.value}'
-				  OR d.doc_from = '${filter.value}'
-				  OR d.doc_to = '${filter.value}'
-				  OR LOWER(dm.dm_ocr_content) LIKE LOWER('%${filter.value}%')
-				  )
-			  `;
+				conditions.push(`
+				LOWER(d.doc_code::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(d.doc_work_name::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(d.doc_department::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(d.doc_financial_date::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(d.doc_agreement_no::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(d.doc_agreement_date::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(d.doc_completion_date::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(d.doc_total_mobilisation_amount::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(d.doc_bal_mobilisation_amount::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(d.doc_retention_amount::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(d.doc_dlp_period::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(d.doc_revised_date::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(d.doc_dlp_ending::TEXT) LIKE LOWER('%${filter.value}%') 
+				`)
 
 			}
 		}
@@ -902,7 +908,6 @@ documentController.getFilteredProjects = async (req, res) => {
 		}
 		// // Build the WHERE clause
 		if (conditions.length > 0) {
-			console.log("🚀 ~ documentController.getFilteredProjects= ~ conditions:", conditions)
 			baseQuery += " WHERE " + conditions.join(" AND ");
 		}
 
