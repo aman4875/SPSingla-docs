@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zxx" class="js">
+
+<head>
+    <base href="../" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" />
+    <!-- Fav Icon  -->
+    <link rel="shortcut icon" href="/app/assets/images/favicon.png" />
+    <!-- Page Title  -->
+    <title>Dashboard | ProjectMaster</title>
+    <!-- StyleSheets  -->
+    <link rel="stylesheet" href="/app/assets/css/dashlite.css" />
+    <link id="skin-default" rel="stylesheet" href="/app/assets/css/theme.css" />
+    <link rel="stylesheet" href="/app/views/project-master/style.css" />
+    <style>
+    </style>
+</head>
+
+<body class="nk-body bg-lighter npc-general has-sidebar">
+    <div class="nk-app-root">
+        <div class="nk-main">
+            <%- include('./common/sidebar' , {subItems:{active:"projectMaster"} }); -%>
+                <div class="nk-wrap">
+
+                    <div class="nk-content">
+                        <div class="container-fluid">
+                            <div class="nk-content-inner">
+                                <div class="nk-content-body">
+                                    <div class="nk-block nk-block-lg">
+                                        <div class="nk-block-head nk-block-head-sm">
+                                            <div class="nk-block-between g-3">
+                                                <div class="nk-block-head-content d-flex">
+                                                    <h3 class="nk-block-title page-title">Add Project</h3>
+                                                    <button id="saveDraftButton"
+                                                        style="margin: -5px 20px 5px 20px; min-width: 88px"
+                                                        class="btn btn-sm btn-dim btn-outline-primary d-none text-center">Save
+                                                        Draft</button>
+                                                </div>
+
+                                                <div class="nk-block-head-content">
+                                                    <a href="/project-master"
+                                                        class="btn btn-outline-light bg-white d-none d-sm-inline-flex"><em
+                                                            class="icon ni ni-arrow-left"></em><span>Back</span></a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card card-bordered">
+                                            <div class="card-inner">
+                                                <form id="documentForm" class="form-validate is-alter">
+                                                    <div class="row g-gs">
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label" for="doc_code">Code</label>
+                                                                <div class="form-control-wrap">
+                                                                    <input type="text" class="form-control"
+                                                                        placeholder="Document Code" id="doc_code"
+                                                                        name="doc_code" value="" required />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label" for="doc_work_name">Name of
+                                                                    Work</label>
+                                                                <div class="form-control-wrap">
+                                                                    <input type="text" class="form-control"
+                                                                        placeholder="Name of Work" id="doc_work_name"
+                                                                        name="doc_work_name" value="" required />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label"
+                                                                    for="doc_department">Department
+                                                                    Name</label>
+                                                                <div class="form-control-wrap">
+                                                                    <input type="text" class="form-control"
+                                                                        placeholder="Department Name"
+                                                                        id="doc_department" name="doc_department"
+                                                                        value="" required />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label"
+                                                                    for="doc_financial_date">Financial
+                                                                    Opening Date</label>
+                                                                <div class="form-control-wrap focused">
+                                                                    <div class="form-icon form-icon-right"><em
+                                                                            class="icon ni ni-calendar-alt"></em></div>
+                                                                    <input type="text" required id="doc_financial_date"
+                                                                        autocomplete="off" name="doc_financial_date"
+                                                                        placeholder="Document Date"
+                                                                        class="form-control date-picker" value="" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-8">
+                                                            <div class="form-group">
+                                                                <label class="form-label"
+                                                                    for="doc_agreement_no">Agreement No</label>
+                                                                <div class="form-control-wrap">
+                                                                    <div class="input-group">
+                                                                        <input type="number" class="form-control"
+                                                                            placeholder="Agreement No"
+                                                                            id="doc_agreement_no"
+                                                                            name="doc_agreement_no" value="" required />
+
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label" for="doc_completion_date">Date
+                                                                    of Completion</label>
+                                                                <div class="form-control-wrap focused">
+                                                                    <div class="form-icon form-icon-right"><em
+                                                                            class="icon ni ni-calendar-alt"></em></div>
+                                                                    <input type="text" required id="doc_completion_date"
+                                                                        autocomplete="off" name="doc_completion_date"
+                                                                        placeholder="Document Date"
+                                                                        class="form-control date-picker" value="" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label"
+                                                                    for="doc_awarded">Awarded</label>
+                                                                <div class="form-control-wrap">
+                                                                    <select
+                                                                        class="form-select form-control js-select2 form-control"
+                                                                        id="doc_awarded" name="doc_awarded"
+                                                                        data-placeholder="Select Option" required>
+                                                                        <option label="empty" value=""></option>
+                                                                        <option value="true">Yes</option>
+                                                                        <option value="false">No</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label"
+                                                                    for="doc_agreement_date">Agreement Date</label>
+                                                                <div class="form-control-wrap focused">
+                                                                    <div class="form-icon form-icon-right"><em
+                                                                            class="icon ni ni-calendar-alt"></em></div>
+                                                                    <input type="text" required id="doc_agreement_date"
+                                                                        autocomplete="off" name="doc_agreement_date"
+                                                                        placeholder="Document Date"
+                                                                        class="form-control date-picker" value="" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label" for="doc_dlp_period">DLP
+                                                                    Period
+                                                                    (in months)</label>
+                                                                <div class="form-control-wrap">
+                                                                    <input type="number" class="form-control"
+                                                                        placeholder="DLP Period" id="doc_dlp_period"
+                                                                        name="doc_dlp_period" value="" required />
+                                                                </div>
+                                                                <small id="error-msg" class="text-danger"
+                                                                    style="display:none;"></small>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label" for="doc_revised_date">Revised
+                                                                    Completion Date</label>
+                                                                <div class="form-control-wrap focused">
+                                                                    <div class="form-icon form-icon-right"><em
+                                                                            class="icon ni ni-calendar-alt"></em></div>
+                                                                    <input type="text" id="doc_revised_date"
+                                                                        autocomplete="off" name="doc_revised_date"
+                                                                        placeholder="Revised Completion Date"
+                                                                        class="form-control date-picker" value="" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label" for="doc_DLP_ending">DLP
+                                                                    Ending on</label>
+                                                                <div class="form-control-wrap focused">
+                                                                    <div class="form-icon form-icon-right"><em
+                                                                            class="icon ni ni-calendar-alt"></em></div>
+                                                                    <input type="text" id="doc_DLP_ending"
+                                                                        autocomplete="off" name="doc_DLP_ending"
+                                                                        placeholder="DLP Ending on"
+                                                                        class="form-control date-picker" value="" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label"
+                                                                    for="doc_total_mobilisation_amount">Total
+                                                                    Mobilisation Amount</label>
+                                                                <div class="form-control-wrap">
+                                                                    <input type="number" class="form-control"
+                                                                        placeholder="Tota Mobilisation Amount"
+                                                                        id="doc_total_mobilisation_amount"
+                                                                        name="doc_total_mobilisation_amount" value="" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label"
+                                                                    for="doc_bal_mobilisation_amount">Balance
+                                                                    Mobilisation Amount</label>
+                                                                <div class="form-control-wrap">
+                                                                    <input type="number" class="form-control"
+                                                                        placeholder="Balance Mobilisation Amount"
+                                                                        id="doc_bal_mobilisation_amount"
+                                                                        name="doc_bal_mobilisation_amount" value="" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label"
+                                                                    for="doc_retention_amount">Retention Amount
+                                                                    as on Date</label>
+                                                                <div class="form-control-wrap">
+                                                                    <input type="number" class="form-control"
+                                                                        placeholder="Retention Amount as on Date"
+                                                                        id="doc_retention_amount"
+                                                                        name="doc_retention_amount" value="" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4" id="pdfUploadContainer">
+                                                            <div class="form-group">
+                                                                <label class="form-label" for="doc_file">Upload
+                                                                    PDF</label>
+                                                                <div class="form-control-wrap">
+                                                                    <input type="file" accept=".pdf"
+                                                                        class="form-control" placeholder="Upload File"
+                                                                        id="doc_file" name="doc_file" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12">
+                                                            <div class="form-group">
+                                                                <button id="uploadDocumentBtn" type="submit"
+                                                                    class="btn btn-lg btn-primary">Upload</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                            </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <%- include('./common/footer'); -%>
+        </div>
+    </div>
+    </div>
+    <script src="/app/assets/js/bundle.js"></script>
+    <script src="/app/assets/js/scripts.js"></script>
+    <script src="/app/assets/js/charts/gd-default.js"></script>
+    <script>
+        let fileName = null
+        $("#doc_file").on("change", function () {
+            fileName = this.files[0].name;
+        });
+
+        $(document).ready(function () {
+
+            $(".nk-menu-sub .nk-menu-item ").each(function () {
+                if ($(this).hasClass("active")) {
+                    let parentMenu = $(this).closest(".nk-menu-item.has-sub");
+                    parentMenu.addClass("active current-page");
+                    parentMenu.find(".nk-menu-sub").show();
+                }
+            });
+        });
+
+        $(document).ready(function () {
+            $("#doc_dlp_period").on("input", function () {
+                let value = $(this).val();
+                value = value.replace(/\D/g, "");
+                if (value.length > 2) {
+                    value = value.substring(0, 2);
+                }
+
+                $(this).val(value); // Update the field with the cleaned value
+            });
+
+            $("#doc_dlp_period").on("blur", function () {
+                let value = $(this).val();
+                let numericValue = parseInt(value, 10);
+
+                if (numericValue < 1 || numericValue > 12 || isNaN(numericValue)) {
+                    $("#error-msg").text("Please enter a valid month (1-12)").show();
+                    $(this).addClass("is-invalid"); // Bootstrap error styling
+                } else {
+                    $("#error-msg").hide();
+                    $(this).removeClass("is-invalid");
+                }
+            });
+        });
+
+
+        $("#documentForm").submit(function (event) {
+            event.preventDefault();
+            if (!this.checkValidity()) {
+                return false;
+            }
+
+            NioApp.handleButtonState("uploadDocumentBtn", "Upload", true);
+
+            let formData = new FormData(this);
+            formData.append("doc_pdf_name", fileName);
+
+            // Your AJAX request
+            $.ajax({
+                type: "POST",
+                url: "/docs/create-project",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    if (response.status == 1) {
+                        NioApp.handleButtonState("uploadDocumentBtn", "Upload", false);
+                        NioApp.Toast("<h5>Document Uploaded</h5><p>Document Uploaded Successfully</p>", "success");
+                        document.getElementById("documentForm").reset();
+                    } else if (response.status == 0) {
+                        NioApp.handleButtonState("uploadDocumentBtn", "Upload", false);
+                        NioApp.Toast(`<h5>Error Occurred</h5><p>${response.msg}</p>`, "error");
+                    } else NioApp.Toast("<h5>Something Went Wrong</h5><p>Error while uploading Document</p>", "error");
+                },
+                error: function (xhr, status, error) {
+                    NioApp.handleButtonState("uploadDocumentBtn", "Upload", false);
+                    NioApp.Toast("<h5>Something Went Wrong</h5><p>Error while uploading Document</p>", "error");
+                    console.error("Error saving draft:", error);
+                },
+            });
+        });
+
+    </script>
+</body>
+
+</html>

@@ -319,6 +319,64 @@ documentController.editDocument = async (req, res) => {
 		res.send({ status: 0, msg: "Internal Server Error" });
 	}
 };
+documentController.editProject = async (req, res) => {
+	try {
+		let { newFormDataEntries, doc_id } = req.body;
+		let token = req.session.token;
+		console.log("🚀 ~ documentController.getFilteredProjects= ~ inputs:", newFormDataEntries)
+
+		if (!token) {
+			return res.json({ status: 0, msg: "User not logged In" });
+		}
+
+		if (token.user_role === "3") {
+			return res.send({ status: 0, msg: "Access Denied: Insufficient Permissions." });
+		}
+
+		const { rows: doc } = await pool.query(
+			`SELECT * FROM documents WHERE doc_number = $1`,
+			[newFormDataEntries.new_doc_number]
+		);
+
+		if (doc.length > 0) {
+			return res.send({ status: 0, msg: "Doc Number Already Exists" });
+		}
+
+		const generateInsertQuery = (data) => {
+			let query
+			const keys = Object.keys(data);
+			data["doc_uploaded_by"] = token.user_name;
+			data["doc_uploaded_by_id"] = token.user_id;
+			data["doc_uploaded_at"] = moment().format("MM/DD/YYYY");
+
+			const nonEmptyKeys = keys.filter((key) => {
+				const value = data[key];
+				return value !== undefined && value !== null && (Array.isArray(value) ? value.length > 0 : typeof value === "string" ? value.trim() !== "" : true);
+			});
+
+			const condition = `doc_id = ${doc_id}`;
+			const setClause = nonEmptyKeys.map((key, index) => `${key} = $${index + 1}`).join(', ');
+			const values = nonEmptyKeys.map((key) => data[key]);
+
+			query = `UPDATE projects_master SET ${setClause} WHERE ${condition}`;
+
+
+			return { query, values: values };
+		};
+
+		const { query: insertQuery, values: insertValues } = generateInsertQuery({
+			...newFormDataEntries,
+		});
+
+		await pool.query(insertQuery, insertValues);
+
+
+		res.send({ status: 1, msg: "Success" });
+	} catch (error) {
+		console.error(error);
+		res.send({ status: 0, msg: "Internal Server Error" });
+	}
+};
 
 documentController.createDocument = async (req, res) => {
 	try {
@@ -442,6 +500,113 @@ documentController.createDocument = async (req, res) => {
 	} catch (error) {
 		res.send({ status: 0, msg: "Something Went Wrong" });
 		console.error(error);
+	}
+};
+documentController.createProject = async (req, res) => {
+	try {
+		let inputs = req.body;
+		const pdfName = req.body.doc_pdf_name
+		let token = req.session.token;
+
+		if (token.user_role == "3") {
+			return res.send({ status: 0, msg: "Access Denied Insufficient Permissions." });
+		}
+
+		let { rows: projectCode } = await pool.query(
+			`SELECT doc_code FROM projects_master WHERE doc_code = $1`,
+			[inputs.doc_code]
+		);
+
+		if (projectCode.length > 0) {
+			return res.send({ status: 0, msg: "Project code already exists !" });
+
+		}
+
+		let pdfLocation = ''
+
+		if (req.file && req.file) {
+			const fileName = uuidv4();
+
+			const s3Params = {
+				Bucket: process.env.BUCKET_NAME,
+				Key: `docs/${fileName}.pdf`,
+				Body: req.file.buffer,
+				ContentType: req.file.mimetype,
+			};
+			const s3Response = await s3.upload(s3Params).promise();
+			pdfLocation = s3Response.Location;
+		}
+
+
+		const generateInsertQuery = (data) => {
+			delete inputs.doc_pdf_name
+			const keys = Object.keys(data);
+			const nonEmptyKeys = keys.filter((key) => {
+				const value = data[key];
+				return value !== undefined && value !== null && (Array.isArray(value) ? value.length > 0 : typeof value === "string" ? value.trim() !== "" : true);
+			});
+
+			nonEmptyKeys.push("doc_uploaded_by", "doc_uploaded_at", "doc_uploaded_by_id", "doc_status");
+			data["doc_uploaded_by"] = token.user_name;
+			data["doc_uploaded_by_id"] = token.user_id;
+			data["doc_uploaded_at"] = getCurrentDateTime();
+			data["doc_status"] = "UPLOADED";
+			const columns = nonEmptyKeys.join(", ");
+			const valuesPlaceholder = nonEmptyKeys.map((_, i) => `$${i + 1}`).join(", ");
+			const values = nonEmptyKeys.map((key) => data[key]);
+			const updateValues = nonEmptyKeys
+				.map((key, i) => {
+					if (key !== "id") {
+						return `${key} = EXCLUDED.${key}`;
+					}
+					return null;
+				})
+				.filter((value) => value !== null)
+				.join(", ");
+
+			const query = `INSERT INTO projects_master (${columns}) VALUES (${valuesPlaceholder}) RETURNING doc_id;`;
+
+			return { query, values };
+		};
+
+		const { query, values } = generateInsertQuery(inputs);
+		const createProject = await pool.query(query, values);
+		const createdDocId = createProject.rows[0].doc_id;
+
+		if (req.file && req.file) {
+			const fileName = uuidv4();
+
+			const s3Params = {
+				Bucket: process.env.BUCKET_NAME,
+				Key: `docs/${fileName}.pdf`,
+				Body: req.file.buffer,
+				ContentType: req.file.mimetype,
+			};
+			const s3Response = await s3.upload(s3Params).promise();
+			pdfLocation = s3Response.Location;
+			await pool.query(
+				`INSERT INTO project_attachments (
+				project_pdf_name, 
+				project_pdf_link,
+				project_code,
+				project_id,
+				attchment_uploaded_by_id,
+				created_at
+				) 
+				VALUES ($1, $2, $3, $4, $5, $6)`,
+				[pdfName, pdfLocation, inputs.doc_code, createdDocId, token.user_id, getCurrentDateTime()]
+			);
+
+		}
+		if (createProject.rowCount > 0) {
+			return res.send({ status: 1, msg: "Success" });
+		}
+
+		return res.send({ status: 0, msg: "Something Went Wrong" });
+
+	} catch (error) {
+		console.error(error);
+		return res.send({ status: 0, msg: "Something Went Wrong" });
 	}
 };
 
@@ -605,7 +770,7 @@ documentController.getFilteredDocuments = async (req, res) => {
 			});
 			orderByClause = `ORDER BY ${sortFields.join(", ")}`;
 		} else {
-			orderByClause = `ORDER BY d.doc_number DESC`;
+			orderByClause = `ORDER BY d.doc_id DESC`;
 		}
 		// Build the WHERE clause
 		if (conditions.length > 0) {
@@ -662,6 +827,130 @@ documentController.getFilteredDocuments = async (req, res) => {
 		res.json({ status: 0, msg: "Internal Server Error" });
 	}
 };
+documentController.getFilteredProjects = async (req, res) => {
+	try {
+		let inputs = req.body;
+		let token = req.session.token;
+		const page = inputs.page || 1;
+		const pageSize = inputs.limit || 10;
+		const offset = (page - 1) * pageSize;
+		let orderByClause = "";
+		let baseQuery = `
+		SELECT    d.*,
+				COALESCE(Json_agg( Jsonb_build_object( 
+				'project_pdf_link', pa.project_pdf_link, 
+				'project_pdf_name', pa.project_pdf_name, 
+				'doc_id', pa.doc_id ) ) filter (WHERE pa.project_id IS NOT NULL), '[]') AS attachments
+		FROM      projects_master                                                                                                                                                                                      AS d
+		LEFT JOIN project_attachments                                                                                                                                                                                  AS pa
+		ON        d.doc_id = pa.project_id`;
+		let conditions = [];
+		let joins = "";
+
+
+		// Handle filters from inputs.activeFilter
+		for (const [field, filter] of Object.entries(inputs.activeFilter)) {
+			if (filter.type === "multiple") {
+				const values = filter.value.map((val) => `'${val.replace(/'/g, "''")}'`).join(", ");
+				values && conditions.push(`d.${field} IN (${values})`);
+			} else if (filter.type === "text") {
+				filter?.value && conditions.push(`LOWER(d.${field}) LIKE LOWER('%${filter.value.replace(/'/g, "''")}%')`);
+			} else if (filter.type === "boolean") {
+				filter?.value && conditions.push(`d.${field} =  ${filter.value.replace(/'/g, "''") === "Yes" ? 'TRUE' : 'FALSE'}`);
+			} else if (filter.type === "date") {
+				filter?.value && conditions.push(`LOWER(d.${field}) LIKE LOWER('%${filter.value.replace(/'/g, "''")}%')`);
+			} else if (filter.type === "number") {
+				filter?.value && conditions.push(`d.${field}::TEXT LIKE '${filter.value.replace(/'/g, "''")}%'`);
+			} else if (filter.type === "keyword") {
+				conditions.push(`
+				LOWER(d.doc_code::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(d.doc_work_name::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(d.doc_department::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(d.doc_financial_date::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(d.doc_agreement_no::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(d.doc_agreement_date::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(d.doc_completion_date::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(d.doc_total_mobilisation_amount::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(d.doc_bal_mobilisation_amount::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(d.doc_retention_amount::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(d.doc_dlp_period::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(d.doc_revised_date::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(d.doc_dlp_ending::TEXT) LIKE LOWER('%${filter.value}%') 
+				`)
+
+			}
+		}
+
+		// // Handle sorting
+		if (inputs.sort && Object.keys(inputs.sort).length > 0) {
+			const sortFields = Object.entries(inputs.sort).map(([field, direction]) => {
+				const dir = direction.toLowerCase() === "asc" ? "ASC" : "DESC";
+
+				// adding storing for date
+				if (inputs.isDate === true) {
+					return `CASE
+						WHEN d.${field} IS NULL OR d.${field} = '' THEN 
+						CASE
+						WHEN '${dir}' = 'ASC' THEN NULL
+						ELSE TO_DATE('01/01/1900', 'DD/MM/YYYY')
+						END
+					    WHEN NOT d.${field} ~ '^\\d{2}/\\d{2}/\\d{4}$' THEN NULL 
+						ELSE TO_DATE(d.${field}, 'DD/MM/YYYY')
+						END ${dir} NULLS LAST`
+				}
+
+				return `d.${field} ${dir}`;
+			});
+			orderByClause = `ORDER BY ${sortFields.join(", ")}`;
+
+		} else {
+			orderByClause = `ORDER BY d.doc_id DESC`;
+		}
+		// // Build the WHERE clause
+		if (conditions.length > 0) {
+			baseQuery += " WHERE " + conditions.join(" AND ");
+		}
+
+		// Query to get the total count of documents
+		let countQuery = `
+		SELECT COUNT(DISTINCT d.doc_id) as total
+		FROM projects_master d
+		${joins}
+		${conditions.length ? " WHERE " + conditions.join(" AND ") : ""}
+	  `;
+
+		let { rows: countResult } = await pool.query(countQuery);
+
+		const totalDocuments = countResult[0].total;
+		const totalPages = Math.ceil(totalDocuments / pageSize);
+		// Main query with pagination
+		let query = `
+        ${baseQuery}
+        GROUP BY
+          d.doc_id
+        ${orderByClause}
+        LIMIT ${pageSize}
+        OFFSET ${offset}
+      `;
+
+		console.log("🚀 ~ documentController.getFilteredProjects= ~ query:", query)
+		// Execute the main query
+		let { rows: documents } = await pool.query(query);
+		return res.json({
+			status: 1,
+			msg: "Success",
+			payload: {
+				documents,
+				totalPages,
+				currentPage: page,
+			},
+		});
+
+	} catch (err) {
+		console.error("Error fetching filtered documents:", err);
+		return res.json({ status: 0, msg: "Internal Server Error" });
+	}
+};
 
 documentController.uploadAttachment = async (req, res) => {
 	try {
@@ -698,6 +987,47 @@ documentController.uploadAttachment = async (req, res) => {
 		);
 
 		await pool.query(`INSERT INTO doc_attachment_junction (daj_doc_number, daj_attachment_name, daj_attachment_link, daj_attachment_upload_date) VALUES ($1, $2, $3, $4)`, [inputs.doc_number, inputs.doc_attachment, attachmentLocation, moment().format("DD/MM/YYYY")]);
+		res.send({ status: 1, msg: "Attachment Uploaded" });
+	} catch (err) {
+		console.error("Error Uploading Attachments", err);
+		res.json({ status: 0, msg: "Internal Server Error" });
+	}
+};
+documentController.uploadProjectAttachments = async (req, res) => {
+	try {
+		let inputs = req.body;
+		let token = req.session.token;
+
+		if (!req.file) {
+			return res.send({ status: 0, msg: "No file uploaded" });
+		}
+
+		const fileExtension = path.extname(req.file.originalname);
+		const fileName = uuidv4();
+
+		const s3Params = {
+			Bucket: process.env.BUCKET_NAME,
+			Key: `docs/${fileName}${fileExtension}`,
+			Body: req.file.buffer,
+			ContentType: req.file.mimetype,
+		};
+
+		const s3Response = await s3.upload(s3Params).promise();
+		const attachmentLocation = s3Response.Location;
+
+		await pool.query(
+			`INSERT INTO project_attachments (
+			project_pdf_name, 
+			project_pdf_link,
+			project_code,
+			project_id,
+			attchment_uploaded_by_id,
+			created_at
+			) 
+			VALUES ($1, $2, $3, $4, $5, $6)`,
+			[inputs.pdfFileName, attachmentLocation, inputs.doc_code, inputs.project_id, token.user_id, getCurrentDateTime()]
+		);
+
 		res.send({ status: 1, msg: "Attachment Uploaded" });
 	} catch (err) {
 		console.error("Error Uploading Attachments", err);
@@ -798,12 +1128,34 @@ documentController.deleteDoc = async (req, res) => {
 		return res.json({ status: 0, msg: "Internal Server Error" });
 	}
 }
-documentController.deleteAttachment = async (req, res) => {
+
+documentController.deleteProject = async (req, res) => {
 	const { docId } = req.body;
 	const { user_id } = req.session.token;
 
 	try {
 		if (!user_id) {
+			return res.json({ status: 0, msg: "User not logged In" });
+		}
+		const result = await pool.query(
+			`DELETE FROM projects_master WHERE doc_id = ${docId}`,
+		);
+		if (result.rows.length === 0) {
+			return res.json({ status: 0, msg: "Document not found" });
+		}
+		return res.json({ status: 1, msg: "Document Deleted" });
+	} catch (error) {
+		console.log("🚀 ~ documentController.deleteDoc ~ error:", error)
+		return res.json({ status: 0, msg: "Internal Server Error" });
+	}
+}
+
+documentController.deleteAttachment = async (req, res) => {
+	const { docId } = req.body;
+	const token = req.session.token;
+
+	try {
+		if (!token) {
 			return res.json({ status: 0, msg: "User not logged In" });
 		}
 		const result = await pool.query(
@@ -814,6 +1166,26 @@ documentController.deleteAttachment = async (req, res) => {
 		}
 		return res.json({ status: 1, msg: "Document Deleted" });
 	} catch (error) {
+		return res.json({ status: 0, msg: "Internal Server Error" });
+	}
+}
+documentController.deleteProjectPdf = async (req, res) => {
+	const { docId } = req.query;
+	const token = req?.session?.token;
+
+	try {
+		if (!token) {
+			return res.json({ status: 0, msg: "User not logged In" });
+		}
+		const result = await pool.query(
+			`DELETE FROM project_attachments WHERE doc_id = ${docId}`,
+		);
+		if (result.rows.length === 0) {
+			return res.json({ status: 0, msg: "Document not found" });
+		}
+		return res.json({ status: 1, msg: "Document Deleted" });
+	} catch (error) {
+		console.log("🚀 ~ documentController.deleteProjectPdf ~ error:", error)
 		return res.json({ status: 0, msg: "Internal Server Error" });
 	}
 }

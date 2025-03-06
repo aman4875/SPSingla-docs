@@ -285,6 +285,7 @@ renderController.renderSites = async (req, res) => {
 		res.send({ status: 0, msg: "Something Went Wrong" });
 	}
 };
+
 renderController.editDoc = async (req, res) => {
 	let token = req.session.token;
 	try {
@@ -366,6 +367,35 @@ renderController.editDoc = async (req, res) => {
 	}
 };
 
+renderController.editProject = async (req, res) => {
+	let token = req.session.token;
+	try {
+		let doc_id = Buffer.from(req.params.id, "base64").toString("utf-8");
+		const query = `
+        SELECT 
+            d.*, 
+            COALESCE(json_agg(
+                jsonb_build_object(
+                    'project_pdf_link', pa.project_pdf_link, 
+                    'project_pdf_name', pa.project_pdf_name, 
+                    'doc_id', pa.doc_id,
+                    'attachment_upload_date', pa.created_at
+                )
+            ) FILTER (WHERE pa.project_id IS NOT NULL), '[]') AS attachments
+        FROM projects_master AS d
+        LEFT JOIN project_attachments AS pa ON d.doc_id = pa.project_id
+        WHERE d.doc_id = $1
+        GROUP BY d.doc_id;
+    `;
+		const { rows } = await pool.query(query, [doc_id]);
+		const projectData = rows[0]
+		return res.render("project-master/edit-project.ejs", { token, projectData });
+	} catch (error) {
+		console.error(error);
+		return res.send("Internal Server Error");
+	}
+};
+
 renderController.renderCreateDocument = async (req, res) => {
 	let token = req.session.token;
 
@@ -408,4 +438,12 @@ renderController.renderCreateDocument = async (req, res) => {
 	}
 };
 
+renderController.renderProjectMaster = async (req, res) => {
+	let token = req.session.token;
+	res.render("project-master/project-master", { token });
+}
+renderController.renderCreateProjectMaster = async (req, res) => {
+	let token = req.session.token;
+	res.render("project-master/create-project", { token });
+}
 module.exports = renderController;
