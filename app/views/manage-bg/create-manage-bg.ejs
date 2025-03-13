@@ -473,11 +473,11 @@
 
                                                             <div class="col-md-4">
                                                                 <div class="form-group">
-                                                                    <label class="form-label" for="doc_bg_amount">Date
+                                                                    <label class="form-label" for="doc_expiry_date">Date
                                                                         of Expiry</label>
                                                                     <div class="form-control-wrap">
-                                                                        <input type="text" id="doc_bg_amount"
-                                                                            autocomplete="off" name="doc_bg_amount"
+                                                                        <input type="text" id="doc_expiry_date"
+                                                                            autocomplete="off" name="doc_expiry_date"
                                                                             placeholder="BG Amount"
                                                                             class="form-control date-picker" value="" />
                                                                     </div>
@@ -534,6 +534,19 @@
         <script src="/app/assets/js/scripts.js"></script>
         <script src="/app/views/manage-bg/create-manage-bg-script.js"></script>
         <script>
+
+            let dataId
+            let dataName
+            let dataCode
+            
+
+            $("#manage-project").on("change", function () {
+                let selectedOption = $(this).find(":selected")
+
+                dataId = selectedOption.data("id");
+                dataName = selectedOption.data("name");
+                dataCode = selectedOption.data("code");
+            });
 
             $(document).ready(function () {
                 $(".nk-menu-sub .nk-menu-item ").each(function () {
@@ -652,9 +665,12 @@
 
                 // NioApp.handleButtonState("uploadDocumentBtn", "Upload", true);
 
+                console.log(dataCode)
+                console.log(dataId)
                 let formData = new FormData(this);
+                formData.append("project_code", dataCode);
+                formData.append("master_project_id", dataId);
                 console.log([...formData])
-                // formData.append("doc_pdf_name", fileName);
 
                 // Your AJAX request
                 $.ajax({
@@ -680,8 +696,6 @@
                     },
                 });
             });
-
-
 
         </script>
 </body>

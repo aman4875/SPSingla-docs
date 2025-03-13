@@ -613,7 +613,7 @@ documentController.createProject = async (req, res) => {
 documentController.createBG = async (req, res) => {
 	try {
 		let inputs = req.body;
-		console.log("🚀 ~ documentController.createBG= ~ inputs:", inputs)
+
 		const pdfName = req.body.doc_pdf_name
 		let token = req.session.token;
 
@@ -698,6 +698,14 @@ documentController.createBG = async (req, res) => {
 			);
 
 		}
+
+		if (inputs.project_code) {
+			await pool.query(`
+		    UPDATE projects_master
+            SET doc_bg_selected = true
+            WHERE doc_code = '${inputs.project_code}'`)
+		}
+
 		if (createProject.rowCount > 0) {
 			return res.send({ status: 1, msg: "Success" });
 		}
@@ -1033,8 +1041,6 @@ documentController.getFilteredProjects = async (req, res) => {
         LIMIT ${pageSize}
         OFFSET ${offset}
       `;
-
-		console.log("🚀 ~ documentController.getFilteredProjects= ~ query:", query)
 		// Execute the main query
 		let { rows: documents } = await pool.query(query);
 		return res.json({
@@ -1058,8 +1064,7 @@ documentController.getProjectsBg = async (req, res) => {
 	try {
 		let inputs = req.body;
 		let projectID = req.query;
-		console.log("🚀 ~ documentController.getProjectsBg= ~ inputs:", projectID)
-		return res.json({ status: 1, msg: "Internal Server Error" });
+
 		let token = req.session.token;
 		const page = inputs.page || 1;
 		const pageSize = inputs.limit || 10;
@@ -1071,7 +1076,7 @@ documentController.getProjectsBg = async (req, res) => {
 				'project_pdf_link', pa.project_pdf_link, 
 				'project_pdf_name', pa.project_pdf_name, 
 				'doc_id', pa.doc_id ) ) filter (WHERE pa.project_id IS NOT NULL), '[]') AS attachments
-		FROM      projects_master                                                                                                                                                                                      AS d
+		FROM      doc_manage_bg                                                                                                                                                                                      AS d
 		LEFT JOIN project_attachments                                                                                                                                                                                  AS pa
 		ON        d.doc_id = pa.project_id`;
 		let conditions = [];
@@ -1079,7 +1084,7 @@ documentController.getProjectsBg = async (req, res) => {
 
 
 		// Handle filters from inputs.activeFilter
-		for (const [field, filter] of Object.entries(inputs.activeFilter)) {
+		for (const [field, filter] of Object.entries(inputs?.activeFilter)) {
 			if (filter.type === "multiple") {
 				const values = filter.value.map((val) => `'${val.replace(/'/g, "''")}'`).join(", ");
 				values && conditions.push(`d.${field} IN (${values})`);
@@ -1144,7 +1149,7 @@ documentController.getProjectsBg = async (req, res) => {
 		// Query to get the total count of documents
 		let countQuery = `
 		SELECT COUNT(DISTINCT d.doc_id) as total
-		FROM projects_master d
+		FROM doc_manage_bg d
 		${joins}
 		${conditions.length ? " WHERE " + conditions.join(" AND ") : ""}
 	  `;
@@ -1163,7 +1168,6 @@ documentController.getProjectsBg = async (req, res) => {
         OFFSET ${offset}
       `;
 
-		console.log("🚀 ~ documentController.getFilteredProjects= ~ query:", query)
 		// Execute the main query
 		let { rows: documents } = await pool.query(query);
 		return res.json({

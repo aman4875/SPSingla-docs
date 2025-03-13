@@ -470,7 +470,6 @@ renderController.renderCreateBg = async (req, res) => {
 		`SELECT * FROM applicant_names ORDER BY id DESC;
 `
 	)
-	console.log(beneficiaryNames)
 
 	res.render("manage-bg/create-manage-bg", {
 		token,

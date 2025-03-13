@@ -11,7 +11,7 @@ router.post("/save-draft", documentController.saveDraft);
 router.post("/edit-document", documentController.editDocument);
 router.post("/edit-project", documentController.editProject);
 router.post("/create-document", upload.single("doc_file"), documentController.createDocument);
-// router.post("/create-project", upload.single("doc_file"), documentController.createProject);
+router.post("/create-project", upload.single("doc_file"), documentController.createProject);
 router.post("/create-bg", upload.single("doc_file"), documentController.createBG);
 router.post("/upload-attachment", upload.single("doc_file"), documentController.uploadAttachment);
 router.post("/upload-project-pdfs", upload.single("doc_file"), documentController.uploadProjectAttachments);

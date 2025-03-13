@@ -46,25 +46,5 @@ $(document).ready(function () {
     }
 
 
-    function fetchProjects(project) {
-        const url = `/docs/get-projects-bg/?project=${project}`;
-        $.ajax({
-            url: url,
-            type: 'POST',
-            // data: filters,
-            success: function (response) {
-                console.log(response);
-                if (response.status === 1) {
-
-                } else {
-                    alert('Error fetching projects');
-                }
-            },
-            error: function (error) {
-                console.error('Error fetching projects:', error);
-                alert('Error fetching projects');
-            }
-        });
-    }
-
 });
+

@@ -523,6 +523,7 @@
 				}
 			});
 		});
+
 		function renderPdfLinks(attachments) {
 			let links = ''
 			if (attachments && attachments.length > 0) {
@@ -532,6 +533,7 @@
 			} else return `-`
 			return links;
 		}
+
 		function renderTabledata(response) {
 			if (response.payload.documents && response.payload.documents.length > 0) {
 				$("#table-status").empty();
@@ -546,7 +548,7 @@
 								<em class="icon ni ni-edit-fill"></em>
 							</a>
 						</span>
-						<span id="deleteDoc" style="cursor: pointer;" data-id="${data.doc_id}">
+						<span class="${data.doc_bg_selected ? "disable" : ""}" id="deleteDoc" style="cursor: pointer;" data-id="${data.doc_id}">
 							<em style="color: #d84040;" class="icon ni ni-trash-fill"></em>
 						</span>
 					</div>
