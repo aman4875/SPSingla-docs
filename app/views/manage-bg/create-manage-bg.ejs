@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="zxx" class="js">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" />
+    <!-- Fav Icon  -->
+    <link rel="shortcut icon" href="/app/assets/images/favicon.png" />
+    <!-- Page Title  -->
+    <title>Documents | Manage BG</title>
+    <!-- StyleSheets  -->
+    <link rel="stylesheet" href="/app/assets/css/dashlite.css" />
+    <link id="skin-default" rel="stylesheet" href="/app/assets/css/theme.css" />
+    <link rel="stylesheet" href="/app/views/manage-bg/styles.css">
+</head>
+
+<body class="nk-body bg-lighter npc-general has-sidebar">
+    <div class="nk-app-root create-manage-bg">
+        <!-- main @s -->
+        <div class="nk-main">
+            <%- include('./common/sidebar' , {subItems:{active:"manageBg"} }); -%>
+                <div class="nk-wrap">
+                    <%- include('./common/navbar'); -%>
+                        <div class="nk-content">
+                            <div class="container-fluid">
+                                <div class="nk-content-inner">
+                                    <div class="nk-content-body">
+                                        <div class="nk-block">
+                                            <div class="nk-block-head nk-block-head-sm">
+                                                <div class="nk-block-between g-3">
+                                                    <div class="nk-block-head-content">
+                                                        <div class="row align-items-center">
+                                                            <div class="col">
+                                                                <h3 class="nk-block-title page-title">Add BG</h3>
+                                                            </div>
+                                                            <div class="col  px-0 ">
+                                                                <form>
+                                                                    <div
+                                                                        class="nk-tb-col px-0 py-0 replied-vide-select">
+                                                                        <select data-placeholder="Select Project"
+                                                                            class="form-select form-control js-select2"
+                                                                            id="manage-project" name="doc_folder">
+                                                                            <option value="">Select Project</option>
+
+                                                                            <% projects.forEach(project=> { %>
+                                                                                <option
+                                                                                    value="<%= project.doc_work_name %>"
+                                                                                    data-code="<%= project.doc_code %>"
+                                                                                    data-name="<%= project.doc_work_name %>"
+                                                                                    data-id="<%= project.doc_id %>">
+                                                                                    <%= project.doc_code %>: <%=
+                                                                                            project.doc_work_name %>
+                                                                                </option>
+                                                                                <% }); %>
+                                                                        </select>
+                                                                    </div>
+
+                                                                </form>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                            <div class="card card-bordered">
+                                                <div class="card-inner">
+                                                    <form id="documentForm" class="form-validate is-alter">
+                                                        <div class="row g-gs">
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <label class="form-label"
+                                                                        for="doc_code">Code</label>
+                                                                    <div class="form-control-wrap">
+                                                                        <input type="text" class="form-control"
+                                                                            placeholder="Document Code" id="doc_code"
+                                                                            name="doc_code"
+                                                                            value="<%= projectData ? projectData.doc_code : '' %>"
+                                                                            disabled />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <label class="form-label" for="doc_work_name">Name
+                                                                        of
+                                                                        Work</label>
+                                                                    <div class="form-control-wrap">
+                                                                        <input type="text" class="form-control"
+                                                                            placeholder="Name of Work"
+                                                                            id="doc_work_name" name="doc_work_name"
+                                                                            value="<%= projectData ? projectData.doc_work_name : '' %>"
+                                                                            disabled />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <label class="form-label"
+                                                                        for="doc_department">Department
+                                                                        Name</label>
+                                                                    <div class="form-control-wrap">
+                                                                        <input type="text" class="form-control"
+                                                                            placeholder="Department Name"
+                                                                            id="doc_department" name="doc_department"
+                                                                            value="<%= projectData ? projectData.doc_department : '' %>"
+                                                                            disabled />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <label class="form-label"
+                                                                        for="doc_financial_date">Financial
+                                                                        Opening Date</label>
+                                                                    <div class="form-control-wrap focused">
+                                                                        <div class="form-icon form-icon-right"><em
+                                                                                class="icon ni ni-calendar-alt"></em>
+                                                                        </div>
+                                                                        <input type="text" required
+                                                                            id="doc_financial_date" autocomplete="off"
+                                                                            name="doc_financial_date"
+                                                                            placeholder="Document Date"
+                                                                            class="form-control date-picker"
+                                                                            value="<%= projectData ? projectData.doc_financial_date : '' %>"
+                                                                            disabled />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-8">
+                                                                <div class="form-group">
+                                                                    <label class="form-label"
+                                                                        for="doc_agreement_no">Agreement No</label>
+                                                                    <div class="form-control-wrap">
+                                                                        <div class="input-group">
+                                                                            <input type="number" class="form-control"
+                                                                                placeholder="Agreement No"
+                                                                                id="doc_agreement_no"
+                                                                                name="doc_agreement_no"
+                                                                                value="<%= projectData ? projectData.doc_agreement_no : '' %>"
+                                                                                disabled />
+
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <label class="form-label"
+                                                                        for="doc_completion_date">Date
+                                                                        of Completion</label>
+                                                                    <div class="form-control-wrap focused">
+                                                                        <div class="form-icon form-icon-right"><em
+                                                                                class="icon ni ni-calendar-alt"></em>
+                                                                        </div>
+                                                                        <input type="text" required
+                                                                            id="doc_completion_date" autocomplete="off"
+                                                                            name="doc_completion_date"
+                                                                            placeholder="Document Date"
+                                                                            class="form-control date-picker"
+                                                                            value="<%= projectData ? projectData.doc_completion_date : '' %>"
+                                                                            disabled />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <label class="form-label"
+                                                                        for="doc_awarded">Awarded</label>
+                                                                    <div class="form-control-wrap">
+                                                                        <select
+                                                                            class="form-select form-control js-select2 form-control"
+                                                                            id="doc_awarded" name="doc_awarded"
+                                                                            data-placeholder="Select Option" disabled>
+                                                                            <option label="empty" value=""></option>
+                                                                            <option <%=projectData &&
+                                                                                projectData.doc_awarded==="true"
+                                                                                ? 'selected' : '' %>
+                                                                                value="true">Yes
+                                                                            </option>
+                                                                            <option <%=projectData &&
+                                                                                projectData.doc_awarded==="false"
+                                                                                ? 'selected' : '' %>
+                                                                                value="false">No
+                                                                            </option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <label class="form-label"
+                                                                        for="doc_agreement_date">Agreement
+                                                                        Date</label>
+                                                                    <div class="form-control-wrap focused">
+                                                                        <div class="form-icon form-icon-right"><em
+                                                                                class="icon ni ni-calendar-alt"></em>
+                                                                        </div>
+                                                                        <input type="text" required
+                                                                            id="doc_agreement_date" autocomplete="off"
+                                                                            name="doc_agreement_date"
+                                                                            placeholder="Document Date"
+                                                                            class="form-control date-picker"
+                                                                            value="<%= projectData ? projectData.doc_agreement_date : '' %>"
+                                                                            disabled />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <label class="form-label" for="doc_DLP_period">DLP
+                                                                        Period
+                                                                        (in months)</label>
+                                                                    <div class="form-control-wrap">
+                                                                        <input type="number" class="form-control"
+                                                                            placeholder="DLP Period" id="doc_dlp_period"
+                                                                            name="doc_dlp_period"
+                                                                            value="<%= projectData ? projectData.doc_dlp_period : '' %>"
+                                                                            disabled />
+                                                                        <small id="error-msg" class="text-danger"
+                                                                            style="display:none;"></small>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <label class="form-label"
+                                                                        for="doc_revised_date">Revised
+                                                                        Completion Date</label>
+                                                                    <div class="form-control-wrap focused">
+                                                                        <div class="form-icon form-icon-right"><em
+                                                                                class="icon ni ni-calendar-alt"></em>
+                                                                        </div>
+                                                                        <input type="text" id="doc_revised_date"
+                                                                            autocomplete="off" name="doc_revised_date"
+                                                                            placeholder="Revised Completion Date"
+                                                                            class="form-control date-picker"
+                                                                            value="<%= projectData ? projectData.doc_revised_date : '' %>" />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-4">
+                                                                <div class="form-group">
+                                                                    <label class="form-label" for="doc_dlp_ending">DLP
+                                                                        Ending on</label>
+                                                                    <div class="form-control-wrap focused">
+                                                                        <div class="form-icon form-icon-right"><em
+                                                                                class="icon ni ni-calendar-alt"></em>
+                                                                        </div>
+                                                                        <input type="text" id="doc_dlp_ending"
+                                                                            autocomplete="off" name="doc_dlp_ending"
+                                                                            placeholder="DLP Ending on"
+                                                                            class="form-control date-picker"
+                                                                            value="<%= projectData ? projectData.doc_dlp_ending : '' %>" />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <label class="form-label"
+                                                                        for="doc_total_mobilisation_amount">Total
+                                                                        Mobilisation Amount</label>
+                                                                    <div class="form-control-wrap">
+                                                                        <input type="number" class="form-control"
+                                                                            placeholder="Tota Mobilisation Amount"
+                                                                            id="doc_total_mobilisation_amount"
+                                                                            name="doc_total_mobilisation_amount"
+                                                                            value="<%= projectData ? projectData.doc_total_mobilisation_amount : '' %>" />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <label class="form-label"
+                                                                        for="doc_bal_mobilisation_amount">Balance
+                                                                        Mobilisation Amount</label>
+                                                                    <div class="form-control-wrap">
+                                                                        <input type="number" class="form-control"
+                                                                            placeholder="Balance Mobilisation Amount"
+                                                                            id="doc_bal_mobilisation_amount"
+                                                                            name="doc_bal_mobilisation_amount"
+                                                                            value="<%= projectData ? projectData.doc_bal_mobilisation_amount : '' %>" />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <label class="form-label"
+                                                                        for="doc_retention_amount">Retention Amount
+                                                                        as on Date</label>
+                                                                    <div class="form-control-wrap">
+                                                                        <input type="number" class="form-control"
+                                                                            placeholder="Retention Amount as on Date"
+                                                                            id="doc_retention_amount"
+                                                                            name="doc_retention_amount"
+                                                                            value="<%= projectData ? projectData.doc_retention_amount : '' %>" />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <label class="form-label"
+                                                                        for="doc_type">Type</label>
+                                                                    <div class="form-control-wrap">
+                                                                        <select
+                                                                            class="form-select form-control js-select2"
+                                                                            id="doc_type" name="doc_type"
+                                                                            data-placeholder="Select or Enter Beneficiary Name">
+                                                                            <option label="empty" value=""></option>
+                                                                            <% types.forEach(type=> { %>
+                                                                                <option data-id="<%= type.id %>"
+                                                                                    value="<%= type.type_name %>">
+                                                                                    <%= type.type_name %>
+                                                                                </option>
+                                                                                <% }); %>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-4">
+                                                                <div class="">
+                                                                    <label class="form-label" for="doc_bank_name">Bank
+                                                                        Name</label>
+                                                                    <select class=" js-select2" id="doc_bank_name"
+                                                                        name="doc_bank_name"
+                                                                        data-placeholder="Select Bank Name">
+                                                                        <option label="empty" value=""></option>
+                                                                        <% bankName.forEach(bankName=> { %>
+                                                                            <option data-id="<%= bankName.id %>"
+                                                                                value="<%= bankName.bank_name %>">
+                                                                                <%= bankName.bank_name %>
+                                                                            </option>
+                                                                            <% }); %>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <label class="form-label"
+                                                                        for="doc_issuing_branch">Issuing
+                                                                        Branch</label>
+                                                                    <div class="form-control-wrap">
+                                                                        <input type="text" class="form-control"
+                                                                            placeholder="Issuing Branch"
+                                                                            id="doc_issuing_branch"
+                                                                            name="doc_issuing_branch" value="" />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-8">
+                                                                <div class="form-group">
+                                                                    <label class="form-label"
+                                                                        for="doc_beneficiary_name">Beneficiary
+                                                                        Name</label>
+                                                                    <div class="form-control-wrap">
+                                                                        <select
+                                                                            class="form-select form-control js-select2"
+                                                                            id="doc_beneficiary_name"
+                                                                            name="doc_beneficiary_name"
+                                                                            data-placeholder="Select or Enter Beneficiary Name">
+                                                                            <option label="empty" value=""></option>
+                                                                            <%
+                                                                                beneficiaryNames.forEach(beneficiaryName=>
+                                                                                { %>
+                                                                                <option
+                                                                                    data-id="<%= beneficiaryName.id %>"
+                                                                                    value="<%= beneficiaryName.beneficiary_code %>">
+                                                                                    <%= beneficiaryName.beneficiary_code
+                                                                                        %>
+                                                                                </option>
+                                                                                <% }); %>
+                                                                        </select>
+
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <label class="form-label" for="doc_bg_number">BG
+                                                                        number</label>
+                                                                    <div class="form-control-wrap">
+                                                                        <input type="number" class="form-control"
+                                                                            placeholder="BG number" id="doc_bg_number"
+                                                                            name="doc_bg_number" value="" required />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <label class="form-label"
+                                                                        for="doc_bg_amendment_number">BG
+                                                                        Amendment Number</label>
+                                                                    <div class="form-control-wrap">
+                                                                        <input type="number" class="form-control"
+                                                                            placeholder="BG Amendment Number"
+                                                                            id="doc_bg_amendment_number"
+                                                                            name="doc_bg_amendment_number" value=""
+                                                                            required />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-8">
+                                                                <div class="form-group">
+                                                                    <label class="form-label"
+                                                                        for="doc_applicant_name">Applicant
+                                                                        Name</label>
+                                                                    <div class="form-control-wrap">
+                                                                        <select
+                                                                            class="form-select form-control js-select2"
+                                                                            id="doc_applicant_name"
+                                                                            name="doc_applicant_name"
+                                                                            data-placeholder="Select or Enter Beneficiary Name">
+                                                                            <option label="empty" value=""></option>
+                                                                            <% applicantNames.forEach(data=>
+                                                                                { %>
+                                                                                <option data-id="<%= data.id %>"
+                                                                                    value="<%=  data.applicant_name %>">
+                                                                                    <%= data.applicant_name %>
+                                                                                </option>
+                                                                                <% }); %>
+                                                                        </select>
+
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <label class="form-label" for="doc_issue_date">Date
+                                                                        Of
+                                                                        Issue</label>
+                                                                    <div class="form-control-wrap">
+                                                                        <input type="text" id="doc_issue_date"
+                                                                            autocomplete="off" name="doc_issue_date"
+                                                                            placeholder="Date Of Issue"
+                                                                            class="form-control date-picker" value="" />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <label class="form-label" for="doc_claim_date">Date
+                                                                        of Claim</label>
+                                                                    <div class="form-control-wrap">
+                                                                        <input type="text" id="doc_claim_date"
+                                                                            autocomplete="off" name="doc_claim_date"
+                                                                            placeholder="Date of Claim"
+                                                                            class="form-control date-picker" value="" />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <label class="form-label" for="doc_bg_amount">BG
+                                                                        Amount</label>
+                                                                    <div class="form-control-wrap">
+                                                                        <input type="number" id="doc_bg_amount"
+                                                                            autocomplete="off" name="doc_bg_amount"
+                                                                            placeholder="BG Amount" class="form-control"
+                                                                            value="" />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <label class="form-label" for="doc_bg_amount">Date
+                                                                        of Expiry</label>
+                                                                    <div class="form-control-wrap">
+                                                                        <input type="text" id="doc_bg_amount"
+                                                                            autocomplete="off" name="doc_bg_amount"
+                                                                            placeholder="BG Amount"
+                                                                            class="form-control date-picker" value="" />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <label class="form-label"
+                                                                        for="doc_bg_cancelled_date">BG
+                                                                        Cancelled on</label>
+                                                                    <div class="form-control-wrap">
+                                                                        <input type="text" id="doc_bg_cancelled_date"
+                                                                            autocomplete="off"
+                                                                            name="doc_bg_cancelled_date"
+                                                                            placeholder="BG Cancelled on"
+                                                                            class="form-control date-picker" value="" />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-4" id="pdfUploadContainer">
+                                                                <div class="form-group">
+                                                                    <label class="form-label" for="doc_file">Upload
+                                                                        PDF</label>
+                                                                    <div class="form-control-wrap">
+                                                                        <input type="file" accept=".pdf"
+                                                                            class="form-control"
+                                                                            placeholder="Upload File" id="doc_file"
+                                                                            name="doc_file" />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-12">
+                                                                <div class="form-group">
+                                                                    <button id="uploadDocumentBtn"
+                                                                        class="btn btn-lg btn-primary upload-btn">Upload</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+        </div>
+
+        <script src="/app/assets/js/bundle.js"></script>
+        <script src="/app/assets/js/scripts.js"></script>
+        <script src="/app/views/manage-bg/create-manage-bg-script.js"></script>
+        <script>
+
+            $(document).ready(function () {
+                $(".nk-menu-sub .nk-menu-item ").each(function () {
+                    if ($(this).hasClass("active")) {
+                        let parentMenu = $(this).closest(".nk-menu-item.has-sub");
+                        parentMenu.addClass("active current-page");
+                        parentMenu.find(".nk-menu-sub").show();
+                    }
+                });
+            });
+
+            function fetchProjects(projectId) {
+                const url = `/docs/get-project-by-id/?projectId=${projectId}`;
+                $.ajax({
+                    url: url,
+                    type: 'GET',
+                    // data: filters,
+                    success: function (response) {
+                        if (response.status === 1) {
+                            updateFormValues(response.project);
+                        } else {
+                            alert('Error fetching projects');
+                        }
+                    },
+                    error: function (error) {
+                        console.error('Error fetching projects:', error);
+                        alert('Error fetching projects');
+                    }
+                });
+            }
+
+            $(document).ready(function () {
+
+                $('#manage-project').select2({
+                    templateResult: formatProject,
+                    templateSelection: formatSelection,
+                    width: '100%'
+                });
+                $('#manage-project').select2({
+                    templateResult: formatProject,
+                    templateSelection: formatSelection,
+                    width: '100%',
+                    escapeMarkup: function (markup) {
+                        return markup;
+                    }
+                });
+
+
+                function formatProject(state) {
+                    if (!state.id) return state.text; // For placeholder option
+                    var $state = $(state.element);
+                    var code = $state.data('code');
+                    var name = $state.data('name');
+                    var id = $state.data('id');
+
+                    // Build custom HTML markup for each option
+                    var $container = $(
+                        '<div class="select2-result-project custom-project">' +
+                        '<div class="select2-result-project__icon"><em class="icon ni ni-folder"></em></div>' +
+                        '<div class="select2-result-project__meta">' +
+                        '<div class="select2-result-project__code"></div>' +
+                        '<div class="select2-result-project__name"></div>' +
+                        '</div>' +
+                        '</div>'
+                    );
+                    $container.find('.select2-result-project__code').text(code);
+                    $container.find('.select2-result-project__name').text(name);
+                    return $container;
+                }
+
+
+                function formatSelection(state) {
+                    if (!state.id) return state.text; // placeholder
+                    const $state = $(state.element);
+                    const name = $state.data('name');
+                    const id = $state.data('id');
+                    fetchProjects(id);
+                    return `<span><em class="icon ni ni-folder" style="margin-right:5px;"></em>${name}</span>`;
+                }
+            });
+
+            function updateFormValues(newData) {
+                const keysArray = [
+                    "doc_code",
+                    "doc_work_name",
+                    "doc_department",
+                    "doc_awarded",
+                    "doc_financial_date",
+                    "doc_completion_date",
+                    "doc_dlp_period",
+                    "doc_retention_amount",
+                    "doc_revised_date",
+                    "doc_dlp_ending",
+                    "doc_total_mobilisation_amount",
+                    "doc_bal_mobilisation_amount",
+                    "doc_agreement_no",
+                    "doc_agreement_date"
+                ];
+
+                keysArray.forEach(key => {
+                    $(`#${key}`).val(newData[0][key])
+                });
+
+                if (newData && newData.length) {
+                    $("#doc_awarded").val(newData[0].doc_awarded === true ? "true" : "false").trigger("change");
+                }
+                $("#uploadDocumentBtn").removeClass("upload-btn")
+            }
+
+            $("#documentForm").submit(function (event) {
+                event.preventDefault();
+                if (!this.checkValidity()) {
+                    return false;
+                }
+
+
+                // NioApp.handleButtonState("uploadDocumentBtn", "Upload", true);
+
+                let formData = new FormData(this);
+                console.log([...formData])
+                // formData.append("doc_pdf_name", fileName);
+
+                // Your AJAX request
+                $.ajax({
+                    type: "POST",
+                    url: "/docs/create-bg",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        if (response.status == 1) {
+                            NioApp.handleButtonState("uploadDocumentBtn", "Upload", false);
+                            NioApp.Toast("<h5>Document Uploaded</h5><p>Document Uploaded Successfully</p>", "success");
+                            document.getElementById("documentForm").reset();
+                        } else if (response.status == 0) {
+                            NioApp.handleButtonState("uploadDocumentBtn", "Upload", false);
+                            NioApp.Toast(`<h5>Error Occurred</h5><p>${response.msg}</p>`, "error");
+                        } else NioApp.Toast("<h5>Something Went Wrong</h5><p>Error while uploading Document</p>", "error");
+                    },
+                    error: function (xhr, status, error) {
+                        NioApp.handleButtonState("uploadDocumentBtn", "Upload", false);
+                        NioApp.Toast("<h5>Something Went Wrong</h5><p>Error while uploading Document</p>", "error");
+                        console.error("Error saving draft:", error);
+                    },
+                });
+            });
+
+
+
+        </script>
+</body>
+
+</html>

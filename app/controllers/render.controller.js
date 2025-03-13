@@ -442,8 +442,55 @@ renderController.renderProjectMaster = async (req, res) => {
 	let token = req.session.token;
 	res.render("project-master/project-master", { token });
 }
+
 renderController.renderCreateProjectMaster = async (req, res) => {
 	let token = req.session.token;
 	res.render("project-master/create-project", { token });
+}
+
+renderController.renderCreateBg = async (req, res) => {
+	let token = req.session.token;
+	let docAttachments = [];
+	let projectData = {}
+
+	let { rows: projects } = await pool.query(
+		`SELECT doc_id, doc_code, doc_work_name FROM projects_master ORDER BY doc_id DESC`
+	);
+	let { rows: types } = await pool.query(
+		`SELECT * FROM contract_types ORDER BY id DESC`
+	)
+	let { rows: bankName } = await pool.query(
+		`SELECT * FROM bank_names ORDER BY id DESC`
+	)
+
+	let { rows: beneficiaryNames } = await pool.query(
+		`SELECT * FROM beneficiary_names ORDER BY id DESC`
+	)
+	let { rows: applicantNames } = await pool.query(
+		`SELECT * FROM applicant_names ORDER BY id DESC;
+`
+	)
+	console.log(beneficiaryNames)
+
+	res.render("manage-bg/create-manage-bg", {
+		token,
+		docAttachments,
+		projects,
+		projectData,
+		types,
+		bankName,
+		beneficiaryNames,
+		applicantNames
+	});
+}
+
+renderController.renderManageBg = async (req, res) => {
+	let token = req.session.token;
+
+	let { rows: projects } = await pool.query(
+		`SELECT doc_id, doc_code, doc_work_name FROM projects_master ORDER BY doc_id DESC`
+	);
+
+	res.render("manage-bg/manage-bg", { token, projects });
 }
 module.exports = renderController;

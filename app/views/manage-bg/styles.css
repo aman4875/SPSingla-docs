@@ -119,3 +119,42 @@ Optional: styling for the active column
 .highlightrow {
   background-color: beige;
 }
+
+.select2-result-project {
+  display: flex;
+  align-items: center;
+  padding: 8px 10px;
+}
+
+.select2-result-project__icon {
+  font-size: 1.5em;
+  margin-right: 10px;
+}
+
+.select2-result-project__meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.select2-result-project__code {
+  font-weight: bold;
+  color: #333;
+}
+
+.select2-result-project__name {
+  font-size: 0.9em;
+  color: #777;
+}
+
+.select2-result-project.custom-project {
+  padding: 0;
+}
+
+#table-head {
+  text-transform: uppercase;
+}
+
+.create-manage-bg .upload-btn {
+  pointer-events: none;
+  opacity: 0.6;
+}

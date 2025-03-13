@@ -134,3 +134,25 @@
   display: inline-block;
   margin-left: 15px;
 }
+
+.select2-result-project {
+  display: flex;
+  align-items: center;
+  padding: 8px 10px;
+}
+.select2-result-project__icon {
+  font-size: 1.5em;
+  margin-right: 10px;
+}
+.select2-result-project__meta {
+  display: flex;
+  flex-direction: column;
+}
+.select2-result-project__code {
+  font-weight: bold;
+  color: #333;
+}
+.select2-result-project__name {
+  font-size: 0.9em;
+  color: #777;
+}

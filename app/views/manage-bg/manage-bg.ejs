@@ -8,18 +8,18 @@
     <!-- Fav Icon  -->
     <link rel="shortcut icon" href="/app/assets/images/favicon.png" />
     <!-- Page Title  -->
-    <title>Documents | Document Controller</title>
+    <title>Documents | Manage BG</title>
     <!-- StyleSheets  -->
     <link rel="stylesheet" href="/app/assets/css/dashlite.css" />
     <link id="skin-default" rel="stylesheet" href="/app/assets/css/theme.css" />
-    <link rel="stylesheet" href="./styles.css">
+    <link rel="stylesheet" href="/app/views/manage-bg/styles.css">
 </head>
 
 <body class="nk-body bg-lighter npc-general has-sidebar">
-    <div class="nk-app-root">
+    <div class="nk-app-root manage-bg">
         <!-- main @s -->
         <div class="nk-main">
-            <%- include('./common/sidebar' , {active : "Documents" }); -%>
+            <%- include('./common/sidebar' , {subItems:{active:"manageBg"} }); -%>
                 <div class="nk-wrap">
                     <%- include('./common/navbar'); -%>
                         <div class="nk-content">
@@ -32,68 +32,37 @@
                                                     <div class="nk-block-head-content">
                                                         <div class="row align-items-center">
                                                             <div class="col">
-                                                                <h3 class="nk-block-title page-title">Documents</h3>
+                                                                <h3 class="nk-block-title page-title">Manage BG</h3>
                                                             </div>
                                                             <div class="col  px-0 ">
                                                                 <div class="nk-tb-col px-0 py-0 replied-vide-select">
-                                                                    <span>
-                                                                        <select
-                                                                            class="form-select form-control js-select2 "
-                                                                            data-filter="single" id="select-site"
-                                                                            name="doc_folder"
-                                                                            data-placeholder="Select Folder">
-                                                                            <option value="select-site">Select Site
+                                                                    <select data-placeholder="Select Project"
+                                                                        class="form-select form-control js-select2"
+                                                                        id="manage-project" name="doc_folder">
+                                                                        <option value="">Select Project</option>
+
+                                                                        <% projects.forEach(project=> { %>
+                                                                            <option value="<%= project.doc_work_name %>"
+                                                                                data-code="<%= project.doc_code %>"
+                                                                                data-name="<%= project.doc_work_name %>">
+                                                                                <%= project.doc_code %>: <%=
+                                                                                        project.doc_work_name %>
                                                                             </option>
-                                                                            <% sites.forEach(site=> { %>
-                                                                                <option id="<%= site.site_id %>"
-                                                                                    value="<%= site.site_name %>">
-                                                                                    <%= site.site_name %>
-                                                                                </option>
-                                                                                <% }); %>
-                                                                        </select>
-                                                                    </span>
+                                                                            <% }); %>
+                                                                    </select>
                                                                 </div>
 
                                                             </div>
-                                                            <div id="fetch-replied-vid"
-                                                                class="col replied-vide-btn disable">
-                                                                <button type="submit" class="btn btn-primary">Fetch
-                                                                    Replied Vide</button>
-                                                            </div>
+
                                                         </div>
                                                     </div>
                                                     <%if(token.user_role !=3){%>
                                                         <div class="nk-block-head-content">
-                                                            <%if(token.user_role==0 || token.user_role==1 ||
-                                                                token.user_role==2){%>
-                                                                <a href="/ai-import"
-                                                                    class="btn btn-white btn-dim btn-outline-light"><span>AI
-                                                                        Import</span></a>
-                                                                <%if(token.user_role!=2){%>
-                                                                    <span class="drodown">
-                                                                        <a href="#"
-                                                                            class="dropdown-toggle btn btn-white btn-dim btn-outline-light"
-                                                                            data-bs-toggle="dropdown"><em
-                                                                                class="icon ni ni-inbox-in"></em><span><span
-                                                                                    class="d-none d-md-inline">Import</a>
-                                                                        <div style="min-width: 140px;"
-                                                                            class="dropdown-menu dropdown-menu-end">
-                                                                            <ul class="link-list-opt no-bdr">
-                                                                                <li>
-                                                                                    <a class="btn-sm"
-                                                                                        href="/documents/import/bulk"><em
-                                                                                            class="icon ni ni-folder-fill"></em><span>Bulk
-                                                                                            Import</span></a>
-                                                                                </li>
-                                                                            </ul>
-                                                                        </div>
-                                                                    </span>
-                                                                    <%}%>
-                                                                        <%}%>
-                                                                            <a href="/documents/create-document"
-                                                                                class="btn btn-white btn-dim btn-outline-light"><em
-                                                                                    class="icon ni ni-plus-sm"></em><span>Add
-                                                                                    Document</span></a>
+                                                            <a href="/manage/create-bg"
+                                                                class="btn btn-white btn-dim btn-outline-light"><em
+                                                                    class="icon ni ni-plus-sm"></em><span>Add
+                                                                    Document</span>
+                                                            </a>
                                                         </div>
                                                         <%}%>
                                                 </div>
@@ -204,77 +173,149 @@
                                                     </div>
                                                     <div class="card-inner p-0 scrollable-datatable">
                                                         <div class="nk-tb-list nk-tb-ulist is-compact">
-                                                            <div class="nk-tb-item nk-tb-head" id="table-head">
+                                                            <div class="nk-tb-item nk-tb-head grid-header"
+                                                                id="table-head">
                                                                 <%if(token.user_role !=3){%>
                                                                     <div class="nk-tb-col no-click  text-start">
-                                                                        <span data-field="edit_doc">ACTIONS</span><span
+                                                                        <span data-field="edit_doc">Actions</span><span
                                                                             class="sort-indicator"></span>
                                                                     </div>
                                                                     <%}%>
                                                                         <div class="nk-tb-col ">
-                                                                            <span data-field="doc_site">SITE</span><span
+                                                                            <span data-field="doc_site">code</span><span
                                                                                 class="sort-indicator"></span>
                                                                         </div>
                                                                         <div class="nk-tb-col">
-                                                                            <span
-                                                                                data-field="doc_folder">FOLDER</span><span
+                                                                            <span data-field="doc_folder">Name of
+                                                                                Work</span><span
                                                                                 class="sort-indicator"></span>
                                                                         </div>
                                                                         <div class="nk-tb-col">
-                                                                            <span data-field="doc_type">TYPE</span><span
+                                                                            <span data-field="doc_type">Department
+                                                                                Name</span><span
                                                                                 class="sort-indicator"></span>
                                                                         </div>
                                                                         <div class="nk-tb-col">
-                                                                            <span
-                                                                                data-field="doc_number">NUMBER</span><span
+                                                                            <span data-field="doc_number">Financial
+                                                                                Opening Date</span><span
                                                                                 class="sort-indicator"></span>
                                                                         </div>
                                                                         <div class="nk-tb-col">
-                                                                            <span
-                                                                                data-field="doc_status">STATUS</span><span
+                                                                            <span data-field="doc_status">Agreement
+                                                                                No</span><span
                                                                                 class="sort-indicator"></span>
                                                                         </div>
                                                                         <div class="nk-tb-col">
-                                                                            <span
-                                                                                data-field="doc_created_at">DATE</span><span
-                                                                                class="sort-indicator"></span>
-                                                                        </div>
-
-                                                                        <div class="nk-tb-col">
-                                                                            <span
-                                                                                data-field="doc_subject">SUBJECT</span><span
-                                                                                class="sort-indicator"></span>
-                                                                        </div>
-
-
-
-                                                                        <div class="nk-tb-col">
-                                                                            <span
-                                                                                data-field="doc_reference">REFERENCE</span><span
-                                                                                class="sort-indicator"></span>
-                                                                        </div>
-                                                                        <div class="nk-tb-col">
-                                                                            <span data-field="doc_replied_vide">REPLIED
-                                                                                VIDE</span><span
+                                                                            <span data-field="doc_created_at">Agreement
+                                                                                Date</span><span
                                                                                 class="sort-indicator"></span>
                                                                         </div>
 
                                                                         <div class="nk-tb-col">
+                                                                            <span data-field="doc_subject">Date of
+                                                                                Completion</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+
+                                                                        <div class="nk-tb-col">
+                                                                            <span data-field="doc_reference">DLP Period
+                                                                                (in months)</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span data-field="doc_replied_vide">Revised
+                                                                                Completion Date</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+
+                                                                        <div class="nk-tb-col">
+                                                                            <span data-field="doc_purpose">DLP Ending
+                                                                                on</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span data-field="doc_from">Total
+                                                                                Mobilisation Amount</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span data-field="doc_to">Balance
+                                                                                Mobilisation Amount</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
                                                                             <span
-                                                                                data-field="doc_purpose">ENCLOSURES</span><span
-                                                                                class="sort-indicator"></span>
-                                                                        </div>
-                                                                        <div class="nk-tb-col">
-                                                                            <span data-field="doc_from">FROM</span><span
-                                                                                class="sort-indicator"></span>
-                                                                        </div>
-                                                                        <div class="nk-tb-col">
-                                                                            <span data-field="doc_to">TO</span><span
+                                                                                data-field="doc_storage_location">Retention
+                                                                                Amount as on Date</span><span
                                                                                 class="sort-indicator"></span>
                                                                         </div>
                                                                         <div class="nk-tb-col">
                                                                             <span
-                                                                                data-field="doc_storage_location">STORAGE</span><span
+                                                                                data-field="doc_storage_location">Type</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span data-field="doc_storage_location">Bank
+                                                                                Name</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span
+                                                                                data-field="doc_storage_location">Issuing
+                                                                                Branch</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span
+                                                                                data-field="doc_storage_location">Beneficiary
+                                                                                Name</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span data-field="doc_storage_location">BG
+                                                                                number</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span data-field="doc_storage_location">BG
+                                                                                Amendment Number</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span
+                                                                                data-field="doc_storage_location">Applicant
+                                                                                Name</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span data-field="doc_storage_location">Date
+                                                                                Of Issue</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span data-field="doc_storage_location">Date
+                                                                                of Claim</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span data-field="doc_storage_location">BG
+                                                                                Amount</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span data-field="doc_storage_location">Date
+                                                                                of Expiry</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span data-field="doc_storage_location">BG
+                                                                                Cancelled on</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span
+                                                                                data-field="doc_storage_location">Upload
+                                                                                BG</span><span
                                                                                 class="sort-indicator"></span>
                                                                         </div>
                                                             </div>
@@ -288,56 +329,26 @@
                                                                     <%}%>
                                                                         <div class="nk-tb-col ">
                                                                             <span>
-                                                                                <select
-                                                                                    class="form-select form-control js-select2 filter-input"
-                                                                                    data-filter="multiple" id="doc_site"
-                                                                                    name="doc_site"
-                                                                                    data-placeholder="Site" multiple>
-                                                                                    <option label="empty" value="">
-                                                                                    </option>
-                                                                                    <% sites.forEach(site=> { %>
-                                                                                        <option
-                                                                                            value="<%= site.site_name %>">
-                                                                                            <%= site.site_name %>
-                                                                                        </option>
-                                                                                        <% }); %>
-                                                                                </select>
+                                                                                <input type="text"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="text" id="doc_number"
+                                                                                    placeholder="Number">
                                                                             </span>
                                                                         </div>
                                                                         <div class="nk-tb-col">
                                                                             <span>
-                                                                                <select
-                                                                                    class="form-select form-control js-select2 filter-input"
-                                                                                    data-filter="multiple"
-                                                                                    id="doc_folder" name="doc_folder"
-                                                                                    data-placeholder="Folder" multiple>
-                                                                                    <option value="">Select Folder
-                                                                                    </option>
-                                                                                    <% folders.forEach(folder=> { %>
-                                                                                        <option
-                                                                                            value="<%= folder.site_name %>">
-                                                                                            <%= folder.site_name %>
-                                                                                        </option>
-                                                                                        <% }); %>
-                                                                                </select>
+                                                                                <input type="text"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="text" id="doc_number"
+                                                                                    placeholder="Number">
                                                                             </span>
                                                                         </div>
                                                                         <div class="nk-tb-col">
                                                                             <span>
-                                                                                <select
-                                                                                    class="form-select form-control js-select2 filter-input"
-                                                                                    data-filter="text" id="doc_type"
-                                                                                    name="doc_type"
-                                                                                    data-placeholder="Select Type">
-                                                                                    <option label="empty" value="">
-                                                                                    </option>
-                                                                                    <option label="INCOMING"
-                                                                                        value="INCOMING">INCOMING
-                                                                                    </option>
-                                                                                    <option label="OUTGOING"
-                                                                                        value="OUTGOING">OUTGOING
-                                                                                    </option>
-                                                                                </select>
+                                                                                <input type="text"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="text" id="doc_number"
+                                                                                    placeholder="Number">
                                                                             </span>
                                                                         </div>
                                                                         <div class="nk-tb-col">
@@ -421,8 +432,6 @@
                                                                             </span>
                                                                         </div>
 
-
-
                                                                         <div class="nk-tb-col">
                                                                             <span>
                                                                                 <select
@@ -468,16 +477,133 @@
                                                                                     placeholder="Storage">
                                                                             </span>
                                                                         </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_storage_location"
+                                                                                    placeholder="Storage">
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_storage_location"
+                                                                                    placeholder="Storage">
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_storage_location"
+                                                                                    placeholder="Storage">
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_storage_location"
+                                                                                    placeholder="Storage">
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_storage_location"
+                                                                                    placeholder="Storage">
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_storage_location"
+                                                                                    placeholder="Storage">
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_storage_location"
+                                                                                    placeholder="Storage">
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_storage_location"
+                                                                                    placeholder="Storage">
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_storage_location"
+                                                                                    placeholder="Storage">
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_storage_location"
+                                                                                    placeholder="Storage">
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_storage_location"
+                                                                                    placeholder="Storage">
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_storage_location"
+                                                                                    placeholder="Storage">
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_storage_location"
+                                                                                    placeholder="Storage">
+                                                                            </span>
+                                                                        </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <div id="table-status" class="card-inner text-center">
                                                         <div class="text-center">
-                                                            <p>No Data Found</p>
+                                                            <p>Please Select Project</p>
                                                         </div>
                                                     </div>
 
-                                                    <div id="table-pagination" class="card-inner">
+                                                    <div id="table-pagination" class="card-inner d-none">
                                                         <ul class="pagination">
                                                             <li class="paginate_button page-item previous disabled"
                                                                 id="DataTables_Table_2_previous">
@@ -548,7 +674,18 @@
             width: 'resolve'
         });
 
-        $('#table-pagination').on('click', 'a', handlePaginationClick);
+        $(document).ready(function () {
+
+            $(".nk-menu-sub .nk-menu-item ").each(function () {
+                if ($(this).hasClass("active")) {
+                    let parentMenu = $(this).closest(".nk-menu-item.has-sub");
+                    parentMenu.addClass("active current-page");
+                    parentMenu.find(".nk-menu-sub").show();
+                }
+            });
+        });
+
+        // $('#table-pagination').on('click', 'a', handlePaginationClick);
 
         $('#scroll-left').on('click', function () {
             $('.scrollable-datatable').animate({ scrollLeft: '-=300' }, 200);
@@ -660,9 +797,6 @@
                 },
             });
         });
-
-
-
     </script>
 </body>
 

@@ -423,6 +423,7 @@
                                 <button type="button" id="deleteDocument" class="btn btn-primary">Yes</button>
                             </div>
                         </div>
+                        
                     </div>
                 </div>
         </div>
@@ -470,7 +471,6 @@
                 formData.append("doc_code", doc_code);
                 formData.append("project_id", project_id);
                 NioApp.handleButtonState("uploadAttachmentButton", "Uploading...", true);
-
 
                 $.ajax({
                     url: '/docs/upload-project-pdfs',

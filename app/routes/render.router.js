@@ -12,8 +12,11 @@ router.get("/documents/:id", authMiddleware.checkLoginStatus, renderController.r
 router.get("/documents/import/bulk", authMiddleware.checkLoginStatus, renderController.renderBulkImport);
 router.get("/ai-import", authMiddleware.checkLoginStatus, renderController.aiImport);
 router.get("/project-master", authMiddleware.checkLoginStatus, renderController.renderProjectMaster);
+router.get("/manage-bg", authMiddleware.checkLoginStatus, renderController.renderManageBg);
 router.get("/project/create-project", authMiddleware.checkLoginStatus, renderController.renderCreateProjectMaster);
+router.get("/manage/create-bg", authMiddleware.checkLoginStatus, renderController.renderCreateBg);
 router.get("/edit-document/:id", authMiddleware.checkLoginStatus, renderController.editDoc);
 router.get("/edit-project/:id", authMiddleware.checkLoginStatus, renderController.editProject);
+
 
 module.exports = router;
