@@ -441,7 +441,7 @@
                                       </span>
                                     </div>
 
-
+                  
 
                                     <div class="nk-tb-col">
                                       <span>
@@ -449,10 +449,12 @@
                                           data-filter="text" id="doc_purpose" name="doc_purpose"
                                           data-placeholder="Select Purpose">
                                           <option label="empty" value=""></option>
-                                          <option label="DESIGN & DRAWINGS" value="DESIGN & DRAWINGS">DESIGN & DRAWINGS
+                                          <% docPurpose.forEach(Purpose=>
+                                          { %>
+                                          <option data-id="<%= Purpose.id %>" value="<%= Purpose.dropdown_val %>">
+                                            <%= Purpose.dropdown_val %>
                                           </option>
-                                          <option label="EOT" value="EOT">EOT</option>
-                                          <option label="OTHERS" value="OTHERS">OTHERS</option>
+                                          <% }); %>
                                         </select>
                                       </span>
                                     </div>

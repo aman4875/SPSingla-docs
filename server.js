@@ -15,7 +15,7 @@ const { ExpressAdapter } = require('@bull-board/express');
 const { BullMQAdapter } = require('@bull-board/api/bullMQAdapter');
 const devEnvivronment = process.env.NODE_ENV;
 
-require("./app/crons/textract.cron.js");
+// require("./app/crons/textract.cron.js");
 // require("./app/crons/openai.cron.js");
 
 // Creating Express Application
@@ -54,6 +54,7 @@ checkRedisConnection()
 app.use(express.static(__dirname + ""));
 app.set("views", [path.join(__dirname, "app/views/")]);
 app.set("view engine", "ejs");
+
 
 // Setting Session Middleware
 app.use(

@@ -833,4 +833,48 @@ documentController.deleteAttachment = async (req, res) => {
 	}
 }
 
+documentController.savePurpose = async (req, res) => {
+	const input = req.body;
+	const token = req?.session?.token;
+	
+	try {
+
+		if (!token) {
+			return res.json({ status: 0, msg: "User not logged In" });
+		}
+
+		const { rowCount } = await pool.query(
+			'SELECT 1 FROM document_purpose WHERE dropdown_val = $1',
+			[input.dropdown_val]
+		);
+
+		if (rowCount > 0) {
+			return res.json({ status: 1, msg: "Applicant already exists" });
+		}
+
+		await pool.query(
+			'INSERT INTO document_purpose (dropdown_val) VALUES ($1)',
+			[input.dropdown_val]
+		);
+
+		res.json({ status: 1, msg: "Applicant saved successfully" });
+	} catch (error) {
+		console.error("Error saving applicant:", error);
+		res.status(500).json({ error: "Internal Server Error" });
+	}
+}
+
+documentController.getAllDocPurpose = async (req, res) => {
+	try {
+		const { rows: beneficiary } = await pool.query(`
+			SELECT * FROM document_purpose ORDER BY id DESC
+		`);
+
+		res.json({ status: 1, msg: "success", payload: beneficiary });
+	} catch (error) {
+		console.error("Error saving applicant:", error);
+		res.status(500).json({ error: "Internal Server Error" });
+	}
+}
+
 module.exports = documentController;
