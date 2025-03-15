@@ -731,13 +731,12 @@
 			const modalCloseBtn = document.querySelector('#closeModal');
 			event.preventDefault();
 			$(`#modalAction`).addClass('disable');
-			console.log(docIdToDelete);
 			$.ajax({
 				type: "POST",
 				url: "/docs/delete-project/",
 				data: { docId: docIdToDelete },
 				success: function (response) {
-					if (response.status == 0) {
+					if (response.status == 1) {
 						NioApp.Toast("<h5>Deleted Successfully</h5><p>Document deleted successfully!</p>", "success");
 						modalCloseBtn.click();
 						fetchProjects();

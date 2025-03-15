@@ -337,52 +337,44 @@
                                                                             <span>
                                                                                 <input type="text"
                                                                                     class="form-control filter-input"
-                                                                                    data-filter="text" id="doc_number"
-                                                                                    placeholder="Number">
+                                                                                    data-filter="text" id="doc_code"
+                                                                                    placeholder="Doc code">
                                                                             </span>
                                                                         </div>
                                                                         <div class="nk-tb-col">
                                                                             <span>
                                                                                 <input type="text"
                                                                                     class="form-control filter-input"
-                                                                                    data-filter="text" id="doc_number"
-                                                                                    placeholder="Number">
+                                                                                    data-filter="text"
+                                                                                    id="doc_work_name"
+                                                                                    placeholder="Name of Work">
                                                                             </span>
                                                                         </div>
                                                                         <div class="nk-tb-col">
                                                                             <span>
                                                                                 <input type="text"
                                                                                     class="form-control filter-input"
-                                                                                    data-filter="text" id="doc_number"
-                                                                                    placeholder="Number">
+                                                                                    data-filter="text"
+                                                                                    id="doc_department"
+                                                                                    placeholder="Department Name">
                                                                             </span>
                                                                         </div>
                                                                         <div class="nk-tb-col">
                                                                             <span>
                                                                                 <input type="text"
                                                                                     class="form-control filter-input"
-                                                                                    data-filter="text" id="doc_number"
-                                                                                    placeholder="Number">
+                                                                                    data-filter="text"
+                                                                                    id="doc_financial_date"
+                                                                                    placeholder="Financial Opening Date">
                                                                             </span>
                                                                         </div>
                                                                         <div class="nk-tb-col">
                                                                             <span>
-                                                                                <select
-                                                                                    class="form-select form-control js-select2 filter-input"
-                                                                                    data-filter="text" id="doc_status"
-                                                                                    name="doc_status"
-                                                                                    data-placeholder="Select Status">
-                                                                                    <option label="empty" value="">
-                                                                                    </option>
-                                                                                    <option label="INSERTED"
-                                                                                        value="INSERTED">INSERTED
-                                                                                    </option>
-                                                                                    <option label="DRAFTED"
-                                                                                        value="DRAFTED">DRAFTED</option>
-                                                                                    <option label="UPLOADED"
-                                                                                        value="UPLOADED">UPLOADED
-                                                                                    </option>
-                                                                                </select>
+                                                                                <input type="text"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_agreement_no"
+                                                                                    placeholder="Agreement No">
                                                                             </span>
                                                                         </div>
                                                                         <div class="nk-tb-col">
@@ -390,7 +382,8 @@
                                                                                 <div class="form-group">
                                                                                     <div class="form-control-wrap">
                                                                                         <input placeholder="Date"
-                                                                                            id="doc_date" type="text"
+                                                                                            id="doc_agreement_date"
+                                                                                            type="text"
                                                                                             class="form-control date-picker filter-input"
                                                                                             data-filter="date">
                                                                                     </div>
@@ -400,10 +393,17 @@
 
                                                                         <div class="nk-tb-col">
                                                                             <span>
-                                                                                <input type="text"
-                                                                                    class="form-control filter-input"
-                                                                                    data-filter="text" id="doc_subject"
-                                                                                    placeholder="Subject">
+                                                                                <span>
+                                                                                    <div class="form-group">
+                                                                                        <div class="form-control-wrap">
+                                                                                            <input placeholder="Date"
+                                                                                                id="doc_completion_date"
+                                                                                                type="text"
+                                                                                                class="form-control date-picker filter-input"
+                                                                                                data-filter="date">
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </span>
                                                                             </span>
                                                                         </div>
 
@@ -426,68 +426,48 @@
 
                                                                         <div class="nk-tb-col">
                                                                             <span>
-                                                                                <select
-                                                                                    class="form-select form-control js-select2 filter-input"
-                                                                                    data-filter="multiple"
-                                                                                    id="doc_reference"
-                                                                                    name="doc_reference"
-                                                                                    data-placeholder="Select Reference"
-                                                                                    multiple>
-                                                                                    <option label="empty" value="">
-                                                                                    </option>
+                                                                                <input type="text"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_dlp_period"
+                                                                                    placeholder="DLP Period">
 
-                                                                                </select>
                                                                             </span>
                                                                         </div>
                                                                         <div class="nk-tb-col">
                                                                             <span>
-                                                                                <select
-                                                                                    class="form-select form-control js-select2 filter-input"
-                                                                                    data-filter="text"
-                                                                                    id="doc_replied_vide"
-                                                                                    name="doc_replied_vide"
-                                                                                    data-placeholder="Select Replied Vide"
-                                                                                    multiple>
-                                                                                    <option label="empty" value="">
-                                                                                    </option>
-                                                                                </select>
+                                                                                <input placeholder="Date"
+                                                                                    id="doc_revised_date" type="text"
+                                                                                    class="form-control date-picker filter-input"
+                                                                                    data-filter="date">
                                                                             </span>
                                                                         </div>
 
                                                                         <div class="nk-tb-col">
                                                                             <span>
-                                                                                <select
-                                                                                    class="form-select form-control js-select2 filter-input"
-                                                                                    data-filter="text" id="doc_purpose"
-                                                                                    name="doc_purpose"
-                                                                                    data-placeholder="Select Purpose">
-                                                                                    <option label="empty" value="">
-                                                                                    </option>
-                                                                                    <option label="DESIGN & DRAWINGS"
-                                                                                        value="DESIGN & DRAWINGS">DESIGN
-                                                                                        & DRAWINGS
-                                                                                    </option>
-                                                                                    <option label="EOT" value="EOT">EOT
-                                                                                    </option>
-                                                                                    <option label="OTHERS"
-                                                                                        value="OTHERS">OTHERS</option>
-                                                                                </select>
+                                                                                <input type="text"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_dlp_period"
+                                                                                    placeholder="DLP Period">
                                                                             </span>
                                                                         </div>
                                                                         <div class="nk-tb-col">
                                                                             <span>
                                                                                 <input type="text"
                                                                                     class="form-control filter-input"
-                                                                                    data-filter="text" id="doc_from"
-                                                                                    placeholder="Subject">
+                                                                                    data-filter="text"
+                                                                                    id="doc_dlp_ending"
+                                                                                    placeholder="DLP Ending on">
                                                                             </span>
                                                                         </div>
                                                                         <div class="nk-tb-col">
                                                                             <span>
-                                                                                <input type="text"
+                                                                                <input type="number"
                                                                                     class="form-control filter-input"
-                                                                                    data-filter="text" id="doc_to"
-                                                                                    placeholder="Subject">
+                                                                                    data-filter="text"
+                                                                                    id="doc_total_mobilisation_amount"
+                                                                                    placeholder="Total Mobilisation Amount">
                                                                             </span>
                                                                         </div>
                                                                         <div class="nk-tb-col">
@@ -504,8 +484,25 @@
                                                                                 <input type="text"
                                                                                     class="form-control filter-input"
                                                                                     data-filter="text"
-                                                                                    id="doc_storage_location"
-                                                                                    placeholder="Storage">
+                                                                                    id="doc_bal_mobilisation_amount"
+                                                                                    placeholder="Balance Mobilisation Amount">
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_retention_amount"
+                                                                                    placeholder="Retention Amount as on Date">
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="text" id="doc_type"
+                                                                                    placeholder="Type">
                                                                             </span>
                                                                         </div>
                                                                         <div class="nk-tb-col">
@@ -522,8 +519,26 @@
                                                                                 <input type="text"
                                                                                     class="form-control filter-input"
                                                                                     data-filter="text"
-                                                                                    id="doc_storage_location"
-                                                                                    placeholder="Storage">
+                                                                                    id="doc_bank_name"
+                                                                                    placeholder="Bank Name">
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_issuing_branch"
+                                                                                    placeholder="Issuing Branch">
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_beneficiary_name"
+                                                                                    placeholder="Beneficiary Name">
                                                                             </span>
                                                                         </div>
                                                                         <div class="nk-tb-col">
@@ -537,11 +552,11 @@
                                                                         </div>
                                                                         <div class="nk-tb-col">
                                                                             <span>
-                                                                                <input type="text"
+                                                                                <input type="number"
                                                                                     class="form-control filter-input"
                                                                                     data-filter="text"
-                                                                                    id="doc_storage_location"
-                                                                                    placeholder="Storage">
+                                                                                    id="doc_bg_number"
+                                                                                    placeholder="BG number">
                                                                             </span>
                                                                         </div>
                                                                         <div class="nk-tb-col">
@@ -549,8 +564,8 @@
                                                                                 <input type="text"
                                                                                     class="form-control filter-input"
                                                                                     data-filter="text"
-                                                                                    id="doc_storage_location"
-                                                                                    placeholder="Storage">
+                                                                                    id="doc_bg_amendment_number"
+                                                                                    placeholder="BG Amendment Number">
                                                                             </span>
                                                                         </div>
                                                                         <div class="nk-tb-col">
@@ -558,8 +573,8 @@
                                                                                 <input type="text"
                                                                                     class="form-control filter-input"
                                                                                     data-filter="text"
-                                                                                    id="doc_storage_location"
-                                                                                    placeholder="Storage">
+                                                                                    id="doc_applicant_name"
+                                                                                    placeholder="Applicant Name">
                                                                             </span>
                                                                         </div>
                                                                         <div class="nk-tb-col">
@@ -567,44 +582,8 @@
                                                                                 <input type="text"
                                                                                     class="form-control filter-input"
                                                                                     data-filter="text"
-                                                                                    id="doc_storage_location"
-                                                                                    placeholder="Storage">
-                                                                            </span>
-                                                                        </div>
-                                                                        <div class="nk-tb-col">
-                                                                            <span>
-                                                                                <input type="text"
-                                                                                    class="form-control filter-input"
-                                                                                    data-filter="text"
-                                                                                    id="doc_storage_location"
-                                                                                    placeholder="Storage">
-                                                                            </span>
-                                                                        </div>
-                                                                        <div class="nk-tb-col">
-                                                                            <span>
-                                                                                <input type="text"
-                                                                                    class="form-control filter-input"
-                                                                                    data-filter="text"
-                                                                                    id="doc_storage_location"
-                                                                                    placeholder="Storage">
-                                                                            </span>
-                                                                        </div>
-                                                                        <div class="nk-tb-col">
-                                                                            <span>
-                                                                                <input type="text"
-                                                                                    class="form-control filter-input"
-                                                                                    data-filter="text"
-                                                                                    id="doc_storage_location"
-                                                                                    placeholder="Storage">
-                                                                            </span>
-                                                                        </div>
-                                                                        <div class="nk-tb-col">
-                                                                            <span>
-                                                                                <input type="text"
-                                                                                    class="form-control filter-input"
-                                                                                    data-filter="text"
-                                                                                    id="doc_storage_location"
-                                                                                    placeholder="Storage">
+                                                                                    id="doc_issue_date"
+                                                                                    placeholder="Date">
                                                                             </span>
                                                                         </div>
                                                                         <div class="nk-tb-col">
@@ -690,6 +669,9 @@
             sort: {},
             activeFilter: {},
         };
+        let isFetching
+        let docCode
+        let docIdToDelete
 
         $('.js-select2').select2({
             placeholder: 'Select an option',
@@ -697,7 +679,6 @@
         });
 
         $(document).ready(function () {
-
             $(".nk-menu-sub .nk-menu-item ").each(function () {
                 if ($(this).hasClass("active")) {
                     let parentMenu = $(this).closest(".nk-menu-item.has-sub");
@@ -707,28 +688,38 @@
             });
         });
 
+
+        // fetch projects
         function fetchProjects(project) {
-            const url = `/docs/get-projects-bg/?project=${project}`;
+            if (isFetching) return; // Exit if already fetching
+            isFetching = true;
+            $(".table-content").remove();
+            $("#table-status").html(`<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>`);
+
             $.ajax({
-                url: url,
-                type: 'POST',
+                type: "POST",
+                url: `/docs/get-projects-bg/?project=${project ? project : null}`,
                 data: JSON.stringify(filters),
                 contentType: "application/json",
                 success: function (response) {
-                    console.log(response);
-                    if (response.status === 1) {
+                    isFetching = false; // Reset flag
+                    if (response.status == 1) {
                         renderTabledata(response)
+                        // totalPages = response.payload.totalPages || 1;
+                        // updatePagination(totalPages, filters.page);
                     } else {
-                        alert('Error fetching projects');
+                        $("#table-status").html(`<div class="text-center"><p>Something Went Wrong</p></div>`);
+                        $(".scrollable-datatable").css({ 'overflow': 'none !important' });
                     }
                 },
-                error: function (error) {
-                    console.error('Error fetching projects:', error);
-                    alert('Error fetching projects');
-                }
+                error: function (xhr, status, error) {
+                    isFetching = false; // Reset flag
+                    console.log(error);
+                    $("#table-status").html(`<div class="text-center"><p>Something Went Wrong</p></div>`);
+                    $(".scrollable-datatable").css({ 'overflow': 'none !important' });
+                },
             });
         }
-
         function renderPdfLinks(attachments) {
             let links = ''
             if (attachments && attachments.length > 0) {
@@ -739,8 +730,8 @@
             return links;
         }
 
-        function renderTabledata(response) {
 
+        function renderTabledata(response) {
             if (response.payload.documents && response.payload.documents.length > 0) {
                 $("#table-status").empty();
                 let rowsHtml = "";
@@ -754,9 +745,13 @@
                         <em class="icon ni ni-edit-fill"></em>
                     </a>
                 </span>
-                <span class="${data.doc_bg_selected ? "disable" : ""}" id="deleteDoc" style="cursor: pointer;" data-id="${data.doc_id}">
-                    <em style="color: #d84040;" class="icon ni ni-trash-fill"></em>
-                </span>
+            <span class="${data.doc_bg_selected ? 'disable' : ''}" 
+                id="deleteDoc" 
+                style="cursor: pointer;" 
+                data-code="${data.doc_code}" 
+                data-id="${data.doc_id}">
+                <em style="color: #d84040;" class="icon ni ni-trash-fill"></em>
+            </span>
             </div>
             <%}%>
             <div class="nk-tb-col text-start">
@@ -802,14 +797,49 @@
                 <span>${data.doc_retention_amount || "-"}</span>
             </div>
             <div class="nk-tb-col text-start">
+                <span>${data.doc_type || "-"}</span>
+            </div>
+            <div class="nk-tb-col text-start">
+                <span>${data.doc_bank_name || "-"}</span>
+            </div>
+            <div class="nk-tb-col text-start">
+                <span>${data.doc_issuing_branch || "-"}</span>
+            </div>
+            <div class="nk-tb-col text-start">
+                <span>${data.doc_beneficiary_name || "-"}</span>
+            </div>
+            <div class="nk-tb-col text-start">
+                <span>${data.doc_bg_number || "-"}</span>
+            </div>
+            <div class="nk-tb-col text-start">
+                <span>${data.doc_bg_amendment_number || "-"}</span>
+            </div>
+            <div class="nk-tb-col text-start">
+                <span>${data.doc_applicant_name || "-"}</span>
+            </div>
+            <div class="nk-tb-col text-start">
+                <span>${data.doc_issue_date || "-"}</span>
+            </div>
+            <div class="nk-tb-col text-start">
+                <span>${data.doc_claim_date || "-"}</span>
+            </div>
+            <div class="nk-tb-col text-start">
+                <span>${data.doc_bg_amount || "-"}</span>
+            </div>
+            <div class="nk-tb-col text-start">
+                <span>${data.doc_expiry_date || "-"}</span>
+            </div>
+            <div class="nk-tb-col text-start">
+                <span>${data.doc_bg_cancelled_date || "-"}</span>
+            </div>
+            <div class="nk-tb-col text-start">
                 <span>
-                  ${renderPdfLinks(data?.attachments)} 
+                ${renderPdfLinks(data?.attachments)} 
                 </span>
             </div>
         </div>`
                     rowsHtml += rowHtml;
                 })
-                console.log(rowsHtml)
                 $("#table-filters").after(rowsHtml);
 
             } else {
@@ -818,9 +848,11 @@
             }
         }
 
-        $(document).ready(function () {
+
+        (function () {
             fetchProjects()
-        });
+        })();
+
 
         // $('#table-pagination').on('click', 'a', handlePaginationClick);
 
@@ -897,26 +929,30 @@
 
         $(document).on('click', '#deleteDoc', function (event) {
             event.preventDefault();
-            let openModal = document.getElementById('open-modal')
-            docIdToDelete = $(this).data('id');
+            let openModal = document.getElementById('open-modal');
+
+            docIdToDelete = $(this).data('id');  // Using .data() to get 'data-id'
+            docCode = $(this).attr('data-code'); // Using .attr() for 'data-code'
+
             if (docIdToDelete) {
                 openModal.click();
             }
         });
+
 
         $(document).on('click', '#deleteDocument', function (event) {
             const modalCloseBtn = document.querySelector('#closeModal');
             event.preventDefault();
             $(`#modalAction`).addClass('disable');
             $.ajax({
-                type: "POST",
-                url: "/docs/delete-doc/",
-                data: { docId: docIdToDelete },
+                type: "DELETE",
+                url: "/docs/delete-bg",
+                data: { docId: docIdToDelete, docCode: docCode },
                 success: function (response) {
-                    if (response.status == 0) {
+                    if (response.status == 1) {
                         NioApp.Toast("<h5>Deleted Successfully</h5><p>Document deleted successfully!</p>", "success");
                         modalCloseBtn.click();
-                        fetchDocuments();
+                        fetchProjects();
                         $(`#modalAction`).removeClass('disable');
 
                     } else {

@@ -26,6 +26,7 @@ router.post("/delete-doc", documentController.deleteDoc);
 router.post("/delete-project", documentController.deleteProject);
 router.post("/delete-attachment", documentController.deleteAttachment);
 router.delete("/delete-project-pdf", documentController.deleteProjectPdf);
+router.delete("/delete-bg", documentController.deleteBG);
 router.get("/get-project-by-id", documentController.getProjectById);
 router.post("/save-beneficiary", documentController.saveBeneficiary);
 router.post("/save-applicant", documentController.saveApplicant);

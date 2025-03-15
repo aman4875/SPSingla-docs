@@ -538,7 +538,11 @@
             let dataId
             let dataName
             let dataCode
-            
+            let fileName = null
+            $("#doc_file").on("change", function () {
+                fileName = this.files[0].name;
+            });
+
 
             $("#manage-project").on("change", function () {
                 let selectedOption = $(this).find(":selected")
@@ -661,18 +665,13 @@
                 if (!this.checkValidity()) {
                     return false;
                 }
-
-
-                // NioApp.handleButtonState("uploadDocumentBtn", "Upload", true);
-
-                console.log(dataCode)
-                console.log(dataId)
+                NioApp.handleButtonState("uploadDocumentBtn", "Upload", true);
                 let formData = new FormData(this);
                 formData.append("project_code", dataCode);
                 formData.append("master_project_id", dataId);
-                console.log([...formData])
+                formData.append("doc_pdf_name", fileName);
 
-                // Your AJAX request
+                //AJAX request
                 $.ajax({
                     type: "POST",
                     url: "/docs/create-bg",
@@ -683,7 +682,7 @@
                         if (response.status == 1) {
                             NioApp.handleButtonState("uploadDocumentBtn", "Upload", false);
                             NioApp.Toast("<h5>Document Uploaded</h5><p>Document Uploaded Successfully</p>", "success");
-                            document.getElementById("documentForm").reset();
+                            window.location.href = '/manage-bg'
                         } else if (response.status == 0) {
                             NioApp.handleButtonState("uploadDocumentBtn", "Upload", false);
                             NioApp.Toast(`<h5>Error Occurred</h5><p>${response.msg}</p>`, "error");

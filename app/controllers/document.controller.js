@@ -323,7 +323,7 @@ documentController.editProject = async (req, res) => {
 	try {
 		let { newFormDataEntries, doc_id } = req.body;
 		let token = req.session.token;
-		console.log("🚀 ~ documentController.getFilteredProjects= ~ inputs:", newFormDataEntries)
+
 
 		if (!token) {
 			return res.json({ status: 0, msg: "User not logged In" });
@@ -685,7 +685,7 @@ documentController.createBG = async (req, res) => {
 			const s3Response = await s3.upload(s3Params).promise();
 			pdfLocation = s3Response.Location;
 			await pool.query(
-				`INSERT INTO project_attachments (
+				`INSERT INTO bg_attachments (
 				project_pdf_name, 
 				project_pdf_link,
 				project_code,
@@ -1060,7 +1060,6 @@ documentController.getFilteredProjects = async (req, res) => {
 };
 
 documentController.getProjectsBg = async (req, res) => {
-	console.log('working')
 	try {
 		let inputs = req.body;
 		let projectID = req.query;
@@ -1071,14 +1070,35 @@ documentController.getProjectsBg = async (req, res) => {
 		const offset = (page - 1) * pageSize;
 		let orderByClause = "";
 		let baseQuery = `
-		SELECT    d.*,
-				COALESCE(Json_agg( Jsonb_build_object( 
-				'project_pdf_link', pa.project_pdf_link, 
-				'project_pdf_name', pa.project_pdf_name, 
-				'doc_id', pa.doc_id ) ) filter (WHERE pa.project_id IS NOT NULL), '[]') AS attachments
-		FROM      doc_manage_bg                                                                                                                                                                                      AS d
-		LEFT JOIN project_attachments                                                                                                                                                                                  AS pa
-		ON        d.doc_id = pa.project_id`;
+			SELECT 
+				d.*,
+				pm.doc_code, 
+				pm.doc_work_name,
+				pm.doc_department,
+				pm.doc_financial_date,
+				pm.doc_agreement_no,
+				pm.doc_agreement_date,
+				pm.doc_completion_date,
+				pm.doc_awarded,
+				pm.doc_dlp_period, 
+				COALESCE(
+					(SELECT Json_agg(
+						Jsonb_build_object(
+							'project_pdf_link', pa.project_pdf_link, 
+							'project_pdf_name', pa.project_pdf_name, 
+							'doc_id', pa.doc_id
+						)
+					)
+					FROM bg_attachments AS pa
+					WHERE pa.project_id = d.doc_id), '[]'
+				) AS attachments
+			FROM 
+				doc_manage_bg AS d
+			LEFT JOIN 
+				projects_master AS pm
+			ON 
+				d.project_code = pm.doc_code
+			`;
 		let conditions = [];
 		let joins = "";
 
@@ -1161,14 +1181,11 @@ documentController.getProjectsBg = async (req, res) => {
 		// Main query with pagination
 		let query = `
         ${baseQuery}
-        GROUP BY
-          d.doc_id
         ${orderByClause}
         LIMIT ${pageSize}
         OFFSET ${offset}
       `;
 
-		// Execute the main query
 		let { rows: documents } = await pool.query(query);
 		return res.json({
 			status: 1,
@@ -1344,16 +1361,16 @@ documentController.getRepliedVide = async (req, res) => {
 
 documentController.deleteDoc = async (req, res) => {
 	const { docId } = req.body;
-	const { user_id } = req.session.token;
+	const token = req.session.token;
 
 	try {
-		if (!user_id) {
+		if (!token) {
 			return res.json({ status: 0, msg: "User not logged In" });
 		}
 		const result = await pool.query(
 			`DELETE FROM documents WHERE doc_id = ${docId}`,
 		);
-		if (result.rows.length === 0) {
+		if (result.rowCount === 0) {
 			return res.json({ status: 0, msg: "Document not found" });
 		}
 		return res.json({ status: 1, msg: "Document Deleted" });
@@ -1365,18 +1382,19 @@ documentController.deleteDoc = async (req, res) => {
 
 documentController.deleteProject = async (req, res) => {
 	const { docId } = req.body;
-	const { user_id } = req.session.token;
+	const token = req.session.token;
 
 	try {
-		if (!user_id) {
+		if (!token) {
 			return res.json({ status: 0, msg: "User not logged In" });
 		}
 		const result = await pool.query(
 			`DELETE FROM projects_master WHERE doc_id = ${docId}`,
 		);
-		if (result.rows.length === 0) {
+		if (result.rowCount === 0) {
 			return res.json({ status: 0, msg: "Document not found" });
 		}
+
 		return res.json({ status: 1, msg: "Document Deleted" });
 	} catch (error) {
 		console.log("🚀 ~ documentController.deleteDoc ~ error:", error)
@@ -1393,13 +1411,63 @@ documentController.deleteAttachment = async (req, res) => {
 			return res.json({ status: 0, msg: "User not logged In" });
 		}
 		const result = await pool.query(
-			`DELETE FROM doc_attachment_junction WHERE id = ${docId}`,
+			`DELETE FROM doc_attachment_junction WHERE id = $1`,
+			[docId]
 		);
-		if (result.rows.length === 0) {
+
+		if (result.rowCount === 0) {
 			return res.json({ status: 0, msg: "Document not found" });
 		}
+
+		return res.json({ status: 1, msg: "Document deleted successfully" });
+
+	} catch (error) {
+		return res.json({ status: 0, msg: "Internal Server Error" });
+	}
+}
+
+documentController.deleteBG = async (req, res) => {
+	const { docId, docCode } = req.body;
+	console.log(docCode, 'bgggggggggg')
+	const token = req?.session?.token;
+
+	try {
+		if (!token) {
+			return res.json({ status: 0, msg: "User not logged In" });
+		}
+
+		const checkForDoc = await pool.query(
+			`SELECT * FROM doc_manage_bg WHERE doc_id = $1`,
+			[docId]
+		);
+
+		if (checkForDoc.rowCount === 0) {
+			return res.json({ status: 0, msg: "Document not found" });
+		}
+
+		await pool.query(
+			`DELETE FROM doc_manage_bg WHERE doc_id = ${docId}`,
+		);
+
+		const removeFlag = await pool.query(
+			`SELECT * FROM doc_manage_bg WHERE project_code = $1`,
+			[docCode]
+		);
+
+
+		if (removeFlag.rows.length === 0) {
+			await pool.query(
+				`UPDATE projects_master 
+				 SET doc_bg_selected = false 
+				 WHERE doc_code = $1`,
+				[docCode]
+			);
+		}
+
+
 		return res.json({ status: 1, msg: "Document Deleted" });
 	} catch (error) {
+		console.log(error)
 		return res.json({ status: 0, msg: "Internal Server Error" });
 	}
 }
@@ -1414,7 +1482,7 @@ documentController.deleteProjectPdf = async (req, res) => {
 		const result = await pool.query(
 			`DELETE FROM project_attachments WHERE doc_id = ${docId}`,
 		);
-		if (result.rows.length === 0) {
+		if (result.rowCount === 0) {
 			return res.json({ status: 0, msg: "Document not found" });
 		}
 		return res.json({ status: 1, msg: "Document Deleted" });
@@ -1437,7 +1505,6 @@ documentController.getProjectById = async (req, res) => {
 		const { rows: project } = await pool.query(
 			`SELECT * FROM projects_master WHERE doc_id = $1`, [parseInt(projectId)],
 		);
-		console.log("🚀 ~ documentController.getProjectById= ~ project:", project)
 
 		if (project.length === 0) {
 			return res.json({ status: 0, msg: "Project not found" });
@@ -1487,7 +1554,7 @@ documentController.saveBeneficiary = async (req, res) => {
 documentController.saveApplicant = async (req, res) => {
 	const input = req.body;
 	const token = req?.session?.token;
-	console.log(req.body)
+
 	try {
 
 		if (!token) {

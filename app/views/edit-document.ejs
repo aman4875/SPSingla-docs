@@ -1,254 +1,319 @@
 <!DOCTYPE html>
 <html lang="zxx" class="js">
-  <head>
-    <base href="../" />
-    <meta charset="utf-8" />
-    
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <meta name="description"  />
-    <!-- Fav Icon  -->
-    <link rel="shortcut icon" href="/app/assets/images/favicon.png" />
-    <!-- Page Title  -->
-    <title>Documents | Document Controller</title>
-    <!-- StyleSheets  -->
-    <link rel="stylesheet" href="/app/assets/css/dashlite.css" />
-    <link id="skin-default" rel="stylesheet" href="/app/assets/css/theme.css" />
-    <style>
-      #saveDraftButton{
-        opacity: 0;
-      }
-      .displayNone{
-        display: none;
-      }
-    </style>
-  </head>
 
-  <body class="nk-body bg-lighter npc-general has-sidebar">
-    <div class="nk-app-root">
-      <div class="nk-main">
-        <%- include('./common/sidebar' , {active : "Documents"}); -%>
+<head>
+  <base href="../" />
+  <meta charset="utf-8" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta name="description" />
+  <!-- Fav Icon  -->
+  <link rel="shortcut icon" href="/app/assets/images/favicon.png" />
+  <!-- Page Title  -->
+  <title>Documents | Document Controller</title>
+  <!-- StyleSheets  -->
+  <link rel="stylesheet" href="/app/assets/css/dashlite.css" />
+  <link id="skin-default" rel="stylesheet" href="/app/assets/css/theme.css" />
+  <style>
+    #saveDraftButton {
+      opacity: 0;
+    }
+
+    .displayNone {
+      display: none;
+    }
+  </style>
+</head>
+
+<body class="nk-body bg-lighter npc-general has-sidebar">
+  <div class="nk-app-root">
+    <div class="nk-main">
+      <%- include('./common/sidebar' , {active : "Documents" }); -%>
         <div class="nk-wrap">
           <%- include('./common/navbar'); -%>
-          <div class="nk-content">
-            <div class="container-fluid">
-              <div class="nk-content-inner">
-                <div class="nk-content-body">
-                  <div class="nk-block nk-block-lg">
-                    <div class="nk-block-head nk-block-head-sm">
-                      <div class="nk-block-between g-3">
-                        <div class="nk-block-head-content d-flex">
-                          <h3 class="nk-block-title page-title">Edit Document</h3>
-                          <button id="saveDraftButton" style="margin: -5px 20px 5px 20px; min-width: 88px" class="btn btn-sm btn-dim btn-outline-primary d-none text-center">Save Draft</button>
-                        </div>
+            <div class="nk-content">
+              <div class="container-fluid">
+                <div class="nk-content-inner">
+                  <div class="nk-content-body">
+                    <div class="nk-block nk-block-lg">
+                      <div class="nk-block-head nk-block-head-sm">
+                        <div class="nk-block-between g-3">
+                          <div class="nk-block-head-content d-flex">
+                            <h3 class="nk-block-title page-title">Edit Document</h3>
+                            <button id="saveDraftButton" style="margin: -5px 20px 5px 20px; min-width: 88px"
+                              class="btn btn-sm btn-dim btn-outline-primary d-none text-center">Save Draft</button>
+                          </div>
 
-                        <div class="nk-block-head-content">
-                          <a href="/documents" class="btn btn-outline-light bg-white d-none d-sm-inline-flex"><em class="icon ni ni-arrow-left"></em><span>Back</span></a>
-                          <a target="_blank" href="<%=documentData.doc_pdf_link%>" class="btn btn-dim btn-outline-primary"><span>View File</span></a>
+                          <div class="nk-block-head-content">
+                            <a href="/documents" class="btn btn-outline-light bg-white d-none d-sm-inline-flex"><em
+                                class="icon ni ni-arrow-left"></em><span>Back</span></a>
+                            <a target="_blank" href="<%=documentData.doc_pdf_link%>"
+                              class="btn btn-dim btn-outline-primary"><span>View File</span></a>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div class="card card-bordered">
-                      <div class="card-inner">
-                        <form id="documentForm" class="form-validate is-alter">
-                          <div class="row g-gs">
-                            <div class="col-md-4">
-                              <div class="form-group">
-                                <label class="form-label" for="doc_site">Site</label>
-                                <div class="form-control-wrap">
-                                  <select class="form-select form-control js-select2" id="doc_site" name="doc_site" data-search="on" data-placeholder="Select Site" required <% if(documentData.doc_status != "INSERTED" || token.user_role != "0") { %> disabled <% } %>>
-                                    <option label="empty" value=""></option>
-                                    <% sites.forEach(function(site) { %>
-                                      <option value="<%= site.site_name %>" data-parent-id="<%= site.site_id %>" <%= documentData && documentData.doc_site == site.site_name ? 'selected' : '' %>><%= site.site_name %></option>
-                                    <% }); %>
-                                  </select>
-                                </div>
-                              </div>
-                            </div>
-                            <div class="col-md-4">
-                              <div class="form-group">
-                                <label class="form-label" for="doc_folder">Folder</label>
-                                <div class="form-control-wrap">
-                                  <select class="form-select form-control js-select2" id="doc_folder" name="doc_folder" data-placeholder="Select Folder" required <% if(documentData.doc_status != "INSERTED" || token.user_role != "0") { %> disabled <% } %> >
-                                    <option label="empty" value=""></option>
-                                    <% folders.forEach(function(folder) { %>
-                                        <% if (documentData && documentData.doc_site && folder.site_parent_name == documentData.doc_site) { %>
-                                            <option value="<%= folder.site_name %>" data-site-id="<%= folder.site_id %>" <%= documentData.doc_folder == folder.site_name ? 'selected' : '' %>><%= folder.site_name %></option>
-                                        <% } %>
-                                    <% }); %>
-                                </select>
-                                </div>
-                              </div>
-                            </div>
-                            <div class="col-md-4">
-                              <div class="form-group">
-                                <label class="form-label" for="doc_type">Type</label>
-                                <div class="form-control-wrap">
-                                  <select class="form-select form-control js-select2" id="doc_type" name="doc_type" data-placeholder="Select Type" required <% if(documentData.doc_status != "INSERTED" || token.user_role != "0") { %> disabled <% } %>>
-                                    <option label="empty" value=""></option>
-                                    <option value="INCOMING" <%= documentData && documentData.doc_type === 'INCOMING' ? 'selected' : '' %>>INCOMING</option>
-                                    <option value="OUTGOING" <%= documentData && documentData.doc_type === 'OUTGOING' ? 'selected' : '' %>>OUTGOING</option>
-                                  </select>
-                                </div>
-                              </div>
-                            </div>
-                            <div class="col-md-4">
-                              <div class="form-group">
-                                <label class="form-label" for="doc_number">Number</label>
-                                <div class="form-control-wrap">
-                                  <div class="input-group">
-                                    <input type="text" class="form-control" placeholder="Document Number" id="doc_number" name="doc_number" value="<%= documentData ? documentData.doc_number : '' %>" required <% if(documentData.doc_status != "INSERTED" || token.user_role != "0") { %>  <% } %>/>
-                                    <div class="input-group-append">
-                                      <button disabled id="choosePrefixButton" class="btn btn-outline-primary btn-dim">Choose Prefix</button>
-                                  </div>
+                      <div class="card card-bordered">
+                        <div class="card-inner">
+                          <form id="documentForm" class="form-validate is-alter">
+                            <div class="row g-gs">
+                              <div class="col-md-4">
+                                <div class="form-group">
+                                  <label class="form-label" for="doc_site">Site</label>
+                                  <div class="form-control-wrap">
+                                    <select class="form-select form-control js-select2" id="doc_site" name="doc_site"
+                                      data-search="on" data-placeholder="Select Site" required <%
+                                      if(documentData.doc_status !="INSERTED" || token.user_role !="0" ) { %> disabled
+                                      <% } %>>
+                                        <option label="empty" value=""></option>
+                                        <% sites.forEach(function(site) { %>
+                                          <option value="<%= site.site_name %>" data-parent-id="<%= site.site_id %>"
+                                            <%=documentData && documentData.doc_site==site.site_name ? 'selected' : ''
+                                            %>><%= site.site_name %>
+                                          </option>
+                                          <% }); %>
+                                    </select>
                                   </div>
                                 </div>
                               </div>
-                            </div>
+                              <div class="col-md-4">
+                                <div class="form-group">
+                                  <label class="form-label" for="doc_folder">Folder</label>
+                                  <div class="form-control-wrap">
+                                    <select class="form-select form-control js-select2" id="doc_folder"
+                                      name="doc_folder" data-placeholder="Select Folder" required <%
+                                      if(documentData.doc_status !="INSERTED" || token.user_role !="0" ) { %> disabled
+                                      <% } %> >
+                                        <option label="empty" value=""></option>
+                                        <% folders.forEach(function(folder) { %>
+                                          <% if (documentData && documentData.doc_site &&
+                                            folder.site_parent_name==documentData.doc_site) { %>
+                                            <option value="<%= folder.site_name %>" data-site-id="<%= folder.site_id %>"
+                                              <%=documentData.doc_folder==folder.site_name ? 'selected' : '' %>><%=
+                                                folder.site_name %>
+                                            </option>
+                                            <% } %>
+                                              <% }); %>
+                                    </select>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="col-md-4">
+                                <div class="form-group">
+                                  <label class="form-label" for="doc_type">Type</label>
+                                  <div class="form-control-wrap">
+                                    <select class="form-select form-control js-select2" id="doc_type" name="doc_type"
+                                      data-placeholder="Select Type" required <% if(documentData.doc_status !="INSERTED"
+                                      || token.user_role !="0" ) { %> disabled <% } %>>
+                                        <option label="empty" value=""></option>
+                                        <option value="INCOMING" <%=documentData && documentData.doc_type==='INCOMING'
+                                          ? 'selected' : '' %>>INCOMING</option>
+                                        <option value="OUTGOING" <%=documentData && documentData.doc_type==='OUTGOING'
+                                          ? 'selected' : '' %>>OUTGOING</option>
+                                    </select>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="col-md-4">
+                                <div class="form-group">
+                                  <label class="form-label" for="doc_number">Number</label>
+                                  <div class="form-control-wrap">
+                                    <div class="input-group">
+                                      <input type="text" class="form-control" placeholder="Document Number"
+                                        id="doc_number" name="doc_number"
+                                        value="<%= documentData ? documentData.doc_number : '' %>" required <%
+                                        if(documentData.doc_status !="INSERTED" || token.user_role !="0" ) { %>
+                                      <% } %>/>
+                                        <div class="input-group-append">
+                                          <button disabled id="choosePrefixButton"
+                                            class="btn btn-outline-primary btn-dim">Choose Prefix</button>
+                                        </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
                               <div class="col-md-8">
-                              <div class="form-group">
-                                <label class="form-label" for="doc_reference">Reference</label>
-                                <div class="form-control-wrap">
-                                  <select class="form-select form-control js-select2" id="doc_reference" name="doc_reference" data-placeholder="Select Reference" multiple>
-                                    <option label="empty" value=""></option>
-                                    <% var references = documentData && documentData.doc_reference ? documentData.doc_reference.split(',') : []; %>
-                                    <% references.forEach(function(reference) { %>
-                                      <option value="<%= reference.trim() %>" selected><%= reference.trim() %></option>
-                                    <% }); %>
-                                  </select>
+                                <div class="form-group">
+                                  <label class="form-label" for="doc_reference">Reference</label>
+                                  <div class="form-control-wrap">
+                                    <select class="form-select form-control js-select2" id="doc_reference"
+                                      name="doc_reference" data-placeholder="Select Reference" multiple>
+                                      <option label="empty" value=""></option>
+                                      <% var references=documentData && documentData.doc_reference ?
+                                        documentData.doc_reference.split(',') : []; %>
+                                        <% references.forEach(function(reference) { %>
+                                          <option value="<%= reference.trim() %>" selected>
+                                            <%= reference.trim() %>
+                                          </option>
+                                          <% }); %>
+                                    </select>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="col-md-4">
+                                <div class="form-group">
+                                  <label class="form-label" for="doc_subject">Subject</label>
+                                  <div class="form-control-wrap">
+                                    <input type="text" class="form-control" placeholder="Document Subject"
+                                      id="doc_subject" name="doc_subject"
+                                      value="<%= documentData ? documentData.doc_subject : '' %>" />
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="col-md-4">
+                                <div class="form-group">
+                                  <label class="form-label" for="doc_storage_location">Storage Location</label>
+                                  <div class="form-control-wrap">
+                                    <input type="text" class="form-control" placeholder="Storage Location"
+                                      id="doc_storage_location" name="doc_storage_location"
+                                      value="<%= documentData ? documentData.doc_storage_location : '' %>" />
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="col-md-4">
+                                <div class="form-group">
+                                  <label class="form-label" for="doc_purpose">Purpose</label>
+                                  <div class="form-control-wrap">
+                                    <select class="form-select form-control js-select2" id="doc_purpose"
+                                      name="doc_purpose" data-placeholder="Select Purpose">
+                                      <option label="empty" value=""></option>
+                                      <option value="DESIGN & DRAWINGS" <%=documentData &&
+                                        documentData.doc_purpose==='DESIGN & DRAWINGS' ? 'selected' : '' %>>DESIGN &
+                                        DRAWINGS</option>
+                                      <option value="EOT" <%=documentData && documentData.doc_purpose==='EOT'
+                                        ? 'selected' : '' %>>EOT</option>
+                                      <option value="OTHERS" <%=documentData && documentData.doc_purpose==='OTHERS'
+                                        ? 'selected' : '' %>>OTHERS</option>
+                                    </select>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="col-sm-4">
+                                <div class="form-group">
+                                  <label class="form-label" for="doc_created_at">Document Date</label>
+                                  <div class="form-control-wrap focused">
+                                    <div class="form-icon form-icon-right"><em class="icon ni ni-calendar-alt"></em>
+                                    </div>
+                                    <input type="text" required id="doc_created_at" autocomplete="off"
+                                      name="doc_created_at" placeholder="Document Date" class="form-control date-picker"
+                                      value="<%= documentData ? documentData.doc_created_at : '' %>" />
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="col-md-4">
+                                <div class="form-group">
+                                  <label class="form-label" for="doc_from"> From</label>
+                                  <div class="form-control-wrap">
+                                    <input type="text" class="form-control" placeholder="From" id="doc_from"
+                                      name="doc_from" value="<%= documentData ? documentData.doc_from : '' %>" />
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="col-md-4">
+                                <div class="form-group">
+                                  <label class="form-label" for="doc_to"> To</label>
+                                  <div class="form-control-wrap">
+                                    <input type="text" class="form-control" placeholder="To" id="doc_to" name="doc_to"
+                                      value="<%= documentData ? documentData.doc_to : '' %>" />
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="col-md-4">
+                                <div class="form-group">
+                                  <label class="form-label" for="doc_confidential">Confidential</label>
+                                  <div class="form-control-wrap">
+                                    <select class="form-select form-control js-select2 form-control"
+                                      id="doc_confidential" name="doc_confidential" data-placeholder="Select Option..">
+                                      <option label="empty" value=""></option>
+                                      <option value="true" <%=documentData && documentData.doc_confidential ? 'selected'
+                                        : '' %>>Yes</option>
+                                      <option value="false" <%=documentData && !documentData.doc_confidential
+                                        ? 'selected' : '' %>>No</option>
+                                    </select>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="col-md-4">
+                                <div class="form-group">
+                                  <label class="form-label" for="doc_reply_required">Required</label>
+                                  <div class="form-control-wrap">
+                                    <select class="form-select form-control js-select2 form-control"
+                                      id="doc_reply_required" name="doc_reply_required"
+                                      data-placeholder="Select Option..">
+                                      <option label="empty" value=""></option>
+                                      <option value="true" <%=documentData && documentData.doc_reply_required
+                                        ? 'selected' : '' %>>Yes</option>
+                                      <option value="false" <%=documentData && !documentData.doc_reply_required
+                                        ? 'selected' : '' %>>No</option>
+                                    </select>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="col-md-12">
+                                <div class="form-group">
+                                  <button id="uploadDocumentBtn" type="submit"
+                                    class="btn btn-lg btn-primary">Update</button>
                                 </div>
                               </div>
                             </div>
-                            <div class="col-md-4">
-                              <div class="form-group">
-                                <label class="form-label" for="doc_subject">Subject</label>
-                                <div class="form-control-wrap">
-                                  <input type="text" class="form-control" placeholder="Document Subject" id="doc_subject" name="doc_subject" value="<%= documentData ? documentData.doc_subject : '' %>"  />
+                          </form>
+                          <div class="row gy-5" style="margin-top: 5px;">
+                            <div class="col-lg-12">
+                              <div class="nk-block-head">
+                                <div class="nk-block-head-content">
+                                  <h5 class="nk-block-title title">Attachments
+                                    <button id="addAttachmentButton" data-bs-toggle="modal"
+                                      data-bs-target="#attachmentModal" style="margin-left: 10px;margin-bottom: 8px;"
+                                      class="btn btn-sm btn-dim  btn-outline-primary">Add Attachments</button>
+                                  </h5>
+
                                 </div>
                               </div>
-                            </div>
-                            <div class="col-md-4">
-                              <div class="form-group">
-                                <label class="form-label" for="doc_storage_location">Storage Location</label>
-                                <div class="form-control-wrap">
-                                  <input type="text" class="form-control" placeholder="Storage Location" id="doc_storage_location" name="doc_storage_location" value="<%= documentData ? documentData.doc_storage_location : '' %>"   />
-                                </div>
-                              </div>
-                            </div>
-                            <div class="col-md-4">
-                              <div class="form-group">
-                                <label class="form-label" for="doc_purpose">Purpose</label>
-                                <div class="form-control-wrap">
-                                  <select class="form-select form-control js-select2" id="doc_purpose" name="doc_purpose" data-placeholder="Select Purpose" >
-                                    <option label="empty" value=""></option>
-                                    <option value="DESIGN & DRAWINGS" <%= documentData && documentData.doc_purpose === 'DESIGN & DRAWINGS' ? 'selected' : '' %>>DESIGN & DRAWINGS</option>
-                                    <option value="EOT" <%= documentData && documentData.doc_purpose === 'EOT' ? 'selected' : '' %>>EOT</option>
-                                    <option value="OTHERS" <%= documentData && documentData.doc_purpose === 'OTHERS' ? 'selected' : '' %>>OTHERS</option>
-                                  </select>
-                                </div>
-                              </div>
-                            </div>
-                            <div class="col-sm-4">
-                              <div class="form-group">
-                                <label class="form-label" for="doc_created_at">Document Date</label>
-                                <div class="form-control-wrap focused">
-                                  <div class="form-icon form-icon-right"><em class="icon ni ni-calendar-alt"></em></div>
-                                  <input type="text" required id="doc_created_at" autocomplete="off" name="doc_created_at" placeholder="Document Date" class="form-control date-picker" value="<%= documentData ? documentData.doc_created_at : '' %>" />
-                                </div>
-                              </div>
-                            </div>
-                            <div class="col-md-4">
-                              <div class="form-group">
-                                <label class="form-label" for="doc_from"> From</label>
-                                <div class="form-control-wrap">
-                                  <input type="text" class="form-control" placeholder="From" id="doc_from" name="doc_from" value="<%= documentData ? documentData.doc_from : '' %>"  />
-                                </div>
-                              </div>
-                            </div>
-                            <div class="col-md-4">
-                              <div class="form-group">
-                                <label class="form-label" for="doc_to"> To</label>
-                                <div class="form-control-wrap">
-                                  <input type="text" class="form-control" placeholder="To" id="doc_to" name="doc_to" value="<%= documentData ? documentData.doc_to : '' %>"   />
-                                </div>
-                              </div>
-                            </div>
-                            <div class="col-md-4">
-                              <div class="form-group">
-                                <label class="form-label" for="doc_confidential">Confidential</label>
-                                <div class="form-control-wrap">
-                                  <select class="form-select form-control js-select2 form-control" id="doc_confidential" name="doc_confidential" data-placeholder="Select Option.." >
-                                    <option label="empty" value=""></option>
-                                    <option value="true" <%= documentData && documentData.doc_confidential ? 'selected' : '' %>>Yes</option>
-                                    <option value="false" <%= documentData && !documentData.doc_confidential ? 'selected' : '' %>>No</option>
-                                  </select>
-                                </div>
-                              </div>
-                            </div>
-                            <div class="col-md-4">
-                              <div class="form-group">
-                                <label class="form-label" for="doc_reply_required">Required</label>
-                                <div class="form-control-wrap">
-                                  <select class="form-select form-control js-select2 form-control" id="doc_reply_required" name="doc_reply_required" data-placeholder="Select Option.." >
-                                    <option label="empty" value=""></option>
-                                    <option value="true" <%= documentData && documentData.doc_reply_required ? 'selected' : '' %>>Yes</option>
-                                    <option value="false" <%= documentData && !documentData.doc_reply_required ? 'selected' : '' %>>No</option>
-                                  </select>
-                                </div>
-                              </div>
-                            </div>
-                            <div class="col-md-12">
-                              <div class="form-group">
-                                <button id="uploadDocumentBtn" type="submit" class="btn btn-lg btn-primary">Update</button>
-                              </div>
-                            </div>
-                          </div>
-                        </form>
-                        <div class="row gy-5" style="margin-top: 5px;">
-                          <div class="col-lg-12">
-                            <div class="nk-block-head">
-                              <div class="nk-block-head-content">
-                                <h5 class="nk-block-title title">Attachments 
-                                  <button id="addAttachmentButton" data-bs-toggle="modal" data-bs-target="#attachmentModal" style="margin-left: 10px;margin-bottom: 8px;" class="btn btn-sm btn-dim  btn-outline-primary" >Add Attachments</button>
-                                </h5>
-                                
-                              </div>
-                            </div>
-                            <div class="card card-bordered card-preview disabled">
-                              <table class="table table-bordered">
-                                <thead>
-                                  <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Attachment Name</th>
-                                    <th scope="col">Upload Date</th>
-                                    <th scope="col" width="160">Actions</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  <% if (docAttachments && docAttachments.length > 0) { %>
-                                    <% docAttachments.forEach((attachment, index) => { %>
+                              <div class="card card-bordered card-preview disabled">
+                                <table class="table table-bordered">
+                                  <thead>
                                     <tr>
-                                      <th scope="row"><%= index + 1 %></th>
-                                      <td><%= attachment.daj_attachment_name %></td>
-                                      <td><%= attachment.daj_attachment_upload_date %></td>
-                                      <td>
-                                      <a href="<%= attachment.daj_attachment_link %>" target="_blank" class="btn btn-sm btn-outline-primary">View</a>
-                                      <button data-id=<%= attachment.id %>   id="deleteDoc" class="btn btn-sm btn-outline-danger">Delete</button>
-                                      </td>
+                                      <th scope="col">#</th>
+                                      <th scope="col">Attachment Name</th>
+                                      <th scope="col">Upload Date</th>
+                                      <th scope="col" width="160">Actions</th>
                                     </tr>
-                                    <% }); %>
-                                  <% } else { %>
-                                    <tr>
-                                    <th scope="row">1</th>
-                                    <td>none</td>
-                                    <td>none</td>
-                                    <td>
-                                      <button class="btn btn-sm btn-outline-secondary" disabled>No Link</button>
-                                    </td>
-                                    </tr>
-                                  <% } %>
+                                  </thead>
+                                  <tbody>
+                                    <% if (docAttachments && docAttachments.length> 0) { %>
+                                      <% docAttachments.forEach((attachment, index)=> { %>
+                                        <tr>
+                                          <th scope="row">
+                                            <%= index + 1 %>
+                                          </th>
+                                          <td>
+                                            <%= attachment.daj_attachment_name %>
+                                          </td>
+                                          <td>
+                                            <%= attachment.daj_attachment_upload_date %>
+                                          </td>
+                                          <td>
+                                            <a href="<%= attachment.daj_attachment_link %>" target="_blank"
+                                              class="btn btn-sm btn-outline-primary">View</a>
+                                            <button data-id=<%=attachment.id %> id="deleteDoc" class="btn btn-sm
+                                              btn-outline-danger">Delete</button>
+                                          </td>
+                                        </tr>
+                                        <% }); %>
+                                          <% } else { %>
+                                            <tr>
+                                              <th scope="row">1</th>
+                                              <td>none</td>
+                                              <td>none</td>
+                                              <td>
+                                                <button class="btn btn-sm btn-outline-secondary" disabled>No
+                                                  Link</button>
+                                              </td>
+                                            </tr>
+                                            <% } %>
                                   </tbody>
-                                  
-                              </table>
+
+                                </table>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -256,388 +321,392 @@
                     </div>
                   </div>
                 </div>
-              </div>
-              <div class="modal fade" tabindex="-1" id="selectPrefixModal">
-                <div class="modal-dialog" role="document">
+                <div class="modal fade" tabindex="-1" id="selectPrefixModal">
+                  <div class="modal-dialog" role="document">
                     <div class="modal-content">
-                        <a href="#" class="close" data-bs-dismiss="modal" aria-label="Close">
-                            <em class="icon ni ni-cross"></em>
-                        </a>
-                        <div class="modal-body">
-                          <form id="documentForm1" class="form-validate is-alter">
-                            <div class="row g-gs">
-                              <div class="col-md-12">
-                                <div class="form-group">
-                                  <label class="form-label" for="doc_number">Select Prefix</label>
-                                  <div class="form-control-wrap">
-                                    <div class="input-group">
-                                      <select class="form-control" data-placeholder="Select Prefix" name="folder_prefix" id="folder_prefix">
-                                        
-                                      </select>
-                                      <div class="input-group-append">
-                                        <button id="savePrefixButton" class="btn btn-outline-primary btn-dim">Choose Prefix</button>
-                                      </div>
+                      <a href="#" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <em class="icon ni ni-cross"></em>
+                      </a>
+                      <div class="modal-body">
+                        <form id="documentForm1" class="form-validate is-alter">
+                          <div class="row g-gs">
+                            <div class="col-md-12">
+                              <div class="form-group">
+                                <label class="form-label" for="doc_number">Select Prefix</label>
+                                <div class="form-control-wrap">
+                                  <div class="input-group">
+                                    <select class="form-control" data-placeholder="Select Prefix" name="folder_prefix"
+                                      id="folder_prefix">
+
+                                    </select>
+                                    <div class="input-group-append">
+                                      <button id="savePrefixButton" class="btn btn-outline-primary btn-dim">Choose
+                                        Prefix</button>
                                     </div>
                                   </div>
                                 </div>
                               </div>
                             </div>
-                          </form>
-                        </div>
+                          </div>
+                        </form>
+                      </div>
                     </div>
-                </div>
-              </div>
-            </div>
-            <button style="display: none" id="open-modal" type="button" class="btn btn-primary" data-bs-toggle="modal"
-              data-bs-target="#staticBackdrop">
-              Launch static backdrop modal
-            </button> 
-            <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-              aria-labelledby="staticBackdropLabel" aria-hidden="true">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel">Delete Attachment</h5>
-                    <button type="button" id="closeModal" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                  </div>
-                  <div class="modal-body">
-                    <p>Are you sure you want to delete this attachment ? </p>
-                  </div>
-                  <div class="modal-footer" id="modalAction">
-                    <button type="button" class="btn btn-secondary" id="rejectModelBtn" data-bs-dismiss="modal">No</button>
-                    <button type="button" id="deleteDocument" class="btn btn-primary">Yes</button>
                   </div>
                 </div>
               </div>
+              <button style="display: none" id="open-modal" type="button" class="btn btn-primary" data-bs-toggle="modal"
+                data-bs-target="#staticBackdrop">
+                Launch static backdrop modal
+              </button>
+              <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false"
+                tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="staticBackdropLabel">Delete Attachment</h5>
+                      <button type="button" id="closeModal" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      <p>Are you sure you want to delete this attachment ? </p>
+                    </div>
+                    <div class="modal-footer" id="modalAction">
+                      <button type="button" class="btn btn-secondary" id="rejectModelBtn"
+                        data-bs-dismiss="modal">No</button>
+                      <button type="button" id="deleteDocument" class="btn btn-primary">Yes</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-          <%- include('./common/footer'); -%>
+            <%- include('./common/footer'); -%>
         </div>
-      </div>
     </div>
+  </div>
 
-        <div class="modal fade" id="attachmentModal">
-          <div class="modal-dialog" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title">Add Attachment</h5>
-                <a href="#" class="close" data-bs-dismiss="modal" aria-label="Close">
-                  <em class="icon ni ni-cross"></em>
-                </a>
-              </div>
-              <div class="modal-body" style="padding: 1.25rem">
-                <form id="attachmentForm" class="form-validate is-alter">
-                  <!-- <div class="form-group displayNone">
+  <div class="modal fade" id="attachmentModal">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Add Attachment</h5>
+          <a href="#" class="close" data-bs-dismiss="modal" aria-label="Close">
+            <em class="icon ni ni-cross"></em>
+          </a>
+        </div>
+        <div class="modal-body" style="padding: 1.25rem">
+          <form id="attachmentForm" class="form-validate is-alter">
+            <!-- <div class="form-group displayNone">
                     <label class="form-label" for="doc_attachment">Attachment Name</label>
                     <div class="form-control-wrap">
                       <input type="text" placeholder="Attachment Name" class="form-control" name="doc_attachment"
                         id="doc_attachment" required />
                     </div>
                   </div> -->
-                  <div class="form-group">
-                    <label class="form-label" for="doc_file">Upload PDF</label>
-                    <div class="form-control-wrap">
-                      <input type="file" class="form-control" placeholder="Upload File" id="doc_file" name="doc_file"
-                        required />
-                    </div>
-                  </div>
-                  <input type="hidden" name="doc_number" id="doc_number" value="<%=documentData.doc_number%>">
-                  <div class="form-group" style="display: flex; justify-content: space-between">
-                    <button data-bs-dismiss="modal" type="button" aria-label="Close" class="btn btn-light">Cancel</button>
-                    <button id="uploadAttachmentButton" class="btn btn-primary">Upload Attachment</button>
-                  </div>
-                </form>
+            <div class="form-group">
+              <label class="form-label" for="doc_file">Upload PDF</label>
+              <div class="form-control-wrap">
+                <input type="file" class="form-control" placeholder="Upload File" id="doc_file" name="doc_file"
+                  required />
               </div>
             </div>
-          </div>
+            <input type="hidden" name="doc_number" id="doc_number" value="<%=documentData.doc_number%>">
+            <div class="form-group" style="display: flex; justify-content: space-between">
+              <button data-bs-dismiss="modal" type="button" aria-label="Close" class="btn btn-light">Cancel</button>
+              <button id="uploadAttachmentButton" class="btn btn-primary">Upload Attachment</button>
+            </div>
+          </form>
         </div>
-    <input type="hidden" id="doc_status" value="<%=documentData.doc_status%>">
-    <script src="/app/assets/js/bundle.js"></script>
-    <script src="/app/assets/js/scripts.js"></script>
-    <script>
-      let documentStatus = $("#doc_status").val();
-      let folders = `<%- JSON.stringify(folders) %>`;
-      let documentData = `<%- JSON.stringify(documentData) %>`;
-      let selectedPrefix = "";
-      let oldDocNumberInput = $("#doc_number").val();
-      const doc_ID = "<%=documentData.doc_id%>"
-      let docIdToDelete = null;
-      let NewURl = null  
-      folders = folders ? JSON.parse(folders) : [];
-      $(document).ready(function () {
-        $("#doc_site").on("change", function () {
-          $("#doc_folder").val("");
-          $("#doc_number").val("");
-          generateDocumentNumber();
-          toggleSaveDraftButton();
-          var selectedSiteParentId = $(this).find("option:selected").data("parent-id");
-          var folderSelect = $("#doc_folder");
-          folderSelect.val("");
-          folderSelect.empty().append('<option label="empty" value=""></option>');
-          folders.forEach(function (folder) {
-            if (folder.site_parent_id == selectedSiteParentId) {
-              folderSelect.append('<option data-site-id="' + folder.site_id + '" value="' + folder.site_name + '">' + folder.site_name + "</option>");
-            }
-          });
-        });
-
-        $(".form-control").on("change", function () {
-          toggleSaveDraftButton();
-        });
-
-        $("#doc_folder").on("change", function () {
-          $("#doc_number").val("");
-          $("#choosePrefixButton").prop("disabled" , true);
-          selectedPrefix = "";
-          generateDocumentNumber();
-          toggleSaveDraftButton();
-        });
-
-        $("#doc_type").on("change", function () {
-          selectedPrefix = "";
-          $("#doc_number").val("");
-          $("#choosePrefixButton").prop("disabled" , true);
-          generateDocumentNumber();
-          toggleSaveDraftButton();
-        });
-
-        function toggleSaveDraftButton() {
-          let docSiteValue = $("#doc_site").val();
-          let docFolderValue = $("#doc_folder").val();
-          let docTypeValue = $("#doc_type").val();
-          let docNumberValue = $("#doc_number").val();
-          if(docTypeValue == "INCOMING"){
-            $("#choosePrefixButton").prop("disabled" , true);
+      </div>
+    </div>
+  </div>
+  <input type="hidden" id="doc_status" value="<%=documentData.doc_status%>">
+  <script src="/app/assets/js/bundle.js"></script>
+  <script src="/app/assets/js/scripts.js"></script>
+  <script>
+    let documentStatus = $("#doc_status").val();
+    let folders = `<%- JSON.stringify(folders) %>`;
+    let documentData = `<%- JSON.stringify(documentData) %>`;
+    let selectedPrefix = "";
+    let oldDocNumberInput = $("#doc_number").val();
+    const doc_ID = "<%=documentData.doc_id%>"
+    let docIdToDelete = null;
+    let NewURl = null
+    folders = folders ? JSON.parse(folders) : [];
+    $(document).ready(function () {
+      $("#doc_site").on("change", function () {
+        $("#doc_folder").val("");
+        $("#doc_number").val("");
+        generateDocumentNumber();
+        toggleSaveDraftButton();
+        var selectedSiteParentId = $(this).find("option:selected").data("parent-id");
+        var folderSelect = $("#doc_folder");
+        folderSelect.val("");
+        folderSelect.empty().append('<option label="empty" value=""></option>');
+        folders.forEach(function (folder) {
+          if (folder.site_parent_id == selectedSiteParentId) {
+            folderSelect.append('<option data-site-id="' + folder.site_id + '" value="' + folder.site_name + '">' + folder.site_name + "</option>");
           }
-          if (docFolderValue && docFolderValue && docTypeValue && docNumberValue) {
-            $("#saveDraftButton").removeClass("d-none");
-          } else {
-            $("#saveDraftButton").addClass("d-none");
-          }
-        }
-
-        // Generating Document Number
-        function generateDocumentNumber() {
-          let docStatus = $("#doc_status").val()
-          if(docStatus == "DRAFTED") return
-          let docSiteValue = $("#doc_site").val();
-          let docFolderValue = $("#doc_folder").val();
-          let docTypeValue = $("#doc_type").val();
-          let docNumberInput = $("#doc_number");
-          let docNumberValue = "";
-          let dataSiteId = $("#doc_site").find("option:selected").data("parent-id");
-          let dataFolderId = $("#doc_folder").find("option:selected").data("site-id");
-
-          if (docSiteValue && docFolderValue && docTypeValue == "OUTGOING") {
-            selectPrefixOptions = "";
-            docNumberInput.prop("disabled", true).val();
-            $.ajax({
-              type: "GET",
-              url: "/docs/generate-document-number",
-              data: { site_id: dataSiteId, folder_id : dataFolderId},
-              success: function (response) {
-                if (response.status == 1) {
-                  let selectPrefixOptions = response.payload.site_prefix.split(",");
-                  $("#choosePrefixButton").prop("disabled" , false);
-                  let sitePrefix = selectPrefixOptions[0];
-                  if(selectedPrefix != ""){
-                    sitePrefix = selectedPrefix;
-                  }
-                  $("#folder_prefix").empty();
-                  for (let i = 0; i < selectPrefixOptions.length; i++) {
-                    let value = selectPrefixOptions[i];
-                    let option = $('<option>').val(value).text(value);
-                    if (value === sitePrefix) {
-                      option.prop("selected", true);
-                    }
-                    $('#folder_prefix').append(option);
-                  }
-                  if (!sitePrefix.endsWith('/')) {
-                      sitePrefix += '/';
-                  }
-                  const docNumberValue = sitePrefix + (parseInt(response.payload.site_record_value, 10) + 1);
-                  docNumberInput.val(docNumberValue);
-                  toggleSaveDraftButton();
-                } else {
-                  docNumberInput.prop("disabled", false).val("");
-                }
-              },
-              error: function (xhr, status, error) {
-                docNumberInput.prop("disabled", false).val("");
-              },
-            });
-          } else {
-            docNumberInput.prop("disabled", false);
-          }
-        }
-        $("#choosePrefixButton").click(function(e){
-          e.preventDefault();
-          $("#selectPrefixModal").modal("show")
-        });
-        $("#savePrefixButton").click(function(e){
-          e.preventDefault();
-          selectedPrefix = $("#folder_prefix").val();
-          generateDocumentNumber();
-          $("#selectPrefixModal").modal("hide")
-        })
-        
-        $("#doc_reference").select2({
-          ajax: {
-            url: function (params) {
-              return "/docs/get-document-reference?query=" + params.term;
-            },
-            dataType: "json",
-            delay: 250,
-            processResults: function (data) {
-              return {
-                results: data.payload.map(function (option) {
-                  return {
-                    text: option,
-                    id: option,
-                  };
-                }),
-              };
-            },
-            cache: true,
-          },
-          minimumInputLength: 1,
-          placeholder: "Select Reference",
-          tags: true
         });
       });
 
-      // Saving Draft
-      $("#uploadDocumentBtn").click(function () {
-        event.preventDefault();
-        toastr.clear();
-        NioApp.handleButtonState("uploadDocumentBtn", "Update", true);
-        let formData = {};
-        $(".form-control").each(function () {
-          let fieldName = $(this).attr('id');
-          let fieldValue = $(this).val();
-          let newDocNumberInput = $("#doc_number").val();      
-          if(fieldName == "folder_prefix") return;
-          if(fieldValue == "" || fieldValue.length == 0 || fieldValue.length == []){
-            fieldValue = null;
-          }
-          formData[fieldName] = fieldValue;
-          if($("#doc_status").val() == "INSERTED"){
-            formData["insertedFlag"] = true;
-          }
-          
-        });
-        let newDocNumberInput = $("#doc_number").val();    
-        if (
-          oldDocNumberInput?.toLocaleLowerCase().trim() !==
-            newDocNumberInput?.toLocaleLowerCase().trim()
-          ) {
-            formData["new_doc_number"] = newDocNumberInput;
-            formData["doc_number"] = oldDocNumberInput;
-            formData["insertedFlag"] = true;
-           
-            NewURl = newDocNumberInput
-          }
-          formData["doc_ID"] = doc_ID
-        $.ajax({
-          type: "POST",
-          url: "/docs/edit-document",
-          data: formData,
-          success: function (response) {
-            if (response.status == 1) {
-              $("#doc_site,#doc_folder,#choosePrefixButton,#doc_type").prop("disabled", true);
-              NioApp.handleButtonState("uploadDocumentBtn", "Update", false);
-              NioApp.Toast("<h5>Update Successfully</h5><p>Document Updated Successfully</p>", "success")
-              location.reload()
+      $(".form-control").on("change", function () {
+        toggleSaveDraftButton();
+      });
 
+      $("#doc_folder").on("change", function () {
+        $("#doc_number").val("");
+        $("#choosePrefixButton").prop("disabled", true);
+        selectedPrefix = "";
+        generateDocumentNumber();
+        toggleSaveDraftButton();
+      });
+
+      $("#doc_type").on("change", function () {
+        selectedPrefix = "";
+        $("#doc_number").val("");
+        $("#choosePrefixButton").prop("disabled", true);
+        generateDocumentNumber();
+        toggleSaveDraftButton();
+      });
+
+      function toggleSaveDraftButton() {
+        let docSiteValue = $("#doc_site").val();
+        let docFolderValue = $("#doc_folder").val();
+        let docTypeValue = $("#doc_type").val();
+        let docNumberValue = $("#doc_number").val();
+        if (docTypeValue == "INCOMING") {
+          $("#choosePrefixButton").prop("disabled", true);
+        }
+        if (docFolderValue && docFolderValue && docTypeValue && docNumberValue) {
+          $("#saveDraftButton").removeClass("d-none");
+        } else {
+          $("#saveDraftButton").addClass("d-none");
+        }
+      }
+
+      // Generating Document Number
+      function generateDocumentNumber() {
+        let docStatus = $("#doc_status").val()
+        if (docStatus == "DRAFTED") return
+        let docSiteValue = $("#doc_site").val();
+        let docFolderValue = $("#doc_folder").val();
+        let docTypeValue = $("#doc_type").val();
+        let docNumberInput = $("#doc_number");
+        let docNumberValue = "";
+        let dataSiteId = $("#doc_site").find("option:selected").data("parent-id");
+        let dataFolderId = $("#doc_folder").find("option:selected").data("site-id");
+
+        if (docSiteValue && docFolderValue && docTypeValue == "OUTGOING") {
+          selectPrefixOptions = "";
+          docNumberInput.prop("disabled", true).val();
+          $.ajax({
+            type: "GET",
+            url: "/docs/generate-document-number",
+            data: { site_id: dataSiteId, folder_id: dataFolderId },
+            success: function (response) {
+              if (response.status == 1) {
+                let selectPrefixOptions = response.payload.site_prefix.split(",");
+                $("#choosePrefixButton").prop("disabled", false);
+                let sitePrefix = selectPrefixOptions[0];
+                if (selectedPrefix != "") {
+                  sitePrefix = selectedPrefix;
+                }
+                $("#folder_prefix").empty();
+                for (let i = 0; i < selectPrefixOptions.length; i++) {
+                  let value = selectPrefixOptions[i];
+                  let option = $('<option>').val(value).text(value);
+                  if (value === sitePrefix) {
+                    option.prop("selected", true);
+                  }
+                  $('#folder_prefix').append(option);
+                }
+                if (!sitePrefix.endsWith('/')) {
+                  sitePrefix += '/';
+                }
+                const docNumberValue = sitePrefix + (parseInt(response.payload.site_record_value, 10) + 1);
+                docNumberInput.val(docNumberValue);
+                toggleSaveDraftButton();
+              } else {
+                docNumberInput.prop("disabled", false).val("");
+              }
+            },
+            error: function (xhr, status, error) {
+              docNumberInput.prop("disabled", false).val("");
+            },
+          });
+        } else {
+          docNumberInput.prop("disabled", false);
+        }
+      }
+      $("#choosePrefixButton").click(function (e) {
+        e.preventDefault();
+        $("#selectPrefixModal").modal("show")
+      });
+      $("#savePrefixButton").click(function (e) {
+        e.preventDefault();
+        selectedPrefix = $("#folder_prefix").val();
+        generateDocumentNumber();
+        $("#selectPrefixModal").modal("hide")
+      })
+
+      $("#doc_reference").select2({
+        ajax: {
+          url: function (params) {
+            return "/docs/get-document-reference?query=" + params.term;
+          },
+          dataType: "json",
+          delay: 250,
+          processResults: function (data) {
+            return {
+              results: data.payload.map(function (option) {
+                return {
+                  text: option,
+                  id: option,
+                };
+              }),
+            };
+          },
+          cache: true,
+        },
+        minimumInputLength: 1,
+        placeholder: "Select Reference",
+        tags: true
+      });
+    });
+
+    // Saving Draft
+    $("#uploadDocumentBtn").click(function () {
+      event.preventDefault();
+      toastr.clear();
+      NioApp.handleButtonState("uploadDocumentBtn", "Update", true);
+      let formData = {};
+      $(".form-control").each(function () {
+        let fieldName = $(this).attr('id');
+        let fieldValue = $(this).val();
+        let newDocNumberInput = $("#doc_number").val();
+        if (fieldName == "folder_prefix") return;
+        if (fieldValue == "" || fieldValue.length == 0 || fieldValue.length == []) {
+          fieldValue = null;
+        }
+        formData[fieldName] = fieldValue;
+        if ($("#doc_status").val() == "INSERTED") {
+          formData["insertedFlag"] = true;
+        }
+
+      });
+      let newDocNumberInput = $("#doc_number").val();
+      if (
+        oldDocNumberInput?.toLocaleLowerCase().trim() !==
+        newDocNumberInput?.toLocaleLowerCase().trim()
+      ) {
+        formData["new_doc_number"] = newDocNumberInput;
+        formData["doc_number"] = oldDocNumberInput;
+        formData["insertedFlag"] = true;
+
+        NewURl = newDocNumberInput
+      }
+      formData["doc_ID"] = doc_ID
+      $.ajax({
+        type: "POST",
+        url: "/docs/edit-document",
+        data: formData,
+        success: function (response) {
+          if (response.status == 1) {
+            $("#doc_site,#doc_folder,#choosePrefixButton,#doc_type").prop("disabled", true);
+            NioApp.handleButtonState("uploadDocumentBtn", "Update", false);
+            NioApp.Toast("<h5>Update Successfully</h5><p>Document Updated Successfully</p>", "success")
+            location.reload()
+
+          } else {
+            NioApp.handleButtonState("uploadDocumentBtn", "Update", false);
+            NioApp.Toast(`<h5>Something Went Wrong</h5>${response.msg || `<p>Error while updating document.</p>`}`, "error");
+          }
+        },
+        error: function (xhr, status, error) {
+          NioApp.handleButtonState("uploadDocumentBtn", "Update", false);
+          NioApp.Toast("<h5>Something Went Wrong</h5><p>Error while updating document.</p>", "error");
+          console.error("Error saving draft:", error);
+        },
+      });
+    });
+
+    // attachmentForm
+    $(document).ready(function () {
+      const folderName = "<%= documentData.doc_folder %>"
+      $('#attachmentForm').on('submit', function (event) {
+        event.preventDefault();
+        const file = document.getElementById("doc_file").files[0]
+        var formData = new FormData(this);
+        formData.append("doc_folder", folderName);
+        formData.append("doc_attachment", file.name);
+        NioApp.handleButtonState("uploadAttachmentButton", "Uploading...", true);
+
+
+        $.ajax({
+          url: '/docs/upload-attachment',
+          type: 'POST',
+          data: formData,
+          contentType: false,
+          processData: false,
+          success: function (response) {
+            if (response.status === 1) {
+              location.reload();
             } else {
-              NioApp.handleButtonState("uploadDocumentBtn", "Update", false);
-              NioApp.Toast(`<h5>Something Went Wrong</h5>${response.msg ||`<p>Error while updating document.</p>`}`, "error");
+              alert('Upload failed: ' + response.message);
             }
           },
           error: function (xhr, status, error) {
-            NioApp.handleButtonState("uploadDocumentBtn", "Update", false);
-            NioApp.Toast("<h5>Something Went Wrong</h5><p>Error while updating document.</p>", "error");
-            console.error("Error saving draft:", error);
-          },
-        });
-      });
-
-      // attachmentForm
-      $(document).ready(function() {
-        const folderName = "<%= documentData.doc_folder %>"
-				$('#attachmentForm').on('submit', function(event) {
-          event.preventDefault();
-          const file = document.getElementById("doc_file").files[0]
-					var formData = new FormData(this);
-					formData.append("doc_folder", folderName);
-          formData.append("doc_attachment",file.name);
-					NioApp.handleButtonState("uploadAttachmentButton", "Uploading...", true);
-
- 
-					$.ajax({
-						url: '/docs/upload-attachment',
-						type: 'POST',
-						data: formData,
-						contentType: false,
-						processData: false,
-						success: function(response) {
-							if (response.status === 1) {
-								location.reload();
-							} else {
-								alert('Upload failed: ' + response.message);
-							}
-						},
-						error: function(xhr, status, error) {
-							NioApp.handleButtonState("uploadAttachmentButton", "Upload File", false);
-							console.error('Error:', error);
-						}
-					});
-				});
-      })
-
-        $(document).on('click', '#deleteDoc', function (event) {
-          console.log('wqdkp');
-
-          event.preventDefault();
-          let openModal = document.getElementById('open-modal')
-
-          docIdToDelete = $(this).data('id');
-          console.log(docIdToDelete);
-          if (docIdToDelete) {
-            openModal.click();
+            NioApp.handleButtonState("uploadAttachmentButton", "Upload File", false);
+            console.error('Error:', error);
           }
         });
-        $(document).on('click', '#deleteDocument', function (event) {
-          const modalCloseBtn = document.querySelector('#closeModal');
-          event.preventDefault();
-          $(`#modalAction`).addClass('disable');
-          $.ajax({
-            type: "POST",
-            url: "/docs/delete-attachment/",
-            data: { docId: docIdToDelete },
-            success: function (response) {
-              if (response.status == 0) {
-                NioApp.Toast("<h5>Deleted Successfully</h5><p>Document deleted successfully!</p>", "success");
-                modalCloseBtn.click();
-                location.reload()
-                $(`#modalAction`).removeClass('disable');
+      });
+    })
 
-              } else {
-                NioApp.Toast(`<h5>Something Went Wrong</h5>${response.msg || `<p>Error while Document deleted</p>`}`, "error");
-                modalCloseBtn.click();
-                $(`#modalAction`).removeClass('disable');
+    $(document).on('click', '#deleteDoc', function (event) {
+      console.log('wqdkp');
 
-              }
-            },
+      event.preventDefault();
+      let openModal = document.getElementById('open-modal')
 
-            error: function (xhr, status, error) {
-              NioApp.Toast(`<h5>Something Went Wrong</h5>${response.msg || `<p>Error while Document deleted</p>`}`, "error");
-              modalCloseBtn.click();
-              $(`#modalAction`).removeClass('disable');
-            },
-          });
-        });
-        
-    </script>
-  </body>
+      docIdToDelete = $(this).data('id');
+      console.log(docIdToDelete);
+      if (docIdToDelete) {
+        openModal.click();
+      }
+    });
+    $(document).on('click', '#deleteDocument', function (event) {
+      const modalCloseBtn = document.querySelector('#closeModal');
+      event.preventDefault();
+      $(`#modalAction`).addClass('disable');
+      $.ajax({
+        type: "POST",
+        url: "/docs/delete-attachment/",
+        data: { docId: docIdToDelete },
+        success: function (response) {
+          if (response.status == 1) {
+            NioApp.Toast("<h5>Deleted Successfully</h5><p>Document deleted successfully!</p>", "success");
+            modalCloseBtn.click();
+            location.reload()
+            $(`#modalAction`).removeClass('disable');
+
+          } else {
+            NioApp.Toast(`<h5>Something Went Wrong</h5>${response.msg || `<p>Error while Document deleted</p>`}`, "error");
+            modalCloseBtn.click();
+            $(`#modalAction`).removeClass('disable');
+
+          }
+        },
+
+        error: function (xhr, status, error) {
+          NioApp.Toast(`<h5>Something Went Wrong</h5>${response.msg || `<p>Error while Document deleted</p>`}`, "error");
+          modalCloseBtn.click();
+          $(`#modalAction`).removeClass('disable');
+        },
+      });
+    });
+
+  </script>
+</body>
+
 </html>
