@@ -24,5 +24,7 @@ router.post("/delete-doc", documentController.deleteDoc);
 router.post("/delete-project", documentController.deleteProject);
 router.post("/delete-attachment", documentController.deleteAttachment);
 router.delete("/delete-project-pdf", documentController.deleteProjectPdf);
+router.post("/save-purpose", documentController.savePurpose);
+router.get("/get-all-purpose", documentController.getAllDocPurpose);
 
 module.exports = router;

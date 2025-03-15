@@ -15,5 +15,6 @@ router.get("/project-master", authMiddleware.checkLoginStatus, renderController.
 router.get("/project/create-project", authMiddleware.checkLoginStatus, renderController.renderCreateProjectMaster);
 router.get("/edit-document/:id", authMiddleware.checkLoginStatus, renderController.editDoc);
 router.get("/edit-project/:id", authMiddleware.checkLoginStatus, renderController.editProject);
+router.get("/settings", authMiddleware.checkLoginStatus, renderController.settings);
 
 module.exports = router;

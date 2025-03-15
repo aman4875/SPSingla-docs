@@ -330,7 +330,7 @@
             // Your AJAX request
             $.ajax({
                 type: "POST",
-                url: "/docs/create-project",
+                url: "/docs/settings",
                 data: formData,
                 processData: false,
                 contentType: false,
@@ -338,7 +338,7 @@
                     if (response.status == 1) {
                         NioApp.handleButtonState("uploadDocumentBtn", "Upload", false);
                         NioApp.Toast("<h5>Document Uploaded</h5><p>Document Uploaded Successfully</p>", "success");
-                        document.getElementById("documentForm").reset();
+                        window.location.href = '/project-master'
                     } else if (response.status == 0) {
                         NioApp.handleButtonState("uploadDocumentBtn", "Upload", false);
                         NioApp.Toast(`<h5>Error Occurred</h5><p>${response.msg}</p>`, "error");
