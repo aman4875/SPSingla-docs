@@ -285,6 +285,7 @@ renderController.renderSites = async (req, res) => {
 		res.send({ status: 0, msg: "Something Went Wrong" });
 	}
 };
+
 renderController.editDoc = async (req, res) => {
 	let token = req.session.token;
 	try {
@@ -405,6 +406,21 @@ renderController.renderCreateDocument = async (req, res) => {
 	} catch (error) {
 		console.error(error);
 		res.status(500).send("Internal Server Error");
+	}
+};
+
+renderController.settings = async (req, res) => {
+	let token = req.session.token;
+
+	try {
+
+		let { rows: settingValues } = await pool.query(`SELECT * FROM admin_settings ORDER BY id ASC`);
+		let doc_lock_date = settingValues[0]
+
+		return res.render("settings/settings", { token, doc_lock_date: doc_lock_date });
+	} catch (err) {
+		console.log(err);
+		return res.send({ status: 0, msg: "Something Went Wrong" });
 	}
 };
 

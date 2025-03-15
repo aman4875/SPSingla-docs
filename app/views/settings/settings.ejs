@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zxx" class="js">
+
+<head>
+    <base href="../" />
+    <meta charset="utf-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" />
+    <!-- Fav Icon  -->
+    <link rel="shortcut icon" href="/app/assets/images/favicon.png" />
+    <!-- Page Title  -->
+    <title>Sites | Document Controller</title>
+    <!-- StyleSheets  -->
+    <link rel="stylesheet" href="/app/assets/css/dashlite.css" />
+    <link id="skin-default" rel="stylesheet" href="/app/assets/css/theme.css" />
+    <link rel="stylesheet" href="/app/views/settings/style.css">
+
+</head>
+
+<body class="nk-body bg-lighter npc-general has-sidebar">
+    <div class="nk-app-root">
+        <div class="nk-main">
+            <%- include('./common/sidebar' , {active : "settings" }); -%>
+                <div class="nk-wrap">
+                    <%- include('./common/navbar',{headerText:"Settings Controller"}); -%>
+                        <div class="nk-content">
+                            <div class="container-fluid">
+                                <div class="nk-content-inner">
+                                    <div class="nk-content-body">
+                                        <div class="nk-block-head nk-block-head-sm">
+                                            <div class="nk-block-between">
+                                                <div class="nk-block-head-content">
+                                                    <h3 class="nk-block-title page-title">Settings</h3>
+
+                                                    <div class="nk-block-des text-soft">
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card card-bordered">
+                                            <div class="card-inner" style="height: 70vh;">
+                                                <form id="documentForm" class="form-validate is-alter"
+                                                    novalidate="novalidate">
+                                                    <div class="row g-gs">
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label settings-header"
+                                                                    for="doc_lock_date">Document
+                                                                    Lock Date </label>
+                                                                <div class="form-control-wrap">
+                                                                    <input type="text" class="form-control date-picker"
+                                                                        placeholder="Document Lock Date"
+                                                                        id="doc_lock_date" name="doc_lock_date"
+                                                                        autocomplete="off"
+                                                                        value=" <%= doc_lock_date.setting_value %>" />
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <button style="letter-spacing: 2px;" id="uploadDocumentBtn"
+                                                            type="submit" class="btn btn-lg btn-primary">Save</button>
+                                                    </div>
+                                            </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                </div>
+                <%- include('./common/footer'); -%>
+        </div>
+    </div>
+    </div>
+    </div>
+
+
+    <script src="/app/assets/js/bundle.js"></script>
+    <script src="/app/assets/js/scripts.js"></script>
+    <script>
+        $("#documentForm").submit(function (event) {
+            event.preventDefault();
+            if (!this.checkValidity()) {
+                return false;
+            }
+
+            NioApp.handleButtonState("uploadDocumentBtn", "Upload", true);
+
+            let formData = new FormData(this);
+            console.log("🚀 Form Data:");
+            for (let pair of formData.entries()) {
+                console.log(pair[0] + ": " + pair[1]);
+            }
+
+
+            // Your AJAX request
+            $.ajax({
+                type: "POST",
+                url: "/admin/settings",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    if (response.status == 1) {
+                        NioApp.handleButtonState("uploadDocumentBtn", "Save", false);
+                        NioApp.Toast("<h5>Settings Saved</h5><p>Settings saved successfully</p>", "success");
+                    } else {
+                        NioApp.Toast("<h5>Something Went Wrong</h5><p>Error while uploading Document</p>", "error");
+                    }
+                },
+                error: function (xhr, status, error) {
+                    NioApp.handleButtonState("uploadDocumentBtn", "Save", false);
+                    NioApp.Toast("<h5>Something Went Wrong</h5><p>Error while uploading Document</p>", "error");
+                    console.error("Error saving draft:", error);
+                },
+            });
+        });
+
+    </script>
+</body>
+
+</html>

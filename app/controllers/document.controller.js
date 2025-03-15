@@ -448,10 +448,14 @@ documentController.createDocument = async (req, res) => {
 documentController.getFilteredDocuments = async (req, res) => {
 	try {
 		let inputs = req.body;
+		console.log("🚀 ~ documentController.getFilteredDocuments= ~ inputs:", inputs)
 		let token = req.session.token;
 		const page = inputs.page || 1;
 		const pageSize = inputs.limit || 10;
 		const offset = (page - 1) * pageSize;
+
+		let { rows } = await pool.query(`SELECT setting_value FROM admin_settings WHERE setting_name = $1`, ['doc_lock_date']);
+
 		let baseQuery = `
 					SELECT 
 						d.*,
@@ -522,8 +526,16 @@ documentController.getFilteredDocuments = async (req, res) => {
 								THEN TRUE
 								ELSE FALSE
 							END
-						) AS highlightrow
-						 FROM documents d`;
+						) AS highlightrow,
+						(
+							CASE
+							    WHEN TO_DATE(d.doc_created_at, 'DD/MM/YYYY') < TO_DATE('${rows[0]?.setting_value}', 'DD/MM/YYYY')
+								THEN FALSE
+								ELSE TRUE
+							END
+						) AS actionActive
+						 FROM documents d
+						 `
 		let conditions = [];
 		let joins = "";
 		let folderQuery = ''
@@ -646,6 +658,8 @@ documentController.getFilteredDocuments = async (req, res) => {
         LIMIT ${pageSize}
         OFFSET ${offset}
       `;
+
+		console.log(query)
 		// Execute the main query
 		let { rows: documents } = await pool.query(query);
 		res.json({
@@ -798,6 +812,7 @@ documentController.deleteDoc = async (req, res) => {
 		return res.json({ status: 0, msg: "Internal Server Error" });
 	}
 }
+
 documentController.deleteAttachment = async (req, res) => {
 	const { docId } = req.body;
 	const { user_id } = req.session.token;

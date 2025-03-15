@@ -1,0 +1,10 @@
+.form-group:last-child {
+  margin-bottom: 50vh !important;
+}
+
+.settings-header {
+  font-weight: 600;
+}
+.nk-wrap {
+  min-height: 0 !important;
+}
