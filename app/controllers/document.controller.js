@@ -1143,6 +1143,29 @@ documentController.deleteDoc = async (req, res) => {
 	}
 }
 
+
+documentController.deleteProject = async (req, res) => {
+	const { docId } = req.body;
+	const token = req.session.token;
+
+	try {
+		if (!token) {
+			return res.json({ status: 0, msg: "User not logged In" });
+		}
+		const result = await pool.query(
+			`DELETE FROM projects_master WHERE doc_id = ${docId}`,
+		);
+		if (result.rowCount === 0) {
+			return res.json({ status: 0, msg: "Document not found" });
+		}
+
+		return res.json({ status: 1, msg: "Document Deleted" });
+	} catch (error) {
+		console.log("🚀 ~ documentController.deleteDoc ~ error:", error)
+		return res.json({ status: 0, msg: "Internal Server Error" });
+	}
+}
+
 documentController.deleteAttachment = async (req, res) => {
 	const { docId } = req.body;
 	const { user_id } = req.session.token;
