@@ -1062,6 +1062,8 @@ documentController.getFilteredProjects = async (req, res) => {
 documentController.getProjectsBg = async (req, res) => {
 	try {
 		let inputs = req.body;
+		console.log("🚀 ~ documentController.getProjectsBg= ~ inputs:", inputs)
+
 		let projectID = req.query;
 
 		let token = req.session.token;
@@ -1108,14 +1110,20 @@ documentController.getProjectsBg = async (req, res) => {
 			if (filter.type === "multiple") {
 				const values = filter.value.map((val) => `'${val.replace(/'/g, "''")}'`).join(", ");
 				values && conditions.push(`d.${field} IN (${values})`);
-			} else if (filter.type === "text") {
+			} else if (filter.type === "text" && filter.dataTable == null) {
 				filter?.value && conditions.push(`LOWER(d.${field}) LIKE LOWER('%${filter.value.replace(/'/g, "''")}%')`);
-			} else if (filter.type === "boolean") {
-				filter?.value && conditions.push(`d.${field} =  ${filter.value.replace(/'/g, "''") === "Yes" ? 'TRUE' : 'FALSE'}`);
-			} else if (filter.type === "date") {
+			} else if (filter.type === "text" && filter.dataTable === 'projects_master' && filter.dataTable != null) {
+				filter?.value && conditions.push(`LOWER(pm.${field}) LIKE LOWER('%${filter.value.replace(/'/g, "''")}%')`);
+			} else if (filter.type === "boolean" && filter.dataTable === 'projects_master' && filter.dataTable != null) {
+				filter?.value && conditions.push(`pm.${field} =  ${filter.value.replace(/'/g, "''") === "Yes" ? 'TRUE' : 'FALSE'}`);
+			} else if (filter.type === "date" && filter.dataTable == null) {
 				filter?.value && conditions.push(`LOWER(d.${field}) LIKE LOWER('%${filter.value.replace(/'/g, "''")}%')`);
-			} else if (filter.type === "number") {
+			} else if (filter.type === "date" && filter.dataTable === 'projects_master' && filter.dataTable != null) {
+				filter?.value && conditions.push(`LOWER(pm.${field}) LIKE LOWER('%${filter.value.replace(/'/g, "''")}%')`);
+			} else if (filter.type === "number" && filter.dataTable == null) {
 				filter?.value && conditions.push(`d.${field}::TEXT LIKE '${filter.value.replace(/'/g, "''")}%'`);
+			} else if (filter.type === "number" && filter.dataTable === 'projects_master' && filter.dataTable != null) {
+				filter?.value && conditions.push(`pm.${field}::TEXT LIKE '${filter.value.replace(/'/g, "''")}%'`);
 			} else if (filter.type === "keyword") {
 				conditions.push(`
 				LOWER(d.doc_code::TEXT) LIKE LOWER('%${filter.value}%') OR
@@ -1161,22 +1169,42 @@ documentController.getProjectsBg = async (req, res) => {
 		} else {
 			orderByClause = `ORDER BY d.doc_id DESC`;
 		}
-		// // Build the WHERE clause
+
+		// Build the WHERE clause
 		if (conditions.length > 0) {
 			baseQuery += " WHERE " + conditions.join(" AND ");
 		}
 
-		// Query to get the total count of documents
+		// total count of documents
 		let countQuery = `
-		SELECT COUNT(DISTINCT d.doc_id) as total
-		FROM doc_manage_bg d
-		${joins}
+		WITH total_count_cte AS (
+			SELECT COUNT(DISTINCT doc_id) AS total_count 
+			FROM doc_manage_bg
+		)
+		SELECT 
+			d.*,
+			pm.doc_code, 
+			pm.doc_work_name,
+			pm.doc_department,
+			pm.doc_financial_date,
+			pm.doc_agreement_no,
+			pm.doc_agreement_date,
+			pm.doc_completion_date,
+			pm.doc_awarded,
+			pm.doc_dlp_period, 
+			tc.total_count
+		FROM 
+			doc_manage_bg AS d
+		LEFT JOIN 
+			projects_master AS pm ON d.project_code = pm.doc_code
+		CROSS JOIN 
+			total_count_cte tc 
 		${conditions.length ? " WHERE " + conditions.join(" AND ") : ""}
 	  `;
-
+		console.log(countQuery)
 		let { rows: countResult } = await pool.query(countQuery);
 
-		const totalDocuments = countResult[0].total;
+		const totalDocuments = countResult[0]?.total;
 		const totalPages = Math.ceil(totalDocuments / pageSize);
 		// Main query with pagination
 		let query = `
