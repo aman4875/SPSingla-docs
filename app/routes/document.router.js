@@ -15,6 +15,7 @@ router.post("/create-project", upload.single("doc_file"), documentController.cre
 router.post("/create-bg", upload.single("doc_file"), documentController.createBG);
 router.post("/upload-attachment", upload.single("doc_file"), documentController.uploadAttachment);
 router.post("/upload-project-pdfs", upload.single("doc_file"), documentController.uploadProjectAttachments);
+router.post("/upload-bg-pdfs", upload.single("doc_file"), documentController.uploadBGAttachments);
 router.post("/get-filtered-documents", documentController.getFilteredDocuments);
 router.post("/get-filtered-projects", documentController.getFilteredProjects);
 router.post("/get-projects-bg", documentController.getProjectsBg);
@@ -26,6 +27,7 @@ router.post("/delete-doc", documentController.deleteDoc);
 router.post("/delete-project", documentController.deleteProject);
 router.post("/delete-attachment", documentController.deleteAttachment);
 router.delete("/delete-project-pdf", documentController.deleteProjectPdf);
+router.delete("/delete-bg-pdf", documentController.deleteBGPdf);
 router.delete("/delete-bg", documentController.deleteBG);
 router.get("/get-project-by-id", documentController.getProjectById);
 router.post("/save-beneficiary", documentController.saveBeneficiary);

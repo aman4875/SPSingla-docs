@@ -1076,10 +1076,8 @@ documentController.getFilteredProjects = async (req, res) => {
 documentController.getProjectsBg = async (req, res) => {
 	try {
 		let inputs = req.body;
-		console.log("🚀 ~ documentController.getProjectsBg= ~ inputs:", inputs)
-
-		let projectID = req.query;
-
+		let projectCode = req.query;
+		console.log("🚀 ~ documentController.getProjectsBg= ~ projectID:", projectCode)
 		let token = req.session.token;
 		const page = inputs.page || 1;
 		const pageSize = inputs.limit || 10;
@@ -1118,7 +1116,9 @@ documentController.getProjectsBg = async (req, res) => {
 		let conditions = [];
 		let joins = "";
 
-
+		if (projectCode.project && projectCode.project !== "null" && projectCode.project.trim() !== "") {
+			conditions.push(`d.project_code = '${projectCode.project}'`)
+		}
 		// Handle filters from inputs.activeFilter
 		for (const [field, filter] of Object.entries(inputs?.activeFilter)) {
 			if (filter.type === "multiple") {
@@ -1140,25 +1140,44 @@ documentController.getProjectsBg = async (req, res) => {
 				filter?.value && conditions.push(`pm.${field}::TEXT LIKE '${filter.value.replace(/'/g, "''")}%'`);
 			} else if (filter.type === "keyword") {
 				conditions.push(`
-				LOWER(d.doc_code::TEXT) LIKE LOWER('%${filter.value}%') OR
-				LOWER(d.doc_work_name::TEXT) LIKE LOWER('%${filter.value}%') OR
-				LOWER(d.doc_department::TEXT) LIKE LOWER('%${filter.value}%') OR
-				LOWER(d.doc_financial_date::TEXT) LIKE LOWER('%${filter.value}%') OR
-				LOWER(d.doc_agreement_no::TEXT) LIKE LOWER('%${filter.value}%') OR
-				LOWER(d.doc_agreement_date::TEXT) LIKE LOWER('%${filter.value}%') OR
-				LOWER(d.doc_completion_date::TEXT) LIKE LOWER('%${filter.value}%') OR
-				LOWER(d.doc_total_mobilisation_amount::TEXT) LIKE LOWER('%${filter.value}%') OR
-				LOWER(d.doc_bal_mobilisation_amount::TEXT) LIKE LOWER('%${filter.value}%') OR
-				LOWER(d.doc_retention_amount::TEXT) LIKE LOWER('%${filter.value}%') OR
-				LOWER(d.doc_dlp_period::TEXT) LIKE LOWER('%${filter.value}%') OR
-				LOWER(d.doc_revised_date::TEXT) LIKE LOWER('%${filter.value}%') OR
-				LOWER(d.doc_dlp_ending::TEXT) LIKE LOWER('%${filter.value}%') 
+				LOWER(d.project_code::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(pm.doc_work_name::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(pm.doc_department::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(pm.doc_financial_date::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(pm.doc_agreement_no::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(pm.doc_agreement_date::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(pm.doc_completion_date::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(pm.doc_total_mobilisation_amount::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(pm.doc_bal_mobilisation_amount::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(pm.doc_retention_amount::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(pm.doc_dlp_period::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(pm.doc_revised_date::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(pm.doc_dlp_ending::TEXT) LIKE LOWER('%${filter.value}%') 
+				LOWER(d.doc_type::TEXT) LIKE LOWER('%${filter.value}%') 
+				LOWER(d.doc_bank_name::TEXT) LIKE LOWER('%${filter.value}%') 
+				LOWER(d.doc_issuing_branch::TEXT) LIKE LOWER('%${filter.value}%') 
+				LOWER(d.doc_beneficiary_name::TEXT) LIKE LOWER('%${filter.value}%') 
+				LOWER(d.doc_bg_number::TEXT) LIKE LOWER('%${filter.value}%') 
+				LOWER(d.doc_applicant_name::TEXT) LIKE LOWER('%${filter.value}%') 
+				LOWER(d.doc_claim_date::TEXT) LIKE LOWER('%${filter.value}%') 
+				LOWER(d.doc_bg_amount::TEXT) LIKE LOWER('%${filter.value}%') 
+				LOWER(d.doc_expiry_date::TEXT) LIKE LOWER('%${filter.value}%') 
+				LOWER(d.doc_bg_cancelled_date::TEXT) LIKE LOWER('%${filter.value}%') 
+				LOWER(d.doc_issue_date::TEXT) LIKE LOWER('%${filter.value}%') 
 				`)
 
 			}
 		}
 
 		// // Handle sorting
+		const tableId = Object.keys(inputs.sort).find((val) => val === 'dataTable');
+		const tableValue = tableId ? inputs.sort[tableId] : null;
+
+		if (tableId) {
+			delete inputs.sort[tableId];
+		}
+		const TableAliases = tableValue === 'projects_master' ? "pm" : "d"
+
 		if (inputs.sort && Object.keys(inputs.sort).length > 0) {
 			const sortFields = Object.entries(inputs.sort).map(([field, direction]) => {
 				const dir = direction.toLowerCase() === "asc" ? "ASC" : "DESC";
@@ -1166,17 +1185,17 @@ documentController.getProjectsBg = async (req, res) => {
 				// adding storing for date
 				if (inputs.isDate === true) {
 					return `CASE
-						WHEN d.${field} IS NULL OR d.${field} = '' THEN 
+						WHEN ${TableAliases}.${field} IS NULL OR d.${field} = '' THEN 
 						CASE
 						WHEN '${dir}' = 'ASC' THEN NULL
 						ELSE TO_DATE('01/01/1900', 'DD/MM/YYYY')
 						END
-					    WHEN NOT d.${field} ~ '^\\d{2}/\\d{2}/\\d{4}$' THEN NULL 
+					    WHEN NOT ${TableAliases}.${field} ~ '^\\d{2}/\\d{2}/\\d{4}$' THEN NULL 
 						ELSE TO_DATE(d.${field}, 'DD/MM/YYYY')
 						END ${dir} NULLS LAST`
 				}
 
-				return `d.${field} ${dir}`;
+				return `${TableAliases}.${field} ${dir}`;
 			});
 			orderByClause = `ORDER BY ${sortFields.join(", ")}`;
 
@@ -1227,6 +1246,7 @@ documentController.getProjectsBg = async (req, res) => {
         LIMIT ${pageSize}
         OFFSET ${offset}
       `;
+		console.log(query)
 
 		let { rows: documents } = await pool.query(query);
 		return res.json({
@@ -1286,6 +1306,7 @@ documentController.uploadAttachment = async (req, res) => {
 		res.json({ status: 0, msg: "Internal Server Error" });
 	}
 };
+
 documentController.uploadProjectAttachments = async (req, res) => {
 	try {
 		let inputs = req.body;
@@ -1319,6 +1340,48 @@ documentController.uploadProjectAttachments = async (req, res) => {
 			) 
 			VALUES ($1, $2, $3, $4, $5, $6)`,
 			[inputs.pdfFileName, attachmentLocation, inputs.doc_code, inputs.project_id, token.user_id, getCurrentDateTime()]
+		);
+
+		res.send({ status: 1, msg: "Attachment Uploaded" });
+	} catch (err) {
+		console.error("Error Uploading Attachments", err);
+		res.json({ status: 0, msg: "Internal Server Error" });
+	}
+};
+
+documentController.uploadBGAttachments = async (req, res) => {
+	try {
+		let inputs = req.body;
+		let token = req.session.token;
+
+		if (!req.file) {
+			return res.send({ status: 0, msg: "No file uploaded" });
+		}
+
+		const fileExtension = path.extname(req.file.originalname);
+		const fileName = uuidv4();
+
+		const s3Params = {
+			Bucket: process.env.BUCKET_NAME,
+			Key: `docs/${fileName}${fileExtension}`,
+			Body: req.file.buffer,
+			ContentType: req.file.mimetype,
+		};
+
+		const s3Response = await s3.upload(s3Params).promise();
+		const attachmentLocation = s3Response.Location;
+
+		await pool.query(
+			`INSERT INTO bg_attachments (
+			project_pdf_name, 
+			project_pdf_link,
+			project_code,
+			project_id,
+			attchment_uploaded_by_id,
+			created_at
+			) 
+			VALUES ($1, $2, $3, $4, $5, $6)`,
+			[inputs.pdfFileName, attachmentLocation, inputs.project_code, inputs.project_id, token.user_id, getCurrentDateTime()]
 		);
 
 		res.send({ status: 1, msg: "Attachment Uploaded" });
@@ -1471,7 +1534,6 @@ documentController.deleteAttachment = async (req, res) => {
 
 documentController.deleteBG = async (req, res) => {
 	const { docId, docCode } = req.body;
-	console.log(docCode, 'bgggggggggg')
 	const token = req?.session?.token;
 
 	try {
@@ -1514,6 +1576,7 @@ documentController.deleteBG = async (req, res) => {
 		return res.json({ status: 0, msg: "Internal Server Error" });
 	}
 }
+
 documentController.deleteProjectPdf = async (req, res) => {
 	const { docId } = req.query;
 	const token = req?.session?.token;
@@ -1524,6 +1587,27 @@ documentController.deleteProjectPdf = async (req, res) => {
 		}
 		const result = await pool.query(
 			`DELETE FROM project_attachments WHERE doc_id = ${docId}`,
+		);
+		if (result.rowCount === 0) {
+			return res.json({ status: 0, msg: "Document not found" });
+		}
+		return res.json({ status: 1, msg: "Document Deleted" });
+	} catch (error) {
+		console.log("🚀 ~ documentController.deleteProjectPdf ~ error:", error)
+		return res.json({ status: 0, msg: "Internal Server Error" });
+	}
+}
+
+documentController.deleteBGPdf = async (req, res) => {
+	const { docId } = req.query;
+	const token = req?.session?.token;
+
+	try {
+		if (!token) {
+			return res.json({ status: 0, msg: "User not logged In" });
+		}
+		const result = await pool.query(
+			`DELETE FROM bg_attachments WHERE doc_id = ${docId}`,
 		);
 		if (result.rowCount === 0) {
 			return res.json({ status: 0, msg: "Document not found" });
@@ -1655,7 +1739,7 @@ documentController.getAllApplicantName = async (req, res) => {
 documentController.savePurpose = async (req, res) => {
 	const input = req.body;
 	const token = req?.session?.token;
-	
+
 	try {
 
 		if (!token) {

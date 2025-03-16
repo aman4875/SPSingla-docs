@@ -17,6 +17,7 @@ router.get("/project/create-project", authMiddleware.checkLoginStatus, renderCon
 router.get("/manage/create-bg", authMiddleware.checkLoginStatus, renderController.renderCreateBg);
 router.get("/edit-document/:id", authMiddleware.checkLoginStatus, renderController.editDoc);
 router.get("/edit-project/:id", authMiddleware.checkLoginStatus, renderController.editProject);
+router.get("/edit-bg/:id", authMiddleware.checkLoginStatus, renderController.editBG);
 router.get("/settings", authMiddleware.checkLoginStatus, renderController.settings);
 
 

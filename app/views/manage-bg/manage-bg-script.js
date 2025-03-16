@@ -48,8 +48,10 @@ $(document).ready(function () {
         if (!state.id) return state.text; // placeholder
         const $state = $(state.element);
         const name = $state.data('name');
+        const code = $state.data('code');
+        projectCode = code
         // Use your desired icon classes
-        fetchProjects(name)
+        fetchProjects()
         return `<span><em class="icon ni ni-folder" style="margin-right:5px;"></em>${name}</span>`;
     }
 
@@ -106,12 +108,8 @@ function resetSortFilter() {
 
 $("#table-head .nk-tb-col").click(function () {
     const column = $(this);
-    const span = column.find("span"); // Find the span inside
-    let dataTable = column.attr("data-table");
-    console.log("🚀 Span Element:", span[0]);
-    console.log("🚀 data-field Attribute:", span.attr("data-table"));
-
-    return
+    const span = column.find("span");
+    let dataTable = span.attr("data-table") || 'manageBg';
 
 
     if (column.hasClass("date")) {
@@ -137,6 +135,7 @@ $("#table-head .nk-tb-col").click(function () {
         filters.sort[columnName] = newSortClass === "sort-dsc" ? "DSC" : "ASC";
         column.addClass(newSortClass).addClass("active");
     }
+    filters.sort.dataTable = dataTable
 
     // Update sorting styles for all columns based on filters.sort
     $("#table-head .nk-tb-col").removeClass("sort-dsc sort-asc active");
@@ -148,4 +147,85 @@ $("#table-head .nk-tb-col").click(function () {
     });
 
     fetchProjects();
+});
+
+
+$('#resetFilters').on('click', function () {
+    if (Object.keys(filters.activeFilter).length || projectCode !== null) {
+        filters = {
+            limit: 10,
+            page: 1,
+            sort: {},
+            activeFilter: {},
+        };
+        resetSortFilter()
+        projectCode = null
+        // reset dropdowns 
+        const resetFields = [
+            '#doc_awarded',
+            '#doc_applicant_name',
+            '#doc_beneficiary_name',
+            '#manage-project'
+        ];
+
+        resetFields.forEach((selector) => {
+            const $field = $(selector);
+
+            if ($field.length) {
+                if ($field.hasClass('select2-hidden-accessible')) {
+                    $field.val(null).trigger('change');
+                } else {
+                    $field.val('');
+                }
+            }
+        });
+
+
+        // all filters with input reset val ""
+        const resetFieldsEmpty = [
+            '#project_code',
+            '#doc_work_name',
+            '#doc_financial_date',
+            '#doc_agreement_no',
+            '#doc_agreement_date',
+            '#doc_completion_date',
+            '#doc_total_mobilisation_amount',
+            '#doc_bal_mobilisation_amount',
+            '#doc_retention_amount',
+            '#doc_dlp_period',
+            '#doc_revised_date',
+            '#doc_dlp_ending',
+            '#doc_department',
+            '#doc_type',
+            'doc_bank_name',
+            'doc_issuing_branch',
+            'doc_bg_number',
+            'doc_bg_amendment_number',
+            'doc_claim_date',
+            'doc_bg_amount',
+            'doc_expiry_date',
+            'doc_bg_cancelled_date',
+            'doc_issue_date',
+        ];
+
+        resetFieldsEmpty.forEach((selector) => {
+            const $field = $(selector);
+            if ($field.val() !== "") {
+                $field.val("").trigger('change');
+            }
+        });
+
+        return
+    }
+
+    if (Object.keys(filters.sort).length) {
+        resetSortFilter()
+        filters = {
+            limit: 10,
+            page: 1,
+            sort: {},
+            activeFilter: {},
+        };
+        fetchDocuments()
+    }
 });

@@ -80,8 +80,8 @@ renderController.renderDocuments = async (req, res) => {
 		let folderFromDb = await pool.query(folderQuery);
 		let sites = siteFromDb.rows;
 		let folders = folderFromDb.rows;
-		
-		res.render("documents.ejs", { token, sites, folders , docPurpose });
+
+		res.render("documents.ejs", { token, sites, folders, docPurpose });
 	} catch (err) {
 		console.log(err);
 		res.send({ status: 0, msg: "Something Went Wrong" });
@@ -182,7 +182,7 @@ renderController.renderSingleDocument = async (req, res) => {
 	try {
 		let siteQuery, folderQuery, documentQuery, referencesQuery;
 		let doc_id = Buffer.from(req.params.id, "base64").toString("utf-8");
-		
+
 
 		// Query to get document details
 		documentQuery = `
@@ -362,13 +362,13 @@ renderController.editDoc = async (req, res) => {
 		`);
 
 		if (documentData.doc_status == "DRAFTED") {
-			res.render("create-document.ejs", { token, sites, folders, documentData ,docPurpose});
+			res.render("create-document.ejs", { token, sites, folders, documentData, docPurpose });
 		} else if (documentData.doc_status == "INSERTED") {
-			res.render("edit-document.ejs", { token, sites, folders, documentData,docPurpose });
+			res.render("edit-document.ejs", { token, sites, folders, documentData, docPurpose });
 		} else {
 			let { rows: docHistory } = await pool.query(`SELECT * FROM doc_history_junction WHERE dhj_doc_number = $1`, [documentData.doc_number]);
 			let { rows: docAttachments } = await pool.query(`SELECT * FROM doc_attachment_junction WHERE daj_doc_number = $1`, [documentData.doc_number]);
-			res.render("edit-document.ejs", { token, sites, folders, documentData, docHistory, docAttachments ,docPurpose});
+			res.render("edit-document.ejs", { token, sites, folders, documentData, docHistory, docAttachments, docPurpose });
 		}
 	} catch (error) {
 		console.error(error);
@@ -399,6 +399,69 @@ renderController.editProject = async (req, res) => {
 		const { rows } = await pool.query(query, [doc_id]);
 		const projectData = rows[0]
 		return res.render("project-master/edit-project.ejs", { token, projectData });
+	} catch (error) {
+		console.error(error);
+		return res.send("Internal Server Error");
+	}
+};
+
+
+renderController.editBG = async (req, res) => {
+	let token = req.session.token;
+	try {
+		let doc_id = Buffer.from(req.params.id, "base64").toString("utf-8");
+		const query = `
+				SELECT 
+				d.*,
+				pm.doc_code, 
+				pm.doc_work_name,
+				pm.doc_department,
+				pm.doc_financial_date,
+				pm.doc_agreement_no,
+				pm.doc_agreement_date,
+				pm.doc_completion_date,
+				pm.doc_awarded,
+				pm.doc_dlp_period, 
+				COALESCE(
+					(SELECT Json_agg(
+						Jsonb_build_object(
+							'project_pdf_link', pa.project_pdf_link, 
+							'project_pdf_name', pa.project_pdf_name, 
+							'doc_id', pa.doc_id
+						)
+					)
+					FROM bg_attachments AS pa
+					WHERE pa.project_id = d.doc_id), '[]'
+				) AS attachments
+			FROM 
+				doc_manage_bg AS d
+			LEFT JOIN 
+				projects_master AS pm
+			ON 
+				d.project_code = pm.doc_code
+			WHERE d.doc_id = $1	
+				`;
+
+		const { rows: beneficiaryNames } = await pool.query(`
+					SELECT * FROM beneficiary_names ORDER BY id DESC
+				`);
+		const { rows: applicantNames } = await pool.query(`
+					SELECT * FROM applicant_names ORDER BY id DESC
+				`);
+		let { rows: types } = await pool.query(
+			`SELECT * FROM contract_types ORDER BY id DESC`
+		)
+
+		let { rows: bankName } = await pool.query(
+			`SELECT * FROM bank_names ORDER BY id DESC`
+		)
+		console.log(types)
+		console.log(applicantNames)
+		console.log(bankName)
+
+		const { rows } = await pool.query(query, [doc_id]);
+		const manageBgData = rows[0]
+		return res.render("manage-bg/edit-bg.ejs", { token, manageBgData, beneficiaryNames, applicantNames, types, bankName });
 	} catch (error) {
 		console.error(error);
 		return res.send("Internal Server Error");
@@ -440,9 +503,9 @@ renderController.renderCreateDocument = async (req, res) => {
 		let sites = siteFromDb.rows;
 		let folders = folderFromDb.rows;
 		let documentData = [];
-		let {rows:docPurpose} = await pool.query(`SELECT * From document_purpose`)
-		
-		res.render("create-document.ejs", { token, sites, folders, documentData,docPurpose });
+		let { rows: docPurpose } = await pool.query(`SELECT * From document_purpose`)
+
+		res.render("create-document.ejs", { token, sites, folders, documentData, docPurpose });
 	} catch (error) {
 		console.error(error);
 		res.status(500).send("Internal Server Error");
@@ -500,8 +563,14 @@ renderController.renderManageBg = async (req, res) => {
 	let { rows: projects } = await pool.query(
 		`SELECT doc_id, doc_code, doc_work_name FROM projects_master ORDER BY doc_id DESC`
 	);
+	const { rows: beneficiaryNames } = await pool.query(`
+		SELECT * FROM beneficiary_names ORDER BY id DESC
+	`);
+	const { rows: applicantNames } = await pool.query(`
+		SELECT * FROM applicant_names ORDER BY id DESC
+	`);
 
-	res.render("manage-bg/manage-bg", { token, projects });
+	res.render("manage-bg/manage-bg", { token, projects, applicantNames, beneficiaryNames });
 }
 renderController.settings = async (req, res) => {
 	let token = req.session.token;

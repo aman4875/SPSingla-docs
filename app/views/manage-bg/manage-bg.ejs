@@ -61,7 +61,7 @@
                                                             <a href="/manage/create-bg"
                                                                 class="btn btn-white btn-dim btn-outline-light"><em
                                                                     class="icon ni ni-plus-sm"></em><span>Add
-                                                                    Document</span>
+                                                                    BG</span>
                                                             </a>
                                                         </div>
                                                         <%}%>
@@ -187,55 +187,55 @@
                                                                                 class="sort-indicator"></span>
                                                                         </div>
                                                                         <div class="nk-tb-col">
-                                                                            <span data-field="doc_work_name">Name of
-                                                                                Work</span><span class="sort-indicator"
-                                                                                data-table="projects_master"></span>
+                                                                            <span data-table="projects_master"
+                                                                                data-field="doc_work_name">Name of
+                                                                                Work</span><span
+                                                                                class="sort-indicator"></span>
                                                                         </div>
                                                                         <div class="nk-tb-col">
-                                                                            <span data-field="doc_department">Department
-                                                                                Name</span><span class="sort-indicator"
-                                                                                data-table="projects_master"></span>
+                                                                            <span data-table="projects_master"
+                                                                                data-field="doc_department">Department
+                                                                                Name</span><span
+                                                                                class="sort-indicator"></span>
                                                                         </div>
                                                                         <div class="nk-tb-col">
-                                                                            <span
+                                                                            <span data-table="projects_master"
                                                                                 data-field="doc_financial_date">Financial
                                                                                 Opening Date</span><span
-                                                                                class="sort-indicator"
-                                                                                data-table="projects_master"></span>
+                                                                                class="sort-indicator"></span>
                                                                         </div>
                                                                         <div class="nk-tb-col">
-                                                                            <span
+                                                                            <span data-table="projects_master"
                                                                                 data-field="doc_agreement_no">Agreement
-                                                                                No</span><span class="sort-indicator"
-                                                                                data-table="projects_master"></span>
+                                                                                No</span><span
+                                                                                class="sort-indicator"></span>
                                                                         </div>
                                                                         <div class="nk-tb-col">
-                                                                            <span
+                                                                            <span data-table="projects_master"
                                                                                 data-field="doc_agreement_date">Agreement
-                                                                                Date</span><span class="sort-indicator"
-                                                                                data-table="projects_master"></span>
+                                                                                Date</span><span
+                                                                                class="sort-indicator"></span>
                                                                         </div>
 
                                                                         <div class="nk-tb-col">
-                                                                            <span data-field="doc_completion_date">Date
+                                                                            <span data-table="projects_master"
+                                                                                data-field="doc_completion_date">Date
                                                                                 of
                                                                                 Completion</span><span
-                                                                                class="sort-indicator"
-                                                                                data-table="projects_master"></span>
+                                                                                class="sort-indicator"></span>
                                                                         </div>
 
                                                                         <div class="nk-tb-col">
-                                                                            <span
+                                                                            <span data-table="projects_master"
                                                                                 data-field="doc_awarded">Awarded</span><span
-                                                                                class="sort-indicator"
-                                                                                data-table="projects_master"></span>
+                                                                                class="sort-indicator"></span>
                                                                         </div>
 
                                                                         <div class="nk-tb-col">
-                                                                            <span data-field="doc_dlp_period">DLP Period
+                                                                            <span data-table="projects_master"
+                                                                                data-field="doc_dlp_period">DLP Period
                                                                                 (in months)</span><span
-                                                                                class="sort-indicator"
-                                                                                data-table="projects_master"></span>
+                                                                                class="sort-indicator"></span>
                                                                         </div>
                                                                         <div class="nk-tb-col">
                                                                             <span data-field="doc_revised_date">Revised
@@ -473,9 +473,9 @@
                                                                         </div>
                                                                         <div class="nk-tb-col">
                                                                             <span>
-                                                                                <input type="text"
+                                                                                <input type="number"
                                                                                     class="form-control filter-input"
-                                                                                    data-filter="text"
+                                                                                    data-filter="number"
                                                                                     id="doc_total_mobilisation_amount"
                                                                                     placeholder="Total Mobilisation Amount">
                                                                             </span>
@@ -484,16 +484,16 @@
                                                                             <span>
                                                                                 <input type="number"
                                                                                     class="form-control filter-input"
-                                                                                    data-filter="text"
+                                                                                    data-filter="number"
                                                                                     id="doc_bal_mobilisation_amount"
                                                                                     placeholder="Balance Mobilisation Amount">
                                                                             </span>
                                                                         </div>
                                                                         <div class="nk-tb-col">
                                                                             <span>
-                                                                                <input type="text"
+                                                                                <input type="number"
                                                                                     class="form-control filter-input"
-                                                                                    data-filter="text"
+                                                                                    data-filter="number"
                                                                                     id="doc_retention_amount"
                                                                                     placeholder="Retention Amount as on Date">
                                                                             </span>
@@ -526,11 +526,25 @@
                                                                         </div>
                                                                         <div class="nk-tb-col">
                                                                             <span>
-                                                                                <input type="text"
-                                                                                    class="form-control filter-input"
+                                                                                <select
+                                                                                    class="form-select form-control js-select2 filter-input"
+                                                                                    id="doc_beneficiary_name"
                                                                                     data-filter="text"
-                                                                                    id="doc_bg_amendment_number"
-                                                                                    placeholder="Beneficiary Name">
+                                                                                    name="doc_beneficiary_name"
+                                                                                    data-placeholder="Select Beneficiary">
+                                                                                    <option label="empty" value="">
+                                                                                    </option>
+                                                                                    <%
+                                                                                        beneficiaryNames.forEach(beneficiaryName=>
+                                                                                        { %>
+                                                                                        <option
+                                                                                            data-id="<%= beneficiaryName.id %>"
+                                                                                            value="<%= beneficiaryName.beneficiary_code %>">
+                                                                                            <%= beneficiaryName.beneficiary_code
+                                                                                                %>
+                                                                                        </option>
+                                                                                        <% }); %>
+                                                                                </select>
                                                                             </span>
                                                                         </div>
                                                                         <div class="nk-tb-col">
@@ -553,11 +567,22 @@
                                                                         </div>
                                                                         <div class="nk-tb-col">
                                                                             <span>
-                                                                                <input type="text"
-                                                                                    class="form-control filter-input"
-                                                                                    data-filter="text"
+                                                                                <select
+                                                                                    class="form-select form-control js-select2 filter-input"
                                                                                     id="doc_applicant_name"
-                                                                                    placeholder="Applicant Name">
+                                                                                    data-filter="text"
+                                                                                    name="doc_applicant_name"
+                                                                                    data-placeholder="Select Applicant">
+                                                                                    <option label="empty" value="">
+                                                                                    </option>
+                                                                                    <% applicantNames.forEach(data=>
+                                                                                        { %>
+                                                                                        <option data-id="<%= data.id %>"
+                                                                                            value="<%=  data.applicant_name %>">
+                                                                                            <%= data.applicant_name %>
+                                                                                        </option>
+                                                                                        <% }); %>
+                                                                                </select>
                                                                             </span>
                                                                         </div>
                                                                         <div class="nk-tb-col">
@@ -688,6 +713,7 @@
         let docCode
         let docIdToDelete
         let totalPages
+        let projectCode = null
 
         $('.js-select2').select2({
             placeholder: 'Select an option',
@@ -708,7 +734,7 @@
 
 
         // fetch projects
-        function fetchProjects(project) {
+        function fetchProjects() {
             if (isFetching) return; // Exit if already fetching
             isFetching = true;
             $(".table-content").remove();
@@ -716,7 +742,7 @@
 
             $.ajax({
                 type: "POST",
-                url: `/docs/get-projects-bg/?project=${project ? project : null}`,
+                url: `/docs/get-projects-bg/?project=${projectCode ? projectCode : null}`,
                 data: JSON.stringify(filters),
                 contentType: "application/json",
                 success: function (response) {
@@ -761,7 +787,7 @@
             <%if(token.user_role != 3){%>
             <div class="nk-tb-col text-start editDocument">
                 <span style="margin-right: 8px;">
-                    <a href="/edit-project/${btoa(data.doc_id)}">
+                    <a href="/edit-bg/${btoa(data.doc_id)}">
                         <em class="icon ni ni-edit-fill"></em>
                     </a>
                 </span>
@@ -898,68 +924,6 @@
         $('#table-pagination').on('click', 'a', handlePaginationClick);
 
 
-
-
-
-        $('#resetFilters').on('click', function () {
-            if (Object.keys(filters.activeFilter).length) {
-                filters = {
-                    limit: 10,
-                    page: 1,
-                    sort: {},
-                    activeFilter: {},
-                };
-                resetSortFilter()
-                // all filters to val "empty"
-                const resetFields = [
-                    '#doc_folder',
-                    '#doc_site',
-                    '#doc_type',
-                    '#doc_status',
-                    '#doc_created_at',
-                    '#doc_purpose',
-                ];
-                resetFields.forEach((selector) => {
-                    const $field = $(selector);
-                    if ($field.val() !== "empty") {
-                        $field.val("empty").trigger('change');
-                    }
-                });
-                // all filters with input reset val ""
-                const resetFieldsEmpty = [
-                    '#doc_subject',
-                    '#doc_from',
-                    '#doc_to',
-                    '#doc_storage_location',
-                    '#doc_date',
-                    '#doc_number',
-                ];
-
-                resetFieldsEmpty.forEach((selector) => {
-                    const $field = $(selector);
-                    if ($field.val() !== "") {
-                        $field.val("").trigger('change');
-                    }
-                });
-
-                return
-            }
-
-            if (Object.keys(filters.sort).length) {
-                resetSortFilter()
-                filters = {
-                    limit: 10,
-                    page: 1,
-                    sort: {},
-                    activeFilter: {},
-                };
-                fetchDocuments()
-            }
-
-
-        });
-
-
         $(document).on('click', '#deleteDoc', function (event) {
             event.preventDefault();
             let openModal = document.getElementById('open-modal');
@@ -969,6 +933,7 @@
 
             if (docIdToDelete) {
                 openModal.click();
+
             }
         });
 
