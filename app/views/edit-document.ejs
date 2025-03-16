@@ -142,10 +142,10 @@
                                   <select class="form-select form-control js-select2" id="doc_purpose" name="doc_purpose"
                                     data-placeholder="Select or Enter Purpose">
                                     <option label="empty" value=""></option>
-                                    <% docPurpose.forEach(Purpose=>
-                                      { %>
-                                      <option data-id="<%= Purpose.id %>" value="<%= Purpose.dropdown_val %>">
-                                        <%= Purpose.dropdown_val %>
+                                    <% docPurpose.forEach(Purpose=> { %>
+                                      <option data-id="<%= Purpose.id %>" value="<%= Purpose.dropdown_val %>" <% if
+                                        (Purpose.dropdown_val===documentData.doc_purpose) { %> selected <% } %>>
+                                          <%= Purpose.dropdown_val %>
                                       </option>
                                       <% }); %>
                                   </select>
@@ -370,6 +370,10 @@
       const doc_ID = "<%=documentData.doc_id%>"
       let docIdToDelete = null;
       let NewURl = null  
+      let purposeValue = '<%- JSON.stringify(documentData.doc_purpose) %>' 
+
+
+
       folders = folders ? JSON.parse(folders) : [];
       $(document).ready(function () {
         $("#doc_site").on("change", function () {
