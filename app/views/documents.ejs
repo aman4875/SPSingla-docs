@@ -441,7 +441,7 @@
                                       </span>
                                     </div>
 
-
+                  
 
                                     <div class="nk-tb-col">
                                       <span>
@@ -449,10 +449,12 @@
                                           data-filter="text" id="doc_purpose" name="doc_purpose"
                                           data-placeholder="Select Purpose">
                                           <option label="empty" value=""></option>
-                                          <option label="DESIGN & DRAWINGS" value="DESIGN & DRAWINGS">DESIGN & DRAWINGS
+                                          <% docPurpose.forEach(Purpose=>
+                                          { %>
+                                          <option data-id="<%= Purpose.id %>" value="<%= Purpose.dropdown_val %>">
+                                            <%= Purpose.dropdown_val %>
                                           </option>
-                                          <option label="EOT" value="EOT">EOT</option>
-                                          <option label="OTHERS" value="OTHERS">OTHERS</option>
+                                          <% }); %>
                                         </select>
                                       </span>
                                     </div>
@@ -619,12 +621,17 @@
                 let rowHtml = `<div class=" ${document.highlightrow ? 'highlightrow nk-tb-item text-left table-content' : 'nk-tb-item text-left table-content'}" >
                     <%if(token.user_role != 3){%>
                     <div class="nk-tb-col text-start editDocument">
-                        <span style="margin-right: 8px">
+                    ${document.actionactive ? `
+                      <span style="margin-right: 8px">
                          <a href="/edit-document/${btoa(document.doc_id)}">
                            <em class="icon ni ni-edit-fill"></em>
                          </a>
                         </span>
-                         <span id="deleteDoc" style="cursor: pointer"  data-id="${document.doc_id}" > <em  style="color: #D84040" class="icon ni ni-trash-fill"></em></span>
+                         <span id="deleteDoc" style="cursor: pointer"  data-id="${document.doc_id}" > 
+                          <em  style="color: #D84040" class="icon ni ni-trash-fill"></em>
+                      </span>
+                    
+                    `: ''} 
                     </div>
                     <%}%>
                     <div class="nk-tb-col text-start">
@@ -651,7 +658,7 @@
                         <span>${document.doc_created_at || "-"}</span>
                     </div>
                     <div class="nk-tb-col">
-                        <span title="${document.doc_subject || "-"}">${document.doc_subject || "-"}</span>
+                        <span title="${document.doc_subject || "-"}">${document.doc_subject.substring(0, 80) || "-"}</span>
                     </div>
                     <div class="nk-tb-col">
                       ${renderReferencesLinks(document.references)}

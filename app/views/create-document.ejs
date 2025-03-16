@@ -129,14 +129,19 @@
                               <div class="form-group">
                                 <label class="form-label" for="doc_purpose">Purpose</label>
                                 <div class="form-control-wrap">
-                                  <select class="form-select form-control js-select2" id="doc_purpose" name="doc_purpose" data-placeholder="Select Purpose" required>
+                                  <select class="form-select form-control js-select2" id="doc_purpose" name="doc_purpose"
+                                    data-placeholder="Select or Enter Purpose">
                                     <option label="empty" value=""></option>
-                                    <option value="DESIGN & DRAWINGS" <%= documentData && documentData.doc_purpose === 'DESIGN & DRAWINGS' ? 'selected' : '' %>>DESIGN & DRAWINGS</option>
-                                    <option value="EOT" <%= documentData && documentData.doc_purpose === 'EOT' ? 'selected' : '' %>>EOT</option>
-                                    <option value="OTHERS" <%= documentData && documentData.doc_purpose === 'OTHERS' ? 'selected' : '' %>>OTHERS</option>
+                                    <% docPurpose.forEach(Purpose=>
+                                      { %>
+                                      <option data-id="<%= Purpose.id %>" value="<%= Purpose.dropdown_val %>">
+                                        <%= Purpose.dropdown_val %>
+                                      </option>
+                                      <% }); %>
                                   </select>
                                 </div>
-                              </div>
+                            </div>
+
                             </div>
                             <div class="col-sm-4">
                               <div class="form-group">
@@ -500,6 +505,108 @@
         });
       });
 
+
+        function fetchAllPurpose() {
+          const url = `/docs/get-all-purpose`;
+          $.ajax({
+            url: url,
+            type: 'GET',
+            success: function (response) {
+              console.log(response);
+              if (response.status === 1) {
+                let $dropdown = $("#doc_purpose");
+
+
+                let currentValue = $dropdown.val();
+                $dropdown.select2('destroy').empty();
+                response.payload.forEach(purpose => {
+                  let option = `<option value="${purpose.dropdown_val}">
+                            ${purpose.dropdown_val}
+                          </option>`;
+                  $dropdown.append(option);
+                });
+
+                // Reinitialize Select2
+                setPurpose();
+
+                // Restore previous selection
+                if (currentValue) {
+                  $dropdown.val(currentValue).trigger('change');
+                }
+              }
+            },
+            error: function (error) {
+              console.error('Error fetching:', error);
+            }
+          });
+        }
+
+
+
+        function setPurpose() {
+          let $dropdown = $('#doc_purpose');
+
+          $dropdown.select2({
+            width: '100%',
+            tags: true,
+            placeholder: "Select or Enter Beneficiary Name",
+            allowClear: true,
+            createTag: function (params) {
+              var term = $.trim(params.term);
+              var exists = false;
+
+              $('#doc_purpose option').each(function () {
+                if ($(this).val().toLowerCase() === term.toLowerCase()) {
+                  exists = true;
+                  return false;
+                }
+              });
+
+              if (exists) {
+                return null;
+              }
+
+              return {
+                id: term,
+                text: term,
+                newTag: true
+              };
+            }
+          });
+
+
+          $dropdown.off('select2:select').on('select2:select', function (e) {
+            var selectedValue = e.params.data.id;
+
+            if (e.params.data.newTag) {
+              $.ajax({
+                url: '/docs/save-purpose/',
+                method: 'POST',
+                data: { dropdown_val: selectedValue },
+                success: function (response) {
+                  if (response.status == 1) {
+                    fetchAllPurpose();
+                  }
+                },
+                error: function (error) {
+                  console.log("Error saving:", error);
+                }
+              });
+            }
+          });
+
+          $dropdown.off('select2:clear').on('select2:clear', function () {
+            let selectedValue = $dropdown.val();
+            if (selectedValue) {
+              $dropdown.find(`option[value="${selectedValue}"]`).remove();
+              $dropdown.trigger('change');
+            }
+          });
+        }
+
+      $(document).ready(function () {
+        setPurpose()
+      })
     </script>
   </body>
 </html>

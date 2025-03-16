@@ -32,5 +32,7 @@ router.post("/save-beneficiary", documentController.saveBeneficiary);
 router.post("/save-applicant", documentController.saveApplicant);
 router.get("/get-Beneficiary", documentController.getAllBeneficiary);
 router.get("/get-applican-names", documentController.getAllApplicantName);
+router.post("/save-purpose", documentController.savePurpose);
+router.get("/get-all-purpose", documentController.getAllDocPurpose);
 
 module.exports = router;

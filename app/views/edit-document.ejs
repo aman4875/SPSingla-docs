@@ -132,184 +132,147 @@
                                 </div>
                               </div>
                               <div class="col-md-8">
-                                <div class="form-group">
-                                  <label class="form-label" for="doc_reference">Reference</label>
-                                  <div class="form-control-wrap">
-                                    <select class="form-select form-control js-select2" id="doc_reference"
-                                      name="doc_reference" data-placeholder="Select Reference" multiple>
-                                      <option label="empty" value=""></option>
-                                      <% var references=documentData && documentData.doc_reference ?
-                                        documentData.doc_reference.split(',') : []; %>
-                                        <% references.forEach(function(reference) { %>
-                                          <option value="<%= reference.trim() %>" selected>
-                                            <%= reference.trim() %>
-                                          </option>
-                                          <% }); %>
-                                    </select>
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="col-md-4">
-                                <div class="form-group">
-                                  <label class="form-label" for="doc_subject">Subject</label>
-                                  <div class="form-control-wrap">
-                                    <input type="text" class="form-control" placeholder="Document Subject"
-                                      id="doc_subject" name="doc_subject"
-                                      value="<%= documentData ? documentData.doc_subject : '' %>" />
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="col-md-4">
-                                <div class="form-group">
-                                  <label class="form-label" for="doc_storage_location">Storage Location</label>
-                                  <div class="form-control-wrap">
-                                    <input type="text" class="form-control" placeholder="Storage Location"
-                                      id="doc_storage_location" name="doc_storage_location"
-                                      value="<%= documentData ? documentData.doc_storage_location : '' %>" />
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="col-md-4">
-                                <div class="form-group">
-                                  <label class="form-label" for="doc_purpose">Purpose</label>
-                                  <div class="form-control-wrap">
-                                    <select class="form-select form-control js-select2" id="doc_purpose"
-                                      name="doc_purpose" data-placeholder="Select Purpose">
-                                      <option label="empty" value=""></option>
-                                      <option value="DESIGN & DRAWINGS" <%=documentData &&
-                                        documentData.doc_purpose==='DESIGN & DRAWINGS' ? 'selected' : '' %>>DESIGN &
-                                        DRAWINGS</option>
-                                      <option value="EOT" <%=documentData && documentData.doc_purpose==='EOT'
-                                        ? 'selected' : '' %>>EOT</option>
-                                      <option value="OTHERS" <%=documentData && documentData.doc_purpose==='OTHERS'
-                                        ? 'selected' : '' %>>OTHERS</option>
-                                    </select>
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="col-sm-4">
-                                <div class="form-group">
-                                  <label class="form-label" for="doc_created_at">Document Date</label>
-                                  <div class="form-control-wrap focused">
-                                    <div class="form-icon form-icon-right"><em class="icon ni ni-calendar-alt"></em>
-                                    </div>
-                                    <input type="text" required id="doc_created_at" autocomplete="off"
-                                      name="doc_created_at" placeholder="Document Date" class="form-control date-picker"
-                                      value="<%= documentData ? documentData.doc_created_at : '' %>" />
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="col-md-4">
-                                <div class="form-group">
-                                  <label class="form-label" for="doc_from"> From</label>
-                                  <div class="form-control-wrap">
-                                    <input type="text" class="form-control" placeholder="From" id="doc_from"
-                                      name="doc_from" value="<%= documentData ? documentData.doc_from : '' %>" />
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="col-md-4">
-                                <div class="form-group">
-                                  <label class="form-label" for="doc_to"> To</label>
-                                  <div class="form-control-wrap">
-                                    <input type="text" class="form-control" placeholder="To" id="doc_to" name="doc_to"
-                                      value="<%= documentData ? documentData.doc_to : '' %>" />
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="col-md-4">
-                                <div class="form-group">
-                                  <label class="form-label" for="doc_confidential">Confidential</label>
-                                  <div class="form-control-wrap">
-                                    <select class="form-select form-control js-select2 form-control"
-                                      id="doc_confidential" name="doc_confidential" data-placeholder="Select Option..">
-                                      <option label="empty" value=""></option>
-                                      <option value="true" <%=documentData && documentData.doc_confidential ? 'selected'
-                                        : '' %>>Yes</option>
-                                      <option value="false" <%=documentData && !documentData.doc_confidential
-                                        ? 'selected' : '' %>>No</option>
-                                    </select>
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="col-md-4">
-                                <div class="form-group">
-                                  <label class="form-label" for="doc_reply_required">Required</label>
-                                  <div class="form-control-wrap">
-                                    <select class="form-select form-control js-select2 form-control"
-                                      id="doc_reply_required" name="doc_reply_required"
-                                      data-placeholder="Select Option..">
-                                      <option label="empty" value=""></option>
-                                      <option value="true" <%=documentData && documentData.doc_reply_required
-                                        ? 'selected' : '' %>>Yes</option>
-                                      <option value="false" <%=documentData && !documentData.doc_reply_required
-                                        ? 'selected' : '' %>>No</option>
-                                    </select>
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="col-md-12">
-                                <div class="form-group">
-                                  <button id="uploadDocumentBtn" type="submit"
-                                    class="btn btn-lg btn-primary">Update</button>
+                              <div class="form-group">
+                                <label class="form-label" for="doc_reference">Reference</label>
+                                <div class="form-control-wrap">
+                                  <select class="form-select form-control js-select2" id="doc_reference" name="doc_reference" data-placeholder="Select Reference" multiple>
+                                    <option label="empty" value=""></option>
+                                    <% var references = documentData && documentData.doc_reference ? documentData.doc_reference.split(',') : []; %>
+                                    <% references.forEach(function(reference) { %>
+                                      <option value="<%= reference.trim() %>" selected><%= reference.trim() %></option>
+                                    <% }); %>
+                                  </select>
                                 </div>
                               </div>
                             </div>
-                          </form>
-                          <div class="row gy-5" style="margin-top: 5px;">
-                            <div class="col-lg-12">
-                              <div class="nk-block-head">
-                                <div class="nk-block-head-content">
-                                  <h5 class="nk-block-title title">Attachments
-                                    <button id="addAttachmentButton" data-bs-toggle="modal"
-                                      data-bs-target="#attachmentModal" style="margin-left: 10px;margin-bottom: 8px;"
-                                      class="btn btn-sm btn-dim  btn-outline-primary">Add Attachments</button>
-                                  </h5>
-
+                            <div class="col-md-4">
+                              <div class="form-group">
+                                <label class="form-label" for="doc_subject">Subject</label>
+                                <div class="form-control-wrap">
+                                  <input type="text" class="form-control" placeholder="Document Subject" id="doc_subject" name="doc_subject" value="<%= documentData ? documentData.doc_subject : '' %>"  />
                                 </div>
                               </div>
-                              <div class="card card-bordered card-preview disabled">
-                                <table class="table table-bordered">
-                                  <thead>
+                            </div>
+                            <div class="col-md-4">
+                              <div class="form-group">
+                                <label class="form-label" for="doc_storage_location">Storage Location</label>
+                                <div class="form-control-wrap">
+                                  <input type="text" class="form-control" placeholder="Storage Location" id="doc_storage_location" name="doc_storage_location" value="<%= documentData ? documentData.doc_storage_location : '' %>"   />
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-md-4">
+                              <div class="form-group">
+                                <label class="form-label" for="doc_purpose">Purpose</label>
+                                <div class="form-control-wrap">
+                                  <select class="form-select form-control js-select2" id="doc_purpose" name="doc_purpose" data-placeholder="Select Purpose" >
+                                    <option label="empty" value=""></option>
+                                    <option value="DESIGN & DRAWINGS" <%= documentData && documentData.doc_purpose === 'DESIGN & DRAWINGS' ? 'selected' : '' %>>DESIGN & DRAWINGS</option>
+                                    <option value="EOT" <%= documentData && documentData.doc_purpose === 'EOT' ? 'selected' : '' %>>EOT</option>
+                                    <option value="OTHERS" <%= documentData && documentData.doc_purpose === 'OTHERS' ? 'selected' : '' %>>OTHERS</option>
+                                  </select>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-sm-4">
+                              <div class="form-group">
+                                <label class="form-label" for="doc_created_at">Document Date</label>
+                                <div class="form-control-wrap focused">
+                                  <div class="form-icon form-icon-right"><em class="icon ni ni-calendar-alt"></em></div>
+                                  <input type="text" required id="doc_created_at" autocomplete="off" name="doc_created_at" placeholder="Document Date" class="form-control date-picker" value="<%= documentData ? documentData.doc_created_at : '' %>" />
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-md-4">
+                              <div class="form-group">
+                                <label class="form-label" for="doc_from"> From</label>
+                                <div class="form-control-wrap">
+                                  <input type="text" class="form-control" placeholder="From" id="doc_from" name="doc_from" value="<%= documentData ? documentData.doc_from : '' %>"  />
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-md-4">
+                              <div class="form-group">
+                                <label class="form-label" for="doc_to"> To</label>
+                                <div class="form-control-wrap">
+                                  <input type="text" class="form-control" placeholder="To" id="doc_to" name="doc_to" value="<%= documentData ? documentData.doc_to : '' %>"   />
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-md-4">
+                              <div class="form-group">
+                                <label class="form-label" for="doc_confidential">Confidential</label>
+                                <div class="form-control-wrap">
+                                  <select class="form-select form-control js-select2 form-control" id="doc_confidential" name="doc_confidential" data-placeholder="Select Option.." >
+                                    <option label="empty" value=""></option>
+                                    <option value="true" <%= documentData && documentData.doc_confidential ? 'selected' : '' %>>Yes</option>
+                                    <option value="false" <%= documentData && !documentData.doc_confidential ? 'selected' : '' %>>No</option>
+                                  </select>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-md-4">
+                              <div class="form-group">
+                                <label class="form-label" for="doc_reply_required">Required</label>
+                                <div class="form-control-wrap">
+                                  <select class="form-select form-control js-select2 form-control" id="doc_reply_required" name="doc_reply_required" data-placeholder="Select Option.." >
+                                    <option label="empty" value=""></option>
+                                    <option value="true" <%= documentData && documentData.doc_reply_required ? 'selected' : '' %>>Yes</option>
+                                    <option value="false" <%= documentData && !documentData.doc_reply_required ? 'selected' : '' %>>No</option>
+                                  </select>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-md-12">
+                              <div class="form-group">
+                                <button id="uploadDocumentBtn" type="submit" class="btn btn-lg btn-primary">Update</button>
+                              </div>
+                            </div>
+                          </div>
+                        </form>
+                        <div class="row gy-5" style="margin-top: 5px;">
+                          <div class="col-lg-12">
+                            <div class="nk-block-head">
+                              <div class="nk-block-head-content">
+                                <h5 class="nk-block-title title">Attachments 
+                                  <button id="addAttachmentButton" data-bs-toggle="modal" data-bs-target="#attachmentModal" style="margin-left: 10px;margin-bottom: 8px;" class="btn btn-sm btn-dim  btn-outline-primary" >Add Attachments</button>
+                                </h5>
+                                
+                              </div>
+                            </div>
+                            <div class="card card-bordered card-preview disabled">
+                              <table class="table table-bordered">
+                                <thead>
+                                  <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Attachment Name</th>
+                                    <th scope="col">Upload Date</th>
+                                    <th scope="col" width="160">Actions</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <% if (docAttachments && docAttachments.length > 0) { %>
+                                    <% docAttachments.forEach((attachment, index) => { %>
                                     <tr>
-                                      <th scope="col">#</th>
-                                      <th scope="col">Attachment Name</th>
-                                      <th scope="col">Upload Date</th>
-                                      <th scope="col" width="160">Actions</th>
+                                      <th scope="row"><%= index + 1 %></th>
+                                      <td><%= attachment.daj_attachment_name %></td>
+                                      <td><%= attachment.daj_attachment_upload_date %></td>
+                                      <td>
+                                      <a href="<%= attachment.daj_attachment_link %>" target="_blank" class="btn btn-sm btn-outline-primary">View</a>
+                                      <button data-id=<%= attachment.id %>   id="deleteDoc" class="btn btn-sm btn-outline-danger">Delete</button>
+                                      </td>
                                     </tr>
-                                  </thead>
-                                  <tbody>
-                                    <% if (docAttachments && docAttachments.length> 0) { %>
-                                      <% docAttachments.forEach((attachment, index)=> { %>
-                                        <tr>
-                                          <th scope="row">
-                                            <%= index + 1 %>
-                                          </th>
-                                          <td>
-                                            <%= attachment.daj_attachment_name %>
-                                          </td>
-                                          <td>
-                                            <%= attachment.daj_attachment_upload_date %>
-                                          </td>
-                                          <td>
-                                            <a href="<%= attachment.daj_attachment_link %>" target="_blank"
-                                              class="btn btn-sm btn-outline-primary">View</a>
-                                            <button data-id=<%=attachment.id %> id="deleteDoc" class="btn btn-sm
-                                              btn-outline-danger">Delete</button>
-                                          </td>
-                                        </tr>
-                                        <% }); %>
-                                          <% } else { %>
-                                            <tr>
-                                              <th scope="row">1</th>
-                                              <td>none</td>
-                                              <td>none</td>
-                                              <td>
-                                                <button class="btn btn-sm btn-outline-secondary" disabled>No
-                                                  Link</button>
-                                              </td>
-                                            </tr>
-                                            <% } %>
+                                    <% }); %>
+                                  <% } else { %>
+                                    <tr>
+                                    <th scope="row">1</th>
+                                    <td>none</td>
+                                    <td>none</td>
+                                    <td>
+                                      <button class="btn btn-sm btn-outline-secondary" disabled>No Link</button>
+                                    </td>
+                                    </tr>
+                                  <% } %>
                                   </tbody>
 
                                 </table>
@@ -698,15 +661,14 @@
           }
         },
 
-        error: function (xhr, status, error) {
-          NioApp.Toast(`<h5>Something Went Wrong</h5>${response.msg || `<p>Error while Document deleted</p>`}`, "error");
-          modalCloseBtn.click();
-          $(`#modalAction`).removeClass('disable');
-        },
-      });
-    });
-
-  </script>
-</body>
-
+            error: function (xhr, status, error) {
+              NioApp.Toast(`<h5>Something Went Wrong</h5>${response.msg || `<p>Error while Document deleted</p>`}`, "error");
+              modalCloseBtn.click();
+              $(`#modalAction`).removeClass('disable');
+            },
+          });
+        });
+        
+    </script>
+  </body>
 </html>

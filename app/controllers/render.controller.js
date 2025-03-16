@@ -72,11 +72,16 @@ renderController.renderDocuments = async (req, res) => {
             `;
 		}
 
+		const { rows: docPurpose } = await pool.query(`
+			SELECT * FROM document_purpose ORDER BY id DESC
+		`);
+
 		let siteFromDb = await pool.query(siteQuery);
 		let folderFromDb = await pool.query(folderQuery);
 		let sites = siteFromDb.rows;
 		let folders = folderFromDb.rows;
-		res.render("documents.ejs", { token, sites, folders });
+		
+		res.render("documents.ejs", { token, sites, folders , docPurpose });
 	} catch (err) {
 		console.log(err);
 		res.send({ status: 0, msg: "Something Went Wrong" });
@@ -177,6 +182,7 @@ renderController.renderSingleDocument = async (req, res) => {
 	try {
 		let siteQuery, folderQuery, documentQuery, referencesQuery;
 		let doc_id = Buffer.from(req.params.id, "base64").toString("utf-8");
+		
 
 		// Query to get document details
 		documentQuery = `
@@ -351,15 +357,18 @@ renderController.editDoc = async (req, res) => {
 		let folderFromDb = await pool.query(folderQuery);
 		let sites = siteFromDb.rows;
 		let folders = folderFromDb.rows;
+		const { rows: docPurpose } = await pool.query(`
+			SELECT * FROM document_purpose ORDER BY id DESC
+		`);
 
 		if (documentData.doc_status == "DRAFTED") {
-			res.render("create-document.ejs", { token, sites, folders, documentData });
+			res.render("create-document.ejs", { token, sites, folders, documentData ,docPurpose});
 		} else if (documentData.doc_status == "INSERTED") {
-			res.render("edit-document.ejs", { token, sites, folders, documentData });
+			res.render("edit-document.ejs", { token, sites, folders, documentData,docPurpose });
 		} else {
 			let { rows: docHistory } = await pool.query(`SELECT * FROM doc_history_junction WHERE dhj_doc_number = $1`, [documentData.doc_number]);
 			let { rows: docAttachments } = await pool.query(`SELECT * FROM doc_attachment_junction WHERE daj_doc_number = $1`, [documentData.doc_number]);
-			res.render("edit-document.ejs", { token, sites, folders, documentData, docHistory, docAttachments });
+			res.render("edit-document.ejs", { token, sites, folders, documentData, docHistory, docAttachments ,docPurpose});
 		}
 	} catch (error) {
 		console.error(error);
@@ -431,7 +440,9 @@ renderController.renderCreateDocument = async (req, res) => {
 		let sites = siteFromDb.rows;
 		let folders = folderFromDb.rows;
 		let documentData = [];
-		res.render("create-document.ejs", { token, sites, folders, documentData });
+		let {rows:docPurpose} = await pool.query(`SELECT * From document_purpose`)
+		
+		res.render("create-document.ejs", { token, sites, folders, documentData,docPurpose });
 	} catch (error) {
 		console.error(error);
 		res.status(500).send("Internal Server Error");
@@ -492,4 +503,19 @@ renderController.renderManageBg = async (req, res) => {
 
 	res.render("manage-bg/manage-bg", { token, projects });
 }
+renderController.settings = async (req, res) => {
+	let token = req.session.token;
+
+	try {
+
+		let { rows: settingValues } = await pool.query(`SELECT * FROM admin_settings ORDER BY id ASC`);
+		let doc_lock_date = settingValues[0]
+
+		return res.render("settings/settings", { token, doc_lock_date: doc_lock_date });
+	} catch (err) {
+		console.log(err);
+		return res.send({ status: 0, msg: "Something Went Wrong" });
+	}
+};
+
 module.exports = renderController;
