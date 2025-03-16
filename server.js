@@ -15,7 +15,7 @@ const { ExpressAdapter } = require('@bull-board/express');
 const { BullMQAdapter } = require('@bull-board/api/bullMQAdapter');
 const devEnvivronment = process.env.NODE_ENV;
 
-// require("./app/crons/textract.cron.js");
+require("./app/crons/textract.cron.js");
 // require("./app/crons/openai.cron.js");
 
 // Creating Express Application
