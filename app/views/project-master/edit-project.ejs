@@ -99,7 +99,7 @@
                                                                             class="icon ni ni-calendar-alt"></em></div>
                                                                     <input type="text" required id="doc_financial_date"
                                                                         autocomplete="off" name="doc_financial_date"
-                                                                        placeholder="Document Date"
+                                                                        placeholder="Financial Opening Date"
                                                                         class="form-control date-picker"
                                                                         value="<%= projectData ? projectData.doc_financial_date : '' %>"
                                                                         required />
@@ -132,7 +132,7 @@
                                                                             class="icon ni ni-calendar-alt"></em></div>
                                                                     <input type="text" required id="doc_completion_date"
                                                                         autocomplete="off" name="doc_completion_date"
-                                                                        placeholder="Document Date"
+                                                                        placeholder="Date of Completion"
                                                                         class="form-control date-picker"
                                                                         value="<%= projectData ? projectData.doc_completion_date : '' %>"
                                                                         required />
@@ -170,7 +170,7 @@
                                                                             class="icon ni ni-calendar-alt"></em></div>
                                                                     <input type="text" required id="doc_agreement_date"
                                                                         autocomplete="off" name="doc_agreement_date"
-                                                                        placeholder="Document Date"
+                                                                        placeholder="Agreement Date"
                                                                         class="form-control date-picker"
                                                                         value="<%= projectData ? projectData.doc_agreement_date : '' %>"
                                                                         required />
@@ -576,34 +576,7 @@
             });
         });
 
-        $(document).ready(function () {
-            $("#doc_dlp_period").on("input", function () {
-                let value = $(this).val();
-                value = value.replace(/\D/g, "");
-                if (value.length > 2) {
-                    value = value.substring(0, 2);
-                }
 
-                $(this).val(value); // Update the field with the cleaned value
-            });
-
-            $("#doc_dlp_period").on("blur", function () {
-                let value = $(this).val();
-                let numericValue = parseInt(value, 10);
-
-                if (numericValue < 1 || numericValue > 12 || isNaN(numericValue)) {
-                    $("#error-msg").text("Please enter a valid month (1-12)").show();
-                    $(this).addClass("is-invalid");
-                    validationFlag.isFlag = true
-                    validationFlag.msg = "<h5>Invalid Input</h5><p>Please enter a valid month (1-12)</p>"
-                } else {
-                    $("#error-msg").hide();
-                    $(this).removeClass("is-invalid");
-                    validationFlag.isFlag = false
-                    validationFlag.msg = ""
-                }
-            });
-        });
 
     </script>
 </body>

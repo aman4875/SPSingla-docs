@@ -286,10 +286,13 @@
                                                                         <option label="empty" value=""></option>
                                                                         <% types.forEach(type=> { %>
                                                                             <option data-id="<%= type.id %>"
-                                                                                value="<%= type.type_name %>">
+                                                                                value="<%= type.type_name %>"
+                                                                                <%=manageBgData.doc_type===type.type_name
+                                                                                ? "selected" : "" %>>
                                                                                 <%= type.type_name %>
                                                                             </option>
                                                                             <% }); %>
+
                                                                     </select>
                                                                 </div>
                                                             </div>
@@ -305,7 +308,8 @@
                                                                     <option label="empty" value=""></option>
                                                                     <% bankName.forEach(bankName=> { %>
                                                                         <option data-id="<%= bankName.id %>"
-                                                                            value="<%= bankName.bank_name %>">
+                                                                            <%=manageBgData.doc_bank_name===bankName.bank_name
+                                                                            ? "selected" : "" %>>
                                                                             <%= bankName.bank_name %>
                                                                         </option>
                                                                         <% }); %>
@@ -322,7 +326,8 @@
                                                                     <input type="text" class="form-control"
                                                                         placeholder="Issuing Branch"
                                                                         id="doc_issuing_branch"
-                                                                        name="doc_issuing_branch" value="" />
+                                                                        name="doc_issuing_branch"
+                                                                        value="<%= manageBgData ? manageBgData.doc_issuing_branch : '' %>" />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -340,7 +345,9 @@
                                                                         <% beneficiaryNames.forEach(beneficiaryName=>
                                                                             { %>
                                                                             <option data-id="<%= beneficiaryName.id %>"
-                                                                                value="<%= beneficiaryName.beneficiary_code %>">
+                                                                                value="<%= beneficiaryName.beneficiary_code %>"
+                                                                                <%=manageBgData.doc_beneficiary_name===beneficiaryName.beneficiary_code
+                                                                                ? "selected" : "" %>>
                                                                                 <%= beneficiaryName.beneficiary_code %>
                                                                             </option>
                                                                             <% }); %>
@@ -357,7 +364,9 @@
                                                                 <div class="form-control-wrap">
                                                                     <input type="number" class="form-control"
                                                                         placeholder="BG number" id="doc_bg_number"
-                                                                        name="doc_bg_number" value="" required />
+                                                                        name="doc_bg_number"
+                                                                        value="<%= manageBgData ? manageBgData.doc_bg_number : '' %>"
+                                                                        required />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -371,7 +380,8 @@
                                                                     <input type="number" class="form-control"
                                                                         placeholder="BG Amendment Number"
                                                                         id="doc_bg_amendment_number"
-                                                                        name="doc_bg_amendment_number" value=""
+                                                                        name="doc_bg_amendment_number"
+                                                                        value="<%= manageBgData ? manageBgData.doc_bg_amendment_number : '' %>"
                                                                         required />
                                                                 </div>
                                                             </div>
@@ -391,7 +401,9 @@
                                                                         <% applicantNames.forEach(data=>
                                                                             { %>
                                                                             <option data-id="<%= data.id %>"
-                                                                                value="<%=  data.applicant_name %>">
+                                                                                value="<%=  data.applicant_name %>"
+                                                                                <%=manageBgData.doc_applicant_name===data.applicant_name
+                                                                                ? "selected" : "" %>>
                                                                                 <%= data.applicant_name %>
                                                                             </option>
                                                                             <% }); %>
@@ -410,7 +422,8 @@
                                                                     <input type="text" id="doc_issue_date"
                                                                         autocomplete="off" name="doc_issue_date"
                                                                         placeholder="Date Of Issue"
-                                                                        class="form-control date-picker" value="" />
+                                                                        class="form-control date-picker"
+                                                                        value="<%= manageBgData ? manageBgData.doc_issue_date : '' %>" />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -423,7 +436,8 @@
                                                                     <input type="text" id="doc_claim_date"
                                                                         autocomplete="off" name="doc_claim_date"
                                                                         placeholder="Date of Claim"
-                                                                        class="form-control date-picker" value="" />
+                                                                        class="form-control date-picker"
+                                                                        value="<%= manageBgData ? manageBgData.doc_claim_date : '' %>" />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -435,7 +449,7 @@
                                                                     <input type="number" id="doc_bg_amount"
                                                                         autocomplete="off" name="doc_bg_amount"
                                                                         placeholder="BG Amount" class="form-control"
-                                                                        value="" />
+                                                                        value="<%= manageBgData ? manageBgData.doc_bg_amount : '' %>" />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -448,7 +462,8 @@
                                                                     <input type="text" id="doc_expiry_date"
                                                                         autocomplete="off" name="doc_expiry_date"
                                                                         placeholder="BG Amount"
-                                                                        class="form-control date-picker" value="" />
+                                                                        class="form-control date-picker"
+                                                                        value="<%= manageBgData ? manageBgData.doc_expiry_date : '' %>" />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -461,19 +476,8 @@
                                                                     <input type="text" id="doc_bg_cancelled_date"
                                                                         autocomplete="off" name="doc_bg_cancelled_date"
                                                                         placeholder="BG Cancelled on"
-                                                                        class="form-control date-picker" value="" />
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="col-md-4" id="pdfUploadContainer">
-                                                            <div class="form-group">
-                                                                <label class="form-label" for="doc_file">Upload
-                                                                    PDF</label>
-                                                                <div class="form-control-wrap">
-                                                                    <input type="file" accept=".pdf"
-                                                                        class="form-control" placeholder="Upload File"
-                                                                        id="doc_file" name="doc_file" />
+                                                                        class="form-control date-picker"
+                                                                        value="<%= manageBgData ? manageBgData.doc_bg_cancelled_date : '' %>" />
                                                                 </div>
                                                             </div>
                                                         </div>

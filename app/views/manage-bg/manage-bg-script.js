@@ -106,48 +106,48 @@ function resetSortFilter() {
     $("#table-head .nk-tb-col").removeClass("sort-asc sort-dsc active");
 }
 
-$("#table-head .nk-tb-col").click(function () {
-    const column = $(this);
-    const span = column.find("span");
-    let dataTable = span.attr("data-table") || 'manageBg';
+// $("#table-head .nk-tb-col").click(function () {
+//     const column = $(this);
+//     const span = column.find("span");
+//     let dataTable = span.attr("data-table") || 'manageBg';
 
 
-    if (column.hasClass("date")) {
-        filters.isDate = true;
-    } else {
-        filters.isDate = false;
-    }
+//     if (column.hasClass("date")) {
+//         filters.isDate = true;
+//     } else {
+//         filters.isDate = false;
+//     }
 
-    const columnName = column.find("span").data("field")
-    let newSortClass = "";
+//     const columnName = column.find("span").data("field")
+//     let newSortClass = "";
 
-    if (column.hasClass("sort-asc")) {
-        newSortClass = "sort-dsc";
-    } else if (column.hasClass("sort-dsc")) {
-        newSortClass = "";
-    } else {
-        newSortClass = "sort-asc";
-    }
-    filters.sort = {};
+//     if (column.hasClass("sort-asc")) {
+//         newSortClass = "sort-dsc";
+//     } else if (column.hasClass("sort-dsc")) {
+//         newSortClass = "";
+//     } else {
+//         newSortClass = "sort-asc";
+//     }
+//     filters.sort = {};
 
-    // If there's a new sorting order, update the filter and apply class
-    if (newSortClass) {
-        filters.sort[columnName] = newSortClass === "sort-dsc" ? "DSC" : "ASC";
-        column.addClass(newSortClass).addClass("active");
-    }
-    filters.sort.dataTable = dataTable
+//     // If there's a new sorting order, update the filter and apply class
+//     if (newSortClass) {
+//         filters.sort[columnName] = newSortClass === "sort-dsc" ? "DSC" : "ASC";
+//         column.addClass(newSortClass).addClass("active");
+//     }
+//     filters.sort.dataTable = dataTable
 
-    // Update sorting styles for all columns based on filters.sort
-    $("#table-head .nk-tb-col").removeClass("sort-dsc sort-asc active");
-    $("#table-head .nk-tb-col").each(function () {
-        const field = $(this).find("span").data("field");
-        if (filters.sort[field]) {
-            $(this).addClass(filters.sort[field] === "DSC" ? "sort-dsc" : "sort-asc").addClass("active");
-        }
-    });
+//     // Update sorting styles for all columns based on filters.sort
+//     $("#table-head .nk-tb-col").removeClass("sort-dsc sort-asc active");
+//     $("#table-head .nk-tb-col").each(function () {
+//         const field = $(this).find("span").data("field");
+//         if (filters.sort[field]) {
+//             $(this).addClass(filters.sort[field] === "DSC" ? "sort-dsc" : "sort-asc").addClass("active");
+//         }
+//     });
 
-    fetchProjects();
-});
+//     fetchProjects();
+// });
 
 
 $('#resetFilters').on('click', function () {

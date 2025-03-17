@@ -427,7 +427,8 @@ renderController.editBG = async (req, res) => {
 						Jsonb_build_object(
 							'project_pdf_link', pa.project_pdf_link, 
 							'project_pdf_name', pa.project_pdf_name, 
-							'doc_id', pa.doc_id
+							'doc_id', pa.doc_id,
+							'attachment_upload_date', pa.created_at
 						)
 					)
 					FROM bg_attachments AS pa
@@ -455,12 +456,10 @@ renderController.editBG = async (req, res) => {
 		let { rows: bankName } = await pool.query(
 			`SELECT * FROM bank_names ORDER BY id DESC`
 		)
-		console.log(types)
-		console.log(applicantNames)
-		console.log(bankName)
 
 		const { rows } = await pool.query(query, [doc_id]);
 		const manageBgData = rows[0]
+		console.table(manageBgData.attachments)
 		return res.render("manage-bg/edit-bg.ejs", { token, manageBgData, beneficiaryNames, applicantNames, types, bankName });
 	} catch (error) {
 		console.error(error);

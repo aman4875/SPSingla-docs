@@ -378,6 +378,57 @@ documentController.editProject = async (req, res) => {
 	}
 };
 
+documentController.editBG = async (req, res) => {
+	try {
+		let { newFormDataEntries, doc_id } = req.body;
+		let token = req.session.token;
+
+
+		if (!token) {
+			return res.json({ status: 0, msg: "User not logged In" });
+		}
+
+		if (token.user_role === "3") {
+			return res.send({ status: 0, msg: "Access Denied: Insufficient Permissions." });
+		}
+
+
+		const generateInsertQuery = (data) => {
+			let query
+			const keys = Object.keys(data);
+			data["doc_uploaded_by"] = token.user_name;
+			data["doc_uploaded_by_id"] = token.user_id;
+			data["doc_uploaded_at"] = moment().format("MM/DD/YYYY");
+
+			const nonEmptyKeys = keys.filter((key) => {
+				const value = data[key];
+				return value !== undefined && value !== null && (Array.isArray(value) ? value.length > 0 : typeof value === "string" ? value.trim() !== "" : true);
+			});
+
+			const condition = `doc_id = ${doc_id}`;
+			const setClause = nonEmptyKeys.map((key, index) => `${key} = $${index + 1}`).join(', ');
+			const values = nonEmptyKeys.map((key) => data[key]);
+
+			query = `UPDATE doc_manage_bg SET ${setClause} WHERE ${condition}`;
+
+
+			return { query, values: values };
+		};
+
+		const { query: insertQuery, values: insertValues } = generateInsertQuery({
+			...newFormDataEntries,
+		});
+
+		await pool.query(insertQuery, insertValues);
+
+
+		res.send({ status: 1, msg: "Success" });
+	} catch (error) {
+		console.error(error);
+		res.send({ status: 0, msg: "Internal Server Error" });
+	}
+};
+
 documentController.createDocument = async (req, res) => {
 	try {
 		let inputs = req.body;
@@ -721,7 +772,6 @@ documentController.createBG = async (req, res) => {
 documentController.getFilteredDocuments = async (req, res) => {
 	try {
 		let inputs = req.body;
-		console.log("🚀 ~ documentController.getFilteredDocuments= ~ inputs:", inputs)
 		let token = req.session.token;
 		const page = inputs.page || 1;
 		const pageSize = inputs.limit || 10;
@@ -932,7 +982,6 @@ documentController.getFilteredDocuments = async (req, res) => {
         OFFSET ${offset}
       `;
 
-		console.log(query)
 		// Execute the main query
 		let { rows: documents } = await pool.query(query);
 		res.json({
@@ -1077,41 +1126,42 @@ documentController.getProjectsBg = async (req, res) => {
 	try {
 		let inputs = req.body;
 		let projectCode = req.query;
-		console.log("🚀 ~ documentController.getProjectsBg= ~ projectID:", projectCode)
+
 		let token = req.session.token;
 		const page = inputs.page || 1;
 		const pageSize = inputs.limit || 10;
 		const offset = (page - 1) * pageSize;
 		let orderByClause = "";
 		let baseQuery = `
-			SELECT 
-				d.*,
-				pm.doc_code, 
-				pm.doc_work_name,
-				pm.doc_department,
-				pm.doc_financial_date,
-				pm.doc_agreement_no,
-				pm.doc_agreement_date,
-				pm.doc_completion_date,
-				pm.doc_awarded,
-				pm.doc_dlp_period, 
+			SELECT
+				d.project_code,
+				d.doc_type,
+				JSON_AGG(
+					JSONB_BUILD_OBJECT(
+						'doc_id', d.doc_id,
+						'other_columns', d.other_columns 
+					)
+				) AS grouped_docs,  
+				JSON_AGG(DISTINCT pm) AS grouped_projects,  
 				COALESCE(
-					(SELECT Json_agg(
-						Jsonb_build_object(
-							'project_pdf_link', pa.project_pdf_link, 
-							'project_pdf_name', pa.project_pdf_name, 
+					(SELECT JSON_AGG(
+						JSONB_BUILD_OBJECT(
+							'project_pdf_link', pa.project_pdf_link,
+							'project_pdf_name', pa.project_pdf_name,
 							'doc_id', pa.doc_id
 						)
 					)
 					FROM bg_attachments AS pa
-					WHERE pa.project_id = d.doc_id), '[]'
+					WHERE pa.project_id IN (
+						SELECT doc_id FROM doc_manage_bg 
+						WHERE project_code = d.project_code AND doc_type = d.doc_type
+					)
+					), '[]'
 				) AS attachments
-			FROM 
-				doc_manage_bg AS d
-			LEFT JOIN 
-				projects_master AS pm
-			ON 
-				d.project_code = pm.doc_code
+			FROM doc_manage_bg AS d
+			LEFT JOIN projects_master AS pm
+				ON d.project_code = pm.doc_code
+			GROUP BY d.project_code, d.doc_type
 			`;
 		let conditions = [];
 		let joins = "";
@@ -1200,7 +1250,7 @@ documentController.getProjectsBg = async (req, res) => {
 			orderByClause = `ORDER BY ${sortFields.join(", ")}`;
 
 		} else {
-			orderByClause = `ORDER BY d.doc_id DESC`;
+			orderByClause = `ORDER BY MAX(d.doc_id) DESC`;
 		}
 
 		// Build the WHERE clause
@@ -1234,8 +1284,7 @@ documentController.getProjectsBg = async (req, res) => {
 			total_count_cte tc 
 		${conditions.length ? " WHERE " + conditions.join(" AND ") : ""}
 	  `;
-		console.log(countQuery)
-		let { rows: countResult } = await pool.query(countQuery);
+		// let { rows: countResult } = await pool.query(countQuery);
 
 		const totalDocuments = countResult[0]?.total;
 		const totalPages = Math.ceil(totalDocuments / pageSize);
@@ -1245,6 +1294,7 @@ documentController.getProjectsBg = async (req, res) => {
         ${orderByClause}
         LIMIT ${pageSize}
         OFFSET ${offset}
+
       `;
 		console.log(query)
 

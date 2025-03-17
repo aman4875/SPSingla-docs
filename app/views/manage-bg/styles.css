@@ -17,10 +17,6 @@
   max-width: 100%;
 }
 
-#table-head.nk-tb-head {
-  cursor: pointer;
-}
-
 .sort-indicator {
   margin-left: 5px;
 }
@@ -157,4 +153,7 @@ Optional: styling for the active column
 .create-manage-bg .upload-btn {
   pointer-events: none;
   opacity: 0.6;
+}
+.manage-bg .form-control {
+  min-width: 100px;
 }
