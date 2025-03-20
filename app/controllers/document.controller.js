@@ -567,7 +567,7 @@ documentController.createProject = async (req, res) => {
 			`SELECT doc_code FROM projects_master WHERE doc_code = $1`,
 			[inputs.doc_code]
 		);
-		console.log(projectCode)
+
 		if (projectCode.length > 0) {
 			return res.send({ status: 0, msg: "Project code already exists !" });
 
@@ -1093,7 +1093,6 @@ documentController.getFilteredProjects = async (req, res) => {
 
 		let { rows: countResult } = await pool.query(countQuery);
 
-		console.log("🚀 ~ documentController.getFilteredProjects= ~ countResult:", countResult)
 		const totalDocuments = countResult[0].total;
 		const totalPages = Math.ceil(totalDocuments / pageSize);
 		// Main query with pagination
