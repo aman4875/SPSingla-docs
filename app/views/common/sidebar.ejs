@@ -74,7 +74,7 @@
                 <li
                   class="nk-menu-item <%= typeof subItems !== 'undefined' && subItems.active == 'manageBg' ? 'active' : '' %>">
                   <a href="/manage-bg" class="nk-menu-link">
-                    <span class="nk-menu-text">Manage BG</span> <!-- ✅ Add back the text -->
+                    <span class="nk-menu-text">Manage BG</span>
                   </a>
                 </li>
               </ul>
@@ -99,6 +99,26 @@
                   <span class="nk-menu-icon"><em class="icon ni ni-file-docs"></em></span>
                   <span class="nk-menu-text">Documents</span>
                 </a>
+              </li>
+              <li class="nk-menu-item has-sub">
+                <a href="#" class="nk-menu-link nk-menu-toggle">
+                  <span class="nk-menu-icon"><em class="icon ni ni-shield-star"></em></span>
+                  <span class="nk-menu-text">Bank Guarantee</span>
+                </a>
+                <ul class="nk-menu-sub bg-items" style="display: none;">
+                  <li
+                    class="nk-menu-item <%= typeof subItems !== 'undefined' && subItems.active == 'projectMaster' ? 'active' : '' %>">
+                    <a href="/project-master" class="nk-menu-link">
+                      <span class="nk-menu-text">Project Master</span>
+                    </a>
+                  </li>
+                  <li
+                    class="nk-menu-item <%= typeof subItems !== 'undefined' && subItems.active == 'manageBg' ? 'active' : '' %>">
+                    <a href="/manage-bg" class="nk-menu-link">
+                      <span class="nk-menu-text">Manage BG</span>
+                    </a>
+                  </li>
+                </ul>
               </li>
             </ul>
             <%}%>

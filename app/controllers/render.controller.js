@@ -568,8 +568,12 @@ renderController.renderManageBg = async (req, res) => {
 	const { rows: applicantNames } = await pool.query(`
 		SELECT * FROM applicant_names ORDER BY id DESC
 	`);
+	let { rows: types } = await pool.query(
+		`SELECT * FROM contract_types ORDER BY id DESC`
+	)
 
-	res.render("manage-bg/manage-bg", { token, projects, applicantNames, beneficiaryNames });
+
+	res.render("manage-bg/manage-bg", { token, projects, applicantNames, beneficiaryNames, types });
 }
 renderController.settings = async (req, res) => {
 	let token = req.session.token;

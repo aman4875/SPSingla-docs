@@ -567,7 +567,7 @@ documentController.createProject = async (req, res) => {
 			`SELECT doc_code FROM projects_master WHERE doc_code = $1`,
 			[inputs.doc_code]
 		);
-
+		console.log(projectCode)
 		if (projectCode.length > 0) {
 			return res.send({ status: 0, msg: "Project code already exists !" });
 
@@ -1093,6 +1093,7 @@ documentController.getFilteredProjects = async (req, res) => {
 
 		let { rows: countResult } = await pool.query(countQuery);
 
+		console.log("🚀 ~ documentController.getFilteredProjects= ~ countResult:", countResult)
 		const totalDocuments = countResult[0].total;
 		const totalPages = Math.ceil(totalDocuments / pageSize);
 		// Main query with pagination
@@ -1133,35 +1134,35 @@ documentController.getProjectsBg = async (req, res) => {
 		const offset = (page - 1) * pageSize;
 		let orderByClause = "";
 		let baseQuery = `
-			SELECT
-				d.project_code,
-				d.doc_type,
-				JSON_AGG(
-					JSONB_BUILD_OBJECT(
-						'doc_id', d.doc_id,
-						'other_columns', d.other_columns 
-					)
-				) AS grouped_docs,  
-				JSON_AGG(DISTINCT pm) AS grouped_projects,  
-				COALESCE(
-					(SELECT JSON_AGG(
-						JSONB_BUILD_OBJECT(
-							'project_pdf_link', pa.project_pdf_link,
-							'project_pdf_name', pa.project_pdf_name,
-							'doc_id', pa.doc_id
+				SELECT
+					d.*,
+					pm.doc_code,
+					pm.doc_work_name,
+					pm.doc_department,
+					pm.doc_financial_date,
+					pm.doc_agreement_no,
+					pm.doc_agreement_date,
+					pm.doc_completion_date,
+					pm.doc_awarded,
+					pm.doc_dlp_period,
+					COALESCE(
+						(SELECT Json_agg(
+							Jsonb_build_object(
+								'project_pdf_link', pa.project_pdf_link,
+								'project_pdf_name', pa.project_pdf_name,
+								'doc_id', pa.doc_id
+							)
 						)
-					)
-					FROM bg_attachments AS pa
-					WHERE pa.project_id IN (
-						SELECT doc_id FROM doc_manage_bg 
-						WHERE project_code = d.project_code AND doc_type = d.doc_type
-					)
-					), '[]'
-				) AS attachments
-			FROM doc_manage_bg AS d
-			LEFT JOIN projects_master AS pm
-				ON d.project_code = pm.doc_code
-			GROUP BY d.project_code, d.doc_type
+						FROM bg_attachments AS pa
+						WHERE pa.project_id = d.doc_id), '[]'
+					) AS attachments,
+					SUM(d.doc_bg_amount) OVER () AS total_bg_amount  -- New field added
+				FROM
+					doc_manage_bg AS d
+				LEFT JOIN
+					projects_master AS pm
+				ON
+					d.project_code = pm.doc_code
 			`;
 		let conditions = [];
 		let joins = "";
@@ -1250,7 +1251,7 @@ documentController.getProjectsBg = async (req, res) => {
 			orderByClause = `ORDER BY ${sortFields.join(", ")}`;
 
 		} else {
-			orderByClause = `ORDER BY MAX(d.doc_id) DESC`;
+			orderByClause = `ORDER BY d.doc_id DESC`;
 		}
 
 		// Build the WHERE clause
@@ -1260,52 +1261,56 @@ documentController.getProjectsBg = async (req, res) => {
 
 		// total count of documents
 		let countQuery = `
-		WITH total_count_cte AS (
-			SELECT COUNT(DISTINCT doc_id) AS total_count 
-			FROM doc_manage_bg
-		)
-		SELECT 
-			d.*,
-			pm.doc_code, 
-			pm.doc_work_name,
-			pm.doc_department,
-			pm.doc_financial_date,
-			pm.doc_agreement_no,
-			pm.doc_agreement_date,
-			pm.doc_completion_date,
-			pm.doc_awarded,
-			pm.doc_dlp_period, 
-			tc.total_count
-		FROM 
-			doc_manage_bg AS d
-		LEFT JOIN 
-			projects_master AS pm ON d.project_code = pm.doc_code
-		CROSS JOIN 
-			total_count_cte tc 
-		${conditions.length ? " WHERE " + conditions.join(" AND ") : ""}
-	  `;
-		// let { rows: countResult } = await pool.query(countQuery);
+			SELECT 
+				d.*,
+				pm.doc_code, 
+				pm.doc_work_name,
+				pm.doc_department,
+				pm.doc_financial_date,
+				pm.doc_agreement_no,
+				pm.doc_agreement_date,
+				pm.doc_completion_date,
+				pm.doc_awarded,
+				pm.doc_dlp_period, 
+				(SELECT COUNT(DISTINCT doc_id) FROM doc_manage_bg) AS total_count
+			FROM 
+				doc_manage_bg AS d
+			LEFT JOIN 
+				projects_master AS pm ON d.project_code = pm.doc_code
+			${conditions.length ? " WHERE " + conditions.join(" AND ") : ""}
 
-		const totalDocuments = countResult[0]?.total;
+	  `;
+		let { rows: countResult } = await pool.query(countQuery);
+		const totalDocuments = countResult[0]?.total_count;
 		const totalPages = Math.ceil(totalDocuments / pageSize);
 		// Main query with pagination
+
+
 		let query = `
+		WITH fetched_docs AS (
         ${baseQuery}
         ${orderByClause}
         LIMIT ${pageSize}
         OFFSET ${offset}
-
-      `;
-		console.log(query)
+		)
+		SELECT 
+			Jsonb_build_object(
+				'data', Jsonb_agg(fetched_docs), 
+				'total_bg_amount', COALESCE(SUM(fetched_docs.doc_bg_amount), 0)
+			) AS result
+		FROM fetched_docs`;
 
 		let { rows: documents } = await pool.query(query);
+		const docs = documents[0]?.result?.data;
+		const totalBgAmount = documents[0]?.result?.total_bg_amount;
 		return res.json({
 			status: 1,
 			msg: "Success",
 			payload: {
-				documents,
+				"documents": docs,
 				totalPages,
 				currentPage: page,
+				totalBgAmount
 			},
 		});
 

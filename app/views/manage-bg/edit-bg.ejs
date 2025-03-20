@@ -600,7 +600,7 @@
                                             <label class="form-label" for="doc_file">Upload PDF</label>
                                             <div class="form-control-wrap">
                                                 <input type="file" class="form-control" placeholder="Upload File"
-                                                    id="doc_file" name="doc_file" required />
+                                                    id="doc_file" name="doc_file" required accept=".pdf" />
                                             </div>
                                         </div>
                                         <div class="form-group" style="display: flex; justify-content: space-between">
@@ -648,6 +648,7 @@
     <script src="/app/assets/js/bundle.js"></script>
     <script src="/app/assets/js/scripts.js"></script>
     <script src="/app/assets/js/charts/gd-default.js"></script>
+    <script src="/app/views//manage-bg/edit-bg-script.js"></script>
     <script>
         let docIdToDelete = null
         let initialFormData = new FormData($("#documentForm")[0]);
@@ -677,6 +678,7 @@
             $("#doc_file").on("change", function () {
                 pdfFileName = this.files[0].name;
             });
+
             $('#attachmentForm').on('submit', function (event) {
                 event.preventDefault();
                 const project_code = "<%= manageBgData.project_code %>"
@@ -770,7 +772,7 @@
 
             $.ajax({
                 type: "POST",
-                url: "/docs/edit-project",
+                url: "/docs/edit-bg",
                 data: { newFormDataEntries, doc_id },
                 success: function (response) {
                     if (response.status == 1) {

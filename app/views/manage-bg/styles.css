@@ -157,3 +157,8 @@ Optional: styling for the active column
 .manage-bg .form-control {
   min-width: 100px;
 }
+
+.bg_amount {
+  padding-bottom: 10px;
+  padding-top: 10px;
+}
