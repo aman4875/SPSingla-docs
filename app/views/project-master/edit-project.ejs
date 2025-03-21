@@ -383,8 +383,8 @@
                                         <div class="form-group">
                                             <label class="form-label" for="doc_file">Upload PDF</label>
                                             <div class="form-control-wrap">
-                                                <input type="file" class="form-control" placeholder="Upload File"
-                                                    id="doc_file" name="doc_file" required />
+                                                <input type="file" class="form-control" accept=".pdf"
+                                                    placeholder="Upload File" id="doc_file" name="doc_file" required />
                                             </div>
                                         </div>
                                         <div class="form-group" style="display: flex; justify-content: space-between">
@@ -463,6 +463,9 @@
             });
             $('#attachmentForm').on('submit', function (event) {
                 event.preventDefault();
+                if (!this.checkValidity()) {
+                    return false;
+                }
                 const doc_code = "<%= projectData.doc_code %>"
                 const project_id = "<%= projectData.doc_id %>"
 

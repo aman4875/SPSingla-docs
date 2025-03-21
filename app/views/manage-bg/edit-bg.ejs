@@ -681,6 +681,9 @@
 
             $('#attachmentForm').on('submit', function (event) {
                 event.preventDefault();
+                if (!this.checkValidity()) {
+                    return false;
+                }
                 const project_code = "<%= manageBgData.project_code %>"
                 const project_id = "<%= manageBgData.doc_id %>"
 
@@ -700,7 +703,8 @@
                         if (response.status === 1) {
                             location.reload();
                         } else {
-                            alert('Upload failed: ' + response.message);
+                            NioApp.Toast(`<h5>Something Went Wrong</h5>${response.msg || `<p>Error while uploading document</p>`}`, "error");
+                            NioApp.handleButtonState("uploadAttachmentButton", "Upload File", false);
                         }
                     },
                     error: function (xhr, status, error) {

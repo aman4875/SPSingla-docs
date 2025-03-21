@@ -459,7 +459,6 @@ renderController.editBG = async (req, res) => {
 
 		const { rows } = await pool.query(query, [doc_id]);
 		const manageBgData = rows[0]
-		console.table(manageBgData.attachments)
 		return res.render("manage-bg/edit-bg.ejs", { token, manageBgData, beneficiaryNames, applicantNames, types, bankName });
 	} catch (error) {
 		console.error(error);

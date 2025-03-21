@@ -221,7 +221,6 @@ aiController.processSingleFile = async (req, res) => {
         // ADDING HISTORY
         await pool.query(`INSERT INTO doc_history_junction (dhj_doc_number, dhj_history_type, dhj_timestamp,dhj_history_blame,dhj_history_blame_user) VALUES ($1,$2,$3,$4,$5)`, [extractedOpenAIData.letter_number, "UPLOADED", moment().format("MM/DD/YYYY HH:mm:ss"), token.user_id, userDataFromDb[0].user_name]);
 
-        console.table({ "Document processed": true, "inserted successfully": true })
 
         return res.send({ status: 1, msg: "File Processed Successfully" });
     } catch (error) {
