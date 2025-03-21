@@ -1286,22 +1286,37 @@ documentController.getProjectsBg = async (req, res) => {
 
 
 		let query = `
-		WITH fetched_docs AS (
         ${baseQuery}
         ${orderByClause}
         LIMIT ${pageSize}
-        OFFSET ${offset}
+        OFFSET ${offset}`
+
+
+
+		if (Object.keys(inputs?.activeFilter).length > 0 || projectCode.project !== "null") {
+			query = `
+			WITH fetched_docs AS(
+			${baseQuery}
+			${orderByClause}
+			LIMIT ${pageSize}
+			OFFSET ${offset}
 		)
-		SELECT 
-			Jsonb_build_object(
-				'data', Jsonb_agg(fetched_docs), 
-				'total_bg_amount', COALESCE(SUM(fetched_docs.doc_bg_amount), 0)
-			) AS result
-		FROM fetched_docs`;
+		SELECT
+		Jsonb_build_object(
+			'data', Jsonb_agg(fetched_docs),
+			'total_bg_amount', COALESCE(SUM(fetched_docs.doc_bg_amount), 0)
+		) AS result
+			FROM fetched_docs`
+		}
 
 		let { rows: documents } = await pool.query(query);
-		const docs = documents[0]?.result?.data;
-		const totalBgAmount = documents[0]?.result?.total_bg_amount;
+		console.log("🚀 ~ documentController.getProjectsBg= ~ query:", query)
+		let totalBgAmount = null
+		let docs = documents
+		if (Object.keys(inputs?.activeFilter).length > 0 || projectCode.project !== "null") {
+			docs = documents[0]?.result?.data;
+			totalBgAmount = documents[0]?.result?.total_bg_amount;
+		}
 		return res.json({
 			status: 1,
 			msg: "Success",
@@ -1331,7 +1346,7 @@ documentController.uploadAttachment = async (req, res) => {
 
 		const s3Params = {
 			Bucket: process.env.BUCKET_NAME,
-			Key: `attachments/${fileName}${fileExtension}`,
+			Key: `attachments / ${fileName}${fileExtension} `,
 			Body: req.file.buffer,
 			ContentType: req.file.mimetype,
 		};
@@ -1343,17 +1358,17 @@ documentController.uploadAttachment = async (req, res) => {
 
 		await pool.query(
 			`
-					INSERT INTO folder_stats (doc_folder_name, doc_folder_id, last_updated) 
-					VALUES ($1, $2, $3) 
-					ON CONFLICT (doc_folder_name) 
+					INSERT INTO folder_stats(doc_folder_name, doc_folder_id, last_updated)
+		VALUES($1, $2, $3) 
+					ON CONFLICT(doc_folder_name) 
 					DO UPDATE SET
-					  last_updated = EXCLUDED.last_updated,
-					  doc_folder_id = EXCLUDED.doc_folder_id;
-					`,
+		last_updated = EXCLUDED.last_updated,
+			doc_folder_id = EXCLUDED.doc_folder_id;
+		`,
 			[inputs.doc_folder, folderId[0].site_id, getCurrentDateTime()]
 		);
 
-		await pool.query(`INSERT INTO doc_attachment_junction (daj_doc_number, daj_attachment_name, daj_attachment_link, daj_attachment_upload_date) VALUES ($1, $2, $3, $4)`, [inputs.doc_number, inputs.doc_attachment, attachmentLocation, moment().format("DD/MM/YYYY")]);
+		await pool.query(`INSERT INTO doc_attachment_junction(daj_doc_number, daj_attachment_name, daj_attachment_link, daj_attachment_upload_date) VALUES($1, $2, $3, $4)`, [inputs.doc_number, inputs.doc_attachment, attachmentLocation, moment().format("DD/MM/YYYY")]);
 		res.send({ status: 1, msg: "Attachment Uploaded" });
 	} catch (err) {
 		console.error("Error Uploading Attachments", err);
@@ -1375,7 +1390,7 @@ documentController.uploadProjectAttachments = async (req, res) => {
 
 		const s3Params = {
 			Bucket: process.env.BUCKET_NAME,
-			Key: `docs/${fileName}${fileExtension}`,
+			Key: `docs / ${fileName}${fileExtension} `,
 			Body: req.file.buffer,
 			ContentType: req.file.mimetype,
 		};
@@ -1384,15 +1399,15 @@ documentController.uploadProjectAttachments = async (req, res) => {
 		const attachmentLocation = s3Response.Location;
 
 		await pool.query(
-			`INSERT INTO project_attachments (
-			project_pdf_name, 
+			`INSERT INTO project_attachments(
+			project_pdf_name,
 			project_pdf_link,
 			project_code,
 			project_id,
 			attchment_uploaded_by_id,
 			created_at
-			) 
-			VALUES ($1, $2, $3, $4, $5, $6)`,
+		)
+		VALUES($1, $2, $3, $4, $5, $6)`,
 			[inputs.pdfFileName, attachmentLocation, inputs.doc_code, inputs.project_id, token.user_id, getCurrentDateTime()]
 		);
 
@@ -1417,7 +1432,7 @@ documentController.uploadBGAttachments = async (req, res) => {
 
 		const s3Params = {
 			Bucket: process.env.BUCKET_NAME,
-			Key: `docs/${fileName}${fileExtension}`,
+			Key: `docs / ${fileName}${fileExtension} `,
 			Body: req.file.buffer,
 			ContentType: req.file.mimetype,
 		};
@@ -1426,15 +1441,15 @@ documentController.uploadBGAttachments = async (req, res) => {
 		const attachmentLocation = s3Response.Location;
 
 		await pool.query(
-			`INSERT INTO bg_attachments (
-			project_pdf_name, 
+			`INSERT INTO bg_attachments(
+			project_pdf_name,
 			project_pdf_link,
 			project_code,
 			project_id,
 			attchment_uploaded_by_id,
 			created_at
-			) 
-			VALUES ($1, $2, $3, $4, $5, $6)`,
+		)
+		VALUES($1, $2, $3, $4, $5, $6)`,
 			[inputs.pdfFileName, attachmentLocation, inputs.project_code, inputs.project_id, token.user_id, getCurrentDateTime()]
 		);
 
@@ -1449,7 +1464,7 @@ documentController.recordDocumentViewed = async (req, res) => {
 	try {
 		let inputs = req.body;
 		let token = req.session.token;
-		await pool.query(`INSERT INTO doc_history_junction (dhj_doc_number, dhj_history_type, dhj_timestamp,dhj_history_blame,dhj_history_blame_user) VALUES ($1,$2,$3,$4,$5)`, [inputs.doc_number, "VIEWED", moment().format("MM/DD/YYYY HH:mm:ss"), token.user_id, token.user_name]);
+		await pool.query(`INSERT INTO doc_history_junction(dhj_doc_number, dhj_history_type, dhj_timestamp, dhj_history_blame, dhj_history_blame_user) VALUES($1, $2, $3, $4, $5)`, [inputs.doc_number, "VIEWED", moment().format("MM/DD/YYYY HH:mm:ss"), token.user_id, token.user_name]);
 	} catch (err) {
 		console.error("Error Uploading Attachments", err);
 		res.json({ status: 0, msg: "Internal Server Error" });
@@ -1460,7 +1475,7 @@ documentController.getFailedUploads = async (req, res) => {
 	try {
 		const inputs = req.body;
 		const { user_id } = req.session.token;
-		let { rows: files } = await pool.query(`SELECT *  FROM failed_job_stats  WHERE user_id = $1`, [user_id]);
+		let { rows: files } = await pool.query(`SELECT * FROM failed_job_stats  WHERE user_id = $1`, [user_id]);
 
 		if (!files.length) {
 			return res.json({ status: 1, msg: null });
@@ -1499,14 +1514,14 @@ documentController.getRepliedVide = async (req, res) => {
 			`
 			UPDATE documents t1
 			SET doc_replied_vide = (
-				SELECT STRING_AGG(t2.doc_number, ',')
+			SELECT STRING_AGG(t2.doc_number, ',')
 				FROM documents t2
-				WHERE TRIM(t2.doc_site) = TRIM($1) -- Match strict doc_site after trimming spaces
-				  AND TRIM(t1.doc_number) = ANY (
-					  SELECT TRIM(UNNEST(string_to_array(t2.doc_reference, ','))) -- Strict match for doc_number in doc_reference
-				  )
+				WHERE TRIM(t2.doc_site) = TRIM($1)-- Match strict doc_site after trimming spaces
+				  AND TRIM(t1.doc_number) = ANY(
+				SELECT TRIM(UNNEST(string_to_array(t2.doc_reference, ',')))-- Strict match for doc_number in doc_reference
+		)
 			)
-			WHERE TRIM(t1.doc_site) = TRIM($1); -- Ensure strict match for t1 doc_site
+			WHERE TRIM(t1.doc_site) = TRIM($1); --Ensure strict match for t1 doc_site
 			`,
 			[isfolderIdExist[0].site_name.trim()]
 		)
@@ -1527,7 +1542,7 @@ documentController.deleteDoc = async (req, res) => {
 			return res.json({ status: 0, msg: "User not logged In" });
 		}
 		const result = await pool.query(
-			`DELETE FROM documents WHERE doc_id = ${docId}`,
+			`DELETE FROM documents WHERE doc_id = ${docId} `,
 		);
 		if (result.rowCount === 0) {
 			return res.json({ status: 0, msg: "Document not found" });
@@ -1549,7 +1564,7 @@ documentController.deleteProject = async (req, res) => {
 			return res.json({ status: 0, msg: "User not logged In" });
 		}
 		const result = await pool.query(
-			`DELETE FROM projects_master WHERE doc_id = ${docId}`,
+			`DELETE FROM projects_master WHERE doc_id = ${docId} `,
 		);
 		if (result.rowCount === 0) {
 			return res.json({ status: 0, msg: "Document not found" });
@@ -1605,7 +1620,7 @@ documentController.deleteBG = async (req, res) => {
 		}
 
 		await pool.query(
-			`DELETE FROM doc_manage_bg WHERE doc_id = ${docId}`,
+			`DELETE FROM doc_manage_bg WHERE doc_id = ${docId} `,
 		);
 
 		const removeFlag = await pool.query(
@@ -1640,7 +1655,7 @@ documentController.deleteProjectPdf = async (req, res) => {
 			return res.json({ status: 0, msg: "User not logged In" });
 		}
 		const result = await pool.query(
-			`DELETE FROM project_attachments WHERE doc_id = ${docId}`,
+			`DELETE FROM project_attachments WHERE doc_id = ${docId} `,
 		);
 		if (result.rowCount === 0) {
 			return res.json({ status: 0, msg: "Document not found" });
@@ -1661,7 +1676,7 @@ documentController.deleteBGPdf = async (req, res) => {
 			return res.json({ status: 0, msg: "User not logged In" });
 		}
 		const result = await pool.query(
-			`DELETE FROM bg_attachments WHERE doc_id = ${docId}`,
+			`DELETE FROM bg_attachments WHERE doc_id = ${docId} `,
 		);
 		if (result.rowCount === 0) {
 			return res.json({ status: 0, msg: "Document not found" });
@@ -1767,8 +1782,8 @@ documentController.saveApplicant = async (req, res) => {
 documentController.getAllBeneficiary = async (req, res) => {
 	try {
 		const { rows: beneficiary } = await pool.query(`
-			SELECT * FROM beneficiary_names ORDER BY id DESC
-		`);
+		SELECT * FROM beneficiary_names ORDER BY id DESC
+			`);
 
 		res.json({ status: 1, msg: "success", payload: beneficiary });
 	} catch (error) {
@@ -1780,8 +1795,8 @@ documentController.getAllBeneficiary = async (req, res) => {
 documentController.getAllApplicantName = async (req, res) => {
 	try {
 		const { rows: beneficiary } = await pool.query(`
-			SELECT * FROM applicant_names ORDER BY id DESC
-		`);
+		SELECT * FROM applicant_names ORDER BY id DESC
+			`);
 
 		res.json({ status: 1, msg: "success", payload: beneficiary });
 	} catch (error) {
@@ -1824,8 +1839,8 @@ documentController.savePurpose = async (req, res) => {
 documentController.getAllDocPurpose = async (req, res) => {
 	try {
 		const { rows: beneficiary } = await pool.query(`
-			SELECT * FROM document_purpose ORDER BY id DESC
-		`);
+		SELECT * FROM document_purpose ORDER BY id DESC
+			`);
 
 		res.json({ status: 1, msg: "success", payload: beneficiary });
 	} catch (error) {

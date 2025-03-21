@@ -501,8 +501,8 @@
                                                                         <div class="nk-tb-col">
                                                                             <span>
                                                                                 <select
-                                                                                    class="form-select form-control js-select2 filter-input"
-                                                                                    data-filter="boolean" id="doc_type"
+                                                                                    class="form-select form-control js-select2 filter-input bg_type"
+                                                                                    data-filter="text" id="doc_type"
                                                                                     name="doc_type"
                                                                                     data-placeholder="Type">
                                                                                     <option label="empty" value="">
@@ -660,10 +660,13 @@
                                                         class="card-inner text-center bg_amount d-none">
                                                         <div class="row justify-content-between">
                                                             <div class="w-auto">
-                                                                <div class="fs-4"><strong>Total BG Amount</strong></div>
+                                                                <div class="fs-4 d-flex gap-4"><strong>Total BG
+                                                                        Amount :</strong>
+                                                                    <div class="w-auto fs-4" id="bg_amount">
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                            <div class="w-auto fs-4" id="bg_amount">
-                                                            </div>
+
 
                                                         </div>
                                                     </div>
@@ -772,7 +775,9 @@
                 success: function (response) {
                     isFetching = false; // Reset flag
                     if (response.status == 1) {
-                        $("table-bg-amount").removeClass('d-none');
+                        if (response.payload.totalBgAmount != null) {
+                            $("table-bg-amount").removeClass('d-none');
+                        }
 
                         renderTabledata(response)
                         totalPages = response.payload.totalPages || 1;
@@ -916,7 +921,12 @@
                     rowsHtml += rowHtml;
                 })
                 $("#table-filters").after(rowsHtml);
-                $("#bg_amount").append(`<strong>${response.payload.totalBgAmount}</strong>`);
+                if (response.payload.totalBgAmount != null) {
+                    $("#bg_amount").append(`<strong>${response.payload.totalBgAmount}</strong>`);
+                } else {
+                    $('#table-bg-amount').addClass('d-none');
+                    $('#table-status').removeClass('d-none');
+                }
 
             } else {
                 console.log("No Records Found");
