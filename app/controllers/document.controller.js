@@ -1310,7 +1310,6 @@ documentController.getProjectsBg = async (req, res) => {
 		}
 
 		let { rows: documents } = await pool.query(query);
-		console.log("🚀 ~ documentController.getProjectsBg= ~ query:", query)
 		let totalBgAmount = null
 		let docs = documents
 		if (Object.keys(inputs?.activeFilter).length > 0 || projectCode.project !== "null") {

@@ -166,3 +166,7 @@ Optional: styling for the active column
 .manage-bg select#doc_type ~ span.select2 {
   min-width: 150px;
 }
+
+.grid-header {
+  cursor: pointer;
+}
