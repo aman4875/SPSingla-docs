@@ -52,9 +52,32 @@
                                                     <div class="row g-gs">
                                                         <div class="col-md-4">
                                                             <div class="form-group">
+                                                                <label class="form-label"
+                                                                    for="doc_awarded">Awarded</label>
+                                                                <div class="form-control-wrap">
+                                                                    <select
+                                                                        class="form-select form-control js-select2 form-control"
+                                                                        id="doc_awarded" name="doc_awarded"
+                                                                        data-placeholder="Select Option" required>
+                                                                        <option label="empty" value=""></option>
+                                                                        <option <%=projectData &&
+                                                                            projectData.doc_awarded===true ? 'selected'
+                                                                            : '' %> value="true">Yes
+                                                                        </option>
+                                                                        <option <%=projectData &&
+                                                                            projectData.doc_awarded===false ? 'selected'
+                                                                            : '' %> value="false">No
+                                                                        </option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
                                                                 <label class="form-label" for="doc_code">Code</label>
                                                                 <div class="form-control-wrap">
-                                                                    <input type="text" class="form-control"
+                                                                    <input type="text"
+                                                                        class="<%= projectData.doc_awarded === true ? 'disableInput form-control' : 'form-control' %>"
                                                                         placeholder="Document Code" id="doc_code"
                                                                         name="doc_code"
                                                                         value="<%= projectData ? projectData.doc_code : '' %>"
@@ -106,6 +129,22 @@
                                                                 </div>
                                                             </div>
                                                         </div>
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label"
+                                                                    for="doc_agreement_date">Agreement Date</label>
+                                                                <div class="form-control-wrap focused">
+                                                                    <div class="form-icon form-icon-right"><em
+                                                                            class="icon ni ni-calendar-alt"></em></div>
+                                                                    <input type="text" required id="doc_agreement_date"
+                                                                        autocomplete="off" name="doc_agreement_date"
+                                                                        placeholder="Agreement Date"
+                                                                        class="form-control date-picker"
+                                                                        value="<%= projectData ? projectData.doc_agreement_date : '' %>"
+                                                                        required />
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                         <div class="col-md-8">
                                                             <div class="form-group">
                                                                 <label class="form-label"
@@ -139,44 +178,8 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="col-md-4">
-                                                            <div class="form-group">
-                                                                <label class="form-label"
-                                                                    for="doc_awarded">Awarded</label>
-                                                                <div class="form-control-wrap">
-                                                                    <select
-                                                                        class="form-select form-control js-select2 form-control"
-                                                                        id="doc_awarded" name="doc_awarded"
-                                                                        data-placeholder="Select Option" required>
-                                                                        <option label="empty" value=""></option>
-                                                                        <option <%=projectData &&
-                                                                            projectData.doc_awarded===true ? 'selected'
-                                                                            : '' %> value="true">Yes
-                                                                        </option>
-                                                                        <option <%=projectData &&
-                                                                            projectData.doc_awarded===false ? 'selected'
-                                                                            : '' %> value="false">No
-                                                                        </option>
-                                                                    </select>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-4">
-                                                            <div class="form-group">
-                                                                <label class="form-label"
-                                                                    for="doc_agreement_date">Agreement Date</label>
-                                                                <div class="form-control-wrap focused">
-                                                                    <div class="form-icon form-icon-right"><em
-                                                                            class="icon ni ni-calendar-alt"></em></div>
-                                                                    <input type="text" required id="doc_agreement_date"
-                                                                        autocomplete="off" name="doc_agreement_date"
-                                                                        placeholder="Agreement Date"
-                                                                        class="form-control date-picker"
-                                                                        value="<%= projectData ? projectData.doc_agreement_date : '' %>"
-                                                                        required />
-                                                                </div>
-                                                            </div>
-                                                        </div>
+
+
                                                         <div class="col-md-4">
                                                             <div class="form-group">
                                                                 <label class="form-label" for="doc_DLP_period">DLP
@@ -226,14 +229,14 @@
                                                         <div class="col-md-4">
                                                             <div class="form-group">
                                                                 <label class="form-label"
-                                                                    for="doc_total_mobilisation_amount">Total
-                                                                    Mobilisation Amount</label>
+                                                                    for="doc_performance_security">Performance
+                                                                    Security</label>
                                                                 <div class="form-control-wrap">
                                                                     <input type="number" class="form-control"
                                                                         placeholder="Tota Mobilisation Amount"
-                                                                        id="doc_total_mobilisation_amount"
-                                                                        name="doc_total_mobilisation_amount"
-                                                                        value="<%= projectData ? projectData.doc_total_mobilisation_amount : '' %>" />
+                                                                        id="doc_performance_security"
+                                                                        name="doc_performance_security"
+                                                                        value="<%= projectData ? projectData.doc_performance_security : '' %>" />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -426,12 +429,43 @@
 
                     </div>
                 </div>
+
+                <div class="modal fade" id="awardedModal">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Select Site</h5>
+                            </div>
+                            <div class="modal-body" style="padding: 1.25rem">
+                                <form id="attachmentForm" class="form-validate ">
+                                    <select class="form-select form-control js-select2" id="doc_selected_site"
+                                        name="doc_selected_site" data-placeholder="Select Site">
+                                        <option label="empty" value=""></option>
+                                        <% sites.forEach(data=>
+                                            { %>
+                                            <option data-site-code="<%= data.site_code%>" data-id="<%= data.site_id %>"
+                                                value="<%=  data.site_name %>">
+                                                <%= data.site_name %>
+                                            </option>
+                                            <% }); %>
+                                    </select>
+
+                                    <div class="form-group mt-2" style="display: flex; justify-content: space-between">
+                                        <button data-bs-dismiss="modal" type="button" aria-label="Close"
+                                            id="cancel-site" class="btn btn-light">Cancel</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
         </div>
 
     </div>
     <script src="/app/assets/js/bundle.js"></script>
     <script src="/app/assets/js/scripts.js"></script>
     <script src="/app/assets/js/charts/gd-default.js"></script>
+    <script src="/app/views/project-master/edit-project.script.js"></script>
     <script>
         let docIdToDelete = null
         let initialFormData = new FormData($("#documentForm")[0]);
@@ -440,6 +474,12 @@
             isFlag: false,
             msg: ""
         };
+        let dplEndingMonths = $("#doc_dlp_period").val() ? parseInt($("#doc_dlp_period").val()) : 0;
+        let projectData = {
+            projectCode: null,
+            projectName: null
+        }
+        let closedByBackdropClick = false;
 
         initialFormData.forEach((value, key) => {
             initialFormDataEntries[key] = value;

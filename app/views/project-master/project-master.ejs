@@ -241,9 +241,14 @@
 																		</div>
 																		<div class="nk-tb-col">
 																			<span
-																				data-field="doc_mobilisation_amount">Total
-																				Mobilisation
-																				Amount</span><span
+																				data-field="doc_mobilisation_amount">Performance
+																				Security</span><span
+																				class="sort-indicator"></span>
+																		</div>
+																		<div class="nk-tb-col">
+																			<span
+																				data-field="doc_mobilisation_amount">Additional
+																				Performance Security</span><span
 																				class="sort-indicator"></span>
 																		</div>
 																		<div class="nk-tb-col">
@@ -411,8 +416,17 @@
 																				<input type="number"
 																					class="form-control filter-input"
 																					data-filter="number"
-																					id="doc_total_mobilisation_amount"
-																					placeholder="Total Mobilisation Amount">
+																					id="doc_performance_security"
+																					placeholder="Performance Security">
+																			</span>
+																		</div>
+																		<div class="nk-tb-col">
+																			<span>
+																				<input type="number"
+																					class="form-control filter-input"
+																					data-filter="number"
+																					id="doc_additional_performance_security"
+																					placeholder="Additional Performance Security">
 																			</span>
 																		</div>
 																		<div class="nk-tb-col">
@@ -502,7 +516,7 @@
 	<script src="/app/assets/js/bundle.js"></script>
 	<script src="/app/assets/js/scripts.js"></script>
 	<script src="/app/assets/js/charts/gd-default.js"></script>
-	<script src="/app/views/project-master/script.js"></script>
+	<script src="/app/views/project-master/project-script.js"></script>
 	<script>
 		let isFetching = false;
 		let docIdToDelete = null;
@@ -588,7 +602,10 @@
 						<span>${data.doc_dlp_ending || "-"}</span>
 					</div>
 					<div class="nk-tb-col text-start">
-						<span>${data.doc_total_mobilisation_amount || "-"}</span>
+						<span>${data.doc_performance_security || "-"}</span>
+					</div>
+					<div class="nk-tb-col text-start">
+						<span>${data.doc_additional_performance_security || "-"}</span>
 					</div>
 					<div class="nk-tb-col text-start">
 						<span>${data.doc_bal_mobilisation_amount || "-"}</span>

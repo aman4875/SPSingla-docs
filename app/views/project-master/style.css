@@ -152,3 +152,8 @@
   font-size: 0.9em;
   color: #777;
 }
+
+.disableInput {
+  background-color: #f5f6fa !important;
+  pointer-events: none !important;
+}

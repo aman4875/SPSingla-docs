@@ -21,7 +21,7 @@
 <body class="nk-body bg-lighter npc-general has-sidebar">
     <div class="nk-app-root">
         <div class="nk-main">
-            <%- include('./common/sidebar' , {subItems:{active:"projectMaster"} }); -%>
+            <%- include('./common/sidebar' , {subItems:{active:"manageBg"} }); -%>
                 <div class="nk-wrap">
 
                     <div class="nk-content">
@@ -362,7 +362,7 @@
                                                                 <label class="form-label" for="doc_bg_number">BG
                                                                     number</label>
                                                                 <div class="form-control-wrap">
-                                                                    <input type="number" class="form-control"
+                                                                    <input type="text" class="form-control"
                                                                         placeholder="BG number" id="doc_bg_number"
                                                                         name="doc_bg_number"
                                                                         value="<%= manageBgData ? manageBgData.doc_bg_number : '' %>"
@@ -446,7 +446,7 @@
                                                                 <label class="form-label" for="doc_bg_amount">BG
                                                                     Amount</label>
                                                                 <div class="form-control-wrap">
-                                                                    <input type="number" id="doc_bg_amount"
+                                                                    <input type="text" id="doc_bg_amount"
                                                                         autocomplete="off" name="doc_bg_amount"
                                                                         placeholder="BG Amount" class="form-control"
                                                                         value="<%= manageBgData ? manageBgData.doc_bg_amount : '' %>" />

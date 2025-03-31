@@ -9,7 +9,7 @@ router.get("/generate-document-number", documentController.generateDocumentNumbe
 router.get("/get-document-reference", documentController.getDocumentReference);
 router.post("/save-draft", documentController.saveDraft);
 router.post("/edit-document", documentController.editDocument);
-router.post("/edit-project", documentController.editProject );
+router.post("/edit-project", documentController.editProject);
 router.post("/edit-bg", documentController.editBG);
 router.post("/create-document", upload.single("doc_file"), documentController.createDocument);
 router.post("/create-project", upload.single("doc_file"), documentController.createProject);
@@ -32,10 +32,12 @@ router.delete("/delete-bg-pdf", documentController.deleteBGPdf);
 router.delete("/delete-bg", documentController.deleteBG);
 router.get("/get-project-by-id", documentController.getProjectById);
 router.post("/save-beneficiary", documentController.saveBeneficiary);
+router.post("/save-type", documentController.saveType);
 router.post("/save-applicant", documentController.saveApplicant);
 router.get("/get-Beneficiary", documentController.getAllBeneficiary);
 router.get("/get-applican-names", documentController.getAllApplicantName);
 router.post("/save-purpose", documentController.savePurpose);
 router.get("/get-all-purpose", documentController.getAllDocPurpose);
+router.get("/get-all-types", documentController.getAllType);
 
 module.exports = router;

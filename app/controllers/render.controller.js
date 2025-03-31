@@ -396,9 +396,11 @@ renderController.editProject = async (req, res) => {
         WHERE d.doc_id = $1
         GROUP BY d.doc_id;
     `;
+		let sitesQuery = `SELECT * FROM sites WHERE site_parent_id = 0`;
+		let { rows: sites } = await pool.query(sitesQuery);
 		const { rows } = await pool.query(query, [doc_id]);
 		const projectData = rows[0]
-		return res.render("project-master/edit-project.ejs", { token, projectData });
+		return res.render("project-master/edit-project.ejs", { token, projectData, sites });
 	} catch (error) {
 		console.error(error);
 		return res.send("Internal Server Error");
@@ -511,13 +513,17 @@ renderController.renderCreateDocument = async (req, res) => {
 };
 
 renderController.renderProjectMaster = async (req, res) => {
+
 	let token = req.session.token;
 	res.render("project-master/project-master", { token });
 }
 
 renderController.renderCreateProjectMaster = async (req, res) => {
 	let token = req.session.token;
-	res.render("project-master/create-project", { token });
+	let query = `SELECT * FROM sites WHERE site_parent_id = 0`;
+	let { rows: sites } = await pool.query(query);
+	res.render("project-master/create-project", { token, sites });
+	console.log("🚀 ~ renderController.renderCreateProjectMaster= ~ sites:", sites)
 }
 
 renderController.renderCreateBg = async (req, res) => {

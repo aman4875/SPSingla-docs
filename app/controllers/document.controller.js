@@ -333,6 +333,15 @@ documentController.editProject = async (req, res) => {
 			return res.send({ status: 0, msg: "Access Denied: Insufficient Permissions." });
 		}
 
+		let { rows: projectCode } = await pool.query(
+			`SELECT doc_code FROM projects_master WHERE doc_code = $1`,
+			[newFormDataEntries.doc_code]
+		);
+
+		if (projectCode.length > 0) {
+			return res.send({ status: 0, msg: "Project code already exists !" });
+
+		}
 		const { rows: doc } = await pool.query(
 			`SELECT * FROM documents WHERE doc_number = $1`,
 			[newFormDataEntries.new_doc_number]
@@ -1133,36 +1142,48 @@ documentController.getProjectsBg = async (req, res) => {
 		const offset = (page - 1) * pageSize;
 		let orderByClause = "";
 		let baseQuery = `
-				SELECT
-					d.*,
-					pm.doc_code,
-					pm.doc_work_name,
-					pm.doc_department,
-					pm.doc_financial_date,
-					pm.doc_agreement_no,
-					pm.doc_agreement_date,
-					pm.doc_completion_date,
-					pm.doc_awarded,
-					pm.doc_dlp_period,
-					COALESCE(
-						(SELECT Json_agg(
-							Jsonb_build_object(
-								'project_pdf_link', pa.project_pdf_link,
-								'project_pdf_name', pa.project_pdf_name,
-								'doc_id', pa.doc_id
-							)
+			SELECT
+				d.*,
+				pm.doc_code,
+				pm.doc_work_name,
+				pm.doc_department,
+				pm.doc_financial_date,
+				pm.doc_agreement_no,
+				pm.doc_agreement_date,
+				pm.doc_completion_date,
+				pm.doc_awarded,
+				pm.doc_dlp_period,
+				COALESCE(
+					(SELECT Json_agg(
+						Jsonb_build_object(
+							'project_pdf_link', pa.project_pdf_link,
+							'project_pdf_name', pa.project_pdf_name,
+							'doc_id', pa.doc_id
 						)
-						FROM bg_attachments AS pa
-						WHERE pa.project_id = d.doc_id), '[]'
-					) AS attachments,
-					SUM(d.doc_bg_amount) OVER () AS total_bg_amount  -- New field added
-				FROM
-					doc_manage_bg AS d
-				LEFT JOIN
-					projects_master AS pm
-				ON
-					d.project_code = pm.doc_code
-			`;
+					)
+					FROM bg_attachments AS pa
+					WHERE pa.project_id = d.doc_id), '[]'
+				) AS attachments,
+			    CASE
+					WHEN NULLIF(d.doc_claim_date, '') IS NOT NULL
+					AND TO_DATE(d.doc_claim_date, 'DD/MM/YYYY') >= CURRENT_DATE
+					THEN d.doc_bg_amount
+					ELSE 0
+				END AS future_bg_amount,
+				CASE
+					WHEN TO_DATE(d.doc_claim_date, 'DD/MM/YYYY')
+						BETWEEN CURRENT_DATE AND CURRENT_DATE + INTERVAL '30 days'
+					THEN true
+					ELSE false
+				END AS claim_pass
+			FROM
+				doc_manage_bg AS d
+			LEFT JOIN
+				projects_master AS pm
+			ON
+				d.project_code = pm.doc_code
+
+`;
 		let conditions = [];
 		let joins = "";
 
@@ -1302,12 +1323,19 @@ documentController.getProjectsBg = async (req, res) => {
 			OFFSET ${offset}
 		)
 		SELECT
-		Jsonb_build_object(
-			'data', Jsonb_agg(fetched_docs),
-			'total_bg_amount', COALESCE(SUM(fetched_docs.doc_bg_amount), 0)
-		) AS result
-			FROM fetched_docs`
+    Jsonb_build_object(
+        'data', Jsonb_agg(fetched_docs),
+        'total_bg_amount', COALESCE(
+            SUM(CASE 
+                    WHEN fetched_docs.future_bg_amount > 0 THEN fetched_docs.future_bg_amount
+                    ELSE 0
+                END), 0)
+    ) AS result
+FROM fetched_docs`
 		}
+		console.log("query", query)
+
+		// Execute the main query
 
 		let { rows: documents } = await pool.query(query);
 		let totalBgAmount = null
@@ -1745,6 +1773,38 @@ documentController.saveBeneficiary = async (req, res) => {
 		res.status(500).json({ error: "Internal Server Error" });
 	}
 }
+documentController.saveType = async (req, res) => {
+	const input = req.body;
+	const token = req?.session?.token;
+
+	try {
+
+		if (!token) {
+			return res.json({ status: 0, msg: "User not logged In" });
+		}
+
+		const { rowCount } = await pool.query(
+			'SELECT 1 FROM contract_types WHERE type_name = $1',
+			[input.type]
+		);
+
+		if (rowCount > 0) {
+			return res.json({ tatus: 0, msg: "type already exists" });
+		}
+
+
+		await pool.query(
+			'INSERT INTO contract_types (type_name) VALUES ($1)',
+			[input.type]
+		);
+
+		return res.json({ status: 1, msg: "success" });
+
+	} catch (error) {
+		console.error("Error saving beneficiary:", error);
+		res.status(500).json({ error: "Internal Server Error" });
+	}
+}
 
 documentController.saveApplicant = async (req, res) => {
 	const input = req.body;
@@ -1842,6 +1902,18 @@ documentController.getAllDocPurpose = async (req, res) => {
 			`);
 
 		res.json({ status: 1, msg: "success", payload: beneficiary });
+	} catch (error) {
+		console.error("Error saving applicant:", error);
+		res.status(500).json({ error: "Internal Server Error" });
+	}
+}
+documentController.getAllType = async (req, res) => {
+	try {
+		const { rows: types } = await pool.query(`
+		SELECT * FROM contract_types ORDER BY id DESC
+			`);
+
+		res.json({ status: 1, msg: "success", payload: types });
 	} catch (error) {
 		console.error("Error saving applicant:", error);
 		res.status(500).json({ error: "Internal Server Error" });

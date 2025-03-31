@@ -52,6 +52,22 @@
                                                     <div class="row g-gs">
                                                         <div class="col-md-4">
                                                             <div class="form-group">
+                                                                <label class="form-label"
+                                                                    for="doc_awarded">Awarded</label>
+                                                                <div class="form-control-wrap">
+                                                                    <select
+                                                                        class="form-select form-control js-select2 form-control"
+                                                                        id="doc_awarded" name="doc_awarded"
+                                                                        data-placeholder="Select Option" required>
+                                                                        <option label="empty" value=""></option>
+                                                                        <option value="true">Yes</option>
+                                                                        <option value="false">No</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
                                                                 <label class="form-label" for="doc_code">Code</label>
                                                                 <div class="form-control-wrap">
                                                                     <input type="text" class="form-control"
@@ -99,6 +115,20 @@
                                                                 </div>
                                                             </div>
                                                         </div>
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label"
+                                                                    for="doc_agreement_date">Agreement Date</label>
+                                                                <div class="form-control-wrap focused">
+                                                                    <div class="form-icon form-icon-right"><em
+                                                                            class="icon ni ni-calendar-alt"></em></div>
+                                                                    <input type="text" required id="doc_agreement_date"
+                                                                        autocomplete="off" name="doc_agreement_date"
+                                                                        placeholder="Agreement Date"
+                                                                        class="form-control date-picker" value="" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                         <div class="col-md-8">
                                                             <div class="form-group">
                                                                 <label class="form-label"
@@ -128,36 +158,7 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="col-md-4">
-                                                            <div class="form-group">
-                                                                <label class="form-label"
-                                                                    for="doc_awarded">Awarded</label>
-                                                                <div class="form-control-wrap">
-                                                                    <select
-                                                                        class="form-select form-control js-select2 form-control"
-                                                                        id="doc_awarded" name="doc_awarded"
-                                                                        data-placeholder="Select Option" required>
-                                                                        <option label="empty" value=""></option>
-                                                                        <option value="true">Yes</option>
-                                                                        <option value="false">No</option>
-                                                                    </select>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-4">
-                                                            <div class="form-group">
-                                                                <label class="form-label"
-                                                                    for="doc_agreement_date">Agreement Date</label>
-                                                                <div class="form-control-wrap focused">
-                                                                    <div class="form-icon form-icon-right"><em
-                                                                            class="icon ni ni-calendar-alt"></em></div>
-                                                                    <input type="text" required id="doc_agreement_date"
-                                                                        autocomplete="off" name="doc_agreement_date"
-                                                                        placeholder="Agreement Date"
-                                                                        class="form-control date-picker" value="" />
-                                                                </div>
-                                                            </div>
-                                                        </div>
+
                                                         <div class="col-md-4">
                                                             <div class="form-group">
                                                                 <label class="form-label" for="doc_dlp_period">DLP
@@ -193,8 +194,8 @@
                                                                 <div class="form-control-wrap focused">
                                                                     <div class="form-icon form-icon-right"><em
                                                                             class="icon ni ni-calendar-alt"></em></div>
-                                                                    <input type="text" id="doc_DLP_ending"
-                                                                        autocomplete="off" name="doc_DLP_ending"
+                                                                    <input type="text" id="doc_dlp_ending"
+                                                                        autocomplete="off" name="doc_dlp_ending"
                                                                         placeholder="DLP Ending on"
                                                                         class="form-control date-picker" value="" />
                                                                 </div>
@@ -203,13 +204,13 @@
                                                         <div class="col-md-4">
                                                             <div class="form-group">
                                                                 <label class="form-label"
-                                                                    for="doc_total_mobilisation_amount">Total
-                                                                    Mobilisation Amount</label>
+                                                                    for="doc_total_mobilisation_amount">Performance
+                                                                    Security</label>
                                                                 <div class="form-control-wrap">
                                                                     <input type="number" class="form-control"
                                                                         placeholder="Tota Mobilisation Amount"
-                                                                        id="doc_total_mobilisation_amount"
-                                                                        name="doc_total_mobilisation_amount" value="" />
+                                                                        id="doc_performance_security"
+                                                                        name="doc_performance_security" value="" />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -239,6 +240,21 @@
                                                                 </div>
                                                             </div>
                                                         </div>
+                                                        <div class="col-md-8">
+                                                            <div class="form-group">
+                                                                <label class="form-label"
+                                                                    for="doc_additional_performance_security">Additional
+                                                                    Performance
+                                                                    Security</label>
+                                                                <div class="form-control-wrap">
+                                                                    <input type="number" class="form-control"
+                                                                        placeholder="Additional Performance Security"
+                                                                        id="doc_additional_performance_security"
+                                                                        name="doc_additional_performance_security"
+                                                                        value="" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                         <div class="col-md-4" id="pdfUploadContainer">
                                                             <div class="form-group">
                                                                 <label class="form-label" for="doc_file">Upload
@@ -261,6 +277,40 @@
                                             </form>
                                         </div>
                                     </div>
+                                    <div class="modal fade" id="attachmentModal">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Select Site</h5>
+                                                </div>
+                                                <div class="modal-body" style="padding: 1.25rem">
+                                                    <form id="attachmentForm" class="form-validate is-alter">
+                                                        <select class="form-select form-control js-select2"
+                                                            id="doc_selected_site" name="doc_selected_site"
+                                                            data-placeholder="Select Site">
+                                                            <option label="empty" value=""></option>
+                                                            <% sites.forEach(data=>
+                                                                { %>
+                                                                <option data-site-code="<%= data.site_code%>"
+                                                                    data-id="<%= data.site_id %>"
+                                                                    value="<%=  data.site_name %>">
+                                                                    <%= data.site_name %>
+                                                                </option>
+                                                                <% }); %>
+                                                        </select>
+
+                                                        <div class="form-group mt-2"
+                                                            style="display: flex; justify-content: space-between">
+                                                            <button data-bs-dismiss="modal" type="button"
+                                                                aria-label="Close" id="cancel-site"
+                                                                class="btn btn-light">Cancel</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
@@ -273,21 +323,18 @@
     <script src="/app/assets/js/bundle.js"></script>
     <script src="/app/assets/js/scripts.js"></script>
     <script src="/app/assets/js/charts/gd-default.js"></script>
+    <script src="/app/views/project-master/creat-project.script.js"></script>
     <script>
         let fileName = null
+        let projectData = {
+            projectCode: null,
+            projectName: null
+        }
+        let closedByBackdropClick = false;
+        let dplEndingMonths = 0
+
         $("#doc_file").on("change", function () {
             fileName = this.files[0].name;
-        });
-
-        $(document).ready(function () {
-
-            $(".nk-menu-sub .nk-menu-item ").each(function () {
-                if ($(this).hasClass("active")) {
-                    let parentMenu = $(this).closest(".nk-menu-item.has-sub");
-                    parentMenu.addClass("active current-page");
-                    parentMenu.find(".nk-menu-sub").show();
-                }
-            });
         });
 
 
@@ -301,7 +348,6 @@
 
             let formData = new FormData(this);
             formData.append("doc_pdf_name", fileName);
-
             // Your AJAX request
             $.ajax({
                 type: "POST",
