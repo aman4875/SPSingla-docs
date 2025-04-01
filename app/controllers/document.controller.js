@@ -1181,9 +1181,8 @@ documentController.getProjectsBg = async (req, res) => {
 			LEFT JOIN
 				projects_master AS pm
 			ON
-				d.project_code = pm.doc_code
+				d.project_code = pm.doc_code`;
 
-`;
 		let conditions = [];
 		let joins = "";
 
@@ -1240,7 +1239,7 @@ documentController.getProjectsBg = async (req, res) => {
 			}
 		}
 
-		// // Handle sorting
+		// Handle sorting
 		const tableId = Object.keys(inputs.sort).find((val) => val === 'dataTable');
 		const tableValue = tableId ? inputs.sort[tableId] : null;
 
@@ -1303,16 +1302,13 @@ documentController.getProjectsBg = async (req, res) => {
 		let { rows: countResult } = await pool.query(countQuery);
 		const totalDocuments = countResult[0]?.total_count;
 		const totalPages = Math.ceil(totalDocuments / pageSize);
+
 		// Main query with pagination
-
-
 		let query = `
         ${baseQuery}
         ${orderByClause}
         LIMIT ${pageSize}
         OFFSET ${offset}`
-
-
 
 		if (Object.keys(inputs?.activeFilter).length > 0 || projectCode.project !== "null") {
 			query = `
@@ -1323,27 +1319,27 @@ documentController.getProjectsBg = async (req, res) => {
 			OFFSET ${offset}
 		)
 		SELECT
-    Jsonb_build_object(
-        'data', Jsonb_agg(fetched_docs),
-        'total_bg_amount', COALESCE(
-            SUM(CASE 
-                    WHEN fetched_docs.future_bg_amount > 0 THEN fetched_docs.future_bg_amount
-                    ELSE 0
-                END), 0)
-    ) AS result
-FROM fetched_docs`
-		}
-		console.log("query", query)
+		Jsonb_build_object(
+			'data', Jsonb_agg(fetched_docs),
+			'total_bg_amount', COALESCE(
+				SUM(CASE 
+						WHEN fetched_docs.future_bg_amount > 0 THEN fetched_docs.future_bg_amount
+						ELSE 0
+					END), 0)
+		) AS result
+	    FROM fetched_docs`}
+
 
 		// Execute the main query
-
 		let { rows: documents } = await pool.query(query);
 		let totalBgAmount = null
 		let docs = documents
+
 		if (Object.keys(inputs?.activeFilter).length > 0 || projectCode.project !== "null") {
 			docs = documents[0]?.result?.data;
 			totalBgAmount = documents[0]?.result?.total_bg_amount;
 		}
+
 		return res.json({
 			status: 1,
 			msg: "Success",
