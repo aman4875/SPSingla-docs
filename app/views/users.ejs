@@ -272,6 +272,7 @@
 				$("#user_status").val(user.user_status.toString()).trigger("change");
 				$(".modal_title").text("Edit");
 				$("#modalForm").modal("show");
+				$("#bank_guarantee_status").prop("checked", user.bank_guarantee_status);
 			}
 		}
 
@@ -306,8 +307,7 @@
 				bank_guarantee_status: $("#bank_guarantee_status").is(":checked") ? true : false,
 			};
 
-			console.log(formData);
-			return
+
 			$.ajax({
 				type: "POST",
 				url: "/users/save-user",
