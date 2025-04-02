@@ -333,15 +333,6 @@ documentController.editProject = async (req, res) => {
 			return res.send({ status: 0, msg: "Access Denied: Insufficient Permissions." });
 		}
 
-		let { rows: projectCode } = await pool.query(
-			`SELECT doc_code FROM projects_master WHERE doc_code = $1`,
-			[newFormDataEntries.doc_code]
-		);
-
-		if (projectCode.length > 0) {
-			return res.send({ status: 0, msg: "Project code already exists !" });
-
-		}
 		const { rows: doc } = await pool.query(
 			`SELECT * FROM documents WHERE doc_number = $1`,
 			[newFormDataEntries.new_doc_number]
@@ -572,15 +563,6 @@ documentController.createProject = async (req, res) => {
 			return res.send({ status: 0, msg: "Access Denied Insufficient Permissions." });
 		}
 
-		let { rows: projectCode } = await pool.query(
-			`SELECT doc_code FROM projects_master WHERE doc_code = $1`,
-			[inputs.doc_code]
-		);
-
-		if (projectCode.length > 0) {
-			return res.send({ status: 0, msg: "Project code already exists !" });
-
-		}
 
 		let pdfLocation = ''
 
@@ -759,11 +741,11 @@ documentController.createBG = async (req, res) => {
 
 		}
 
-		if (inputs.project_code) {
+		if (inputs.master_project_id) {
 			await pool.query(`
 		    UPDATE projects_master
             SET doc_bg_selected = true
-            WHERE doc_code = '${inputs.project_code}'`)
+            WHERE doc_id = '${inputs.master_project_id}'`)
 		}
 
 		if (createProject.rowCount > 0) {
@@ -1181,7 +1163,7 @@ documentController.getProjectsBg = async (req, res) => {
 			LEFT JOIN
 				projects_master AS pm
 			ON
-				d.project_code = pm.doc_code`;
+				d.master_project_id = pm.doc_id`;
 
 		let conditions = [];
 		let joins = "";
@@ -1625,7 +1607,8 @@ documentController.deleteAttachment = async (req, res) => {
 }
 
 documentController.deleteBG = async (req, res) => {
-	const { docId, docCode } = req.body;
+	const { docId, docCode ,projectIdToDelete} = req.body;
+
 	const token = req?.session?.token;
 
 	try {
@@ -1647,8 +1630,8 @@ documentController.deleteBG = async (req, res) => {
 		);
 
 		const removeFlag = await pool.query(
-			`SELECT * FROM doc_manage_bg WHERE project_code = $1`,
-			[docCode]
+			`SELECT * FROM doc_manage_bg WHERE master_project_id = $1`,
+			[projectIdToDelete]
 		);
 
 
@@ -1656,8 +1639,8 @@ documentController.deleteBG = async (req, res) => {
 			await pool.query(
 				`UPDATE projects_master 
 				 SET doc_bg_selected = false 
-				 WHERE doc_code = $1`,
-				[docCode]
+				 WHERE doc_id = $1`,
+				[projectIdToDelete]
 			);
 		}
 

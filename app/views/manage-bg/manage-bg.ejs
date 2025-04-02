@@ -203,7 +203,7 @@
                                                                             <span data-table="projects_master"
                                                                                 data-field="doc_department">Department
                                                                                 Name</span><span
-                                                                                class="sort-indicator"></span>
+                                                                                class="sort-indicator "></span>
                                                                         </div>
                                                                         <div class="nk-tb-col">
                                                                             <span data-table="projects_master"
@@ -257,8 +257,7 @@
                                                                         </div>
                                                                         <div class="nk-tb-col">
                                                                             <span
-                                                                                data-field="doc_total_mobilisation_amount">Total
-                                                                                Mobilisation Amount</span><span
+                                                                                data-field="doc_performance_security">Performance Security</span><span
                                                                                 class="sort-indicator"></span>
                                                                         </div>
                                                                         <div class="nk-tb-col">
@@ -296,7 +295,7 @@
                                                                         </div>
                                                                         <div class="nk-tb-col">
                                                                             <span data-field="doc_bg_number">BG
-                                                                                number</span><span
+                                                                                Number</span><span
                                                                                 class="sort-indicator"></span>
                                                                         </div>
                                                                         <div class="nk-tb-col">
@@ -483,8 +482,8 @@
                                                                                 <input type="number"
                                                                                     class="form-control filter-input"
                                                                                     data-filter="number"
-                                                                                    id="doc_total_mobilisation_amount"
-                                                                                    placeholder="Total Mobilisation Amount">
+                                                                                    id="doc_performance_security"
+                                                                                    placeholder="Performance Security">
                                                                             </span>
                                                                         </div>
                                                                         <div class="nk-tb-col">
@@ -746,6 +745,7 @@
         let isFetching
         let docCode
         let docIdToDelete
+        let projectIdToDelete
         let totalPages
         let projectCode = null
 
@@ -837,7 +837,8 @@
                 id="deleteDoc" 
                 style="cursor: pointer;" 
                 data-code="${data.doc_code}" 
-                data-id="${data.doc_id}">
+                data-id="${data.doc_id}"
+                data-project-id="${data.master_project_id}">
                 <em style="color: #d84040;" class="icon ni ni-trash-fill"></em>
             </span>
             </div>
@@ -876,7 +877,7 @@
                 <span>${data.doc_dlp_ending || "-"}</span>
             </div>
             <div class="nk-tb-col text-start">
-                <span>${data.doc_total_mobilisation_amount || "-"}</span>
+                <span>${data.doc_performance_security || "-"}</span>
             </div>
             <div class="nk-tb-col text-start">
                 <span>${data.doc_bal_mobilisation_amount || "-"}</span>
@@ -980,6 +981,7 @@
 
             docIdToDelete = $(this).data('id');  // Using .data() to get 'data-id'
             docCode = $(this).attr('data-code'); // Using .attr() for 'data-code'
+            projectIdToDelete = $(this).attr('data-project-id'); // Using .attr() for 'data-code'
 
             if (docIdToDelete) {
                 openModal.click();
@@ -995,7 +997,7 @@
             $.ajax({
                 type: "DELETE",
                 url: "/docs/delete-bg",
-                data: { docId: docIdToDelete, docCode: docCode },
+                data: { docId: docIdToDelete, docCode: docCode ,projectIdToDelete:projectIdToDelete },
                 success: function (response) {
                     if (response.status == 1) {
                         NioApp.Toast("<h5>Deleted Successfully</h5><p>Document deleted successfully!</p>", "success");

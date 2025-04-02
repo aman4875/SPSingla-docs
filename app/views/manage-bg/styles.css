@@ -170,3 +170,6 @@ Optional: styling for the active column
 .grid-header {
   cursor: pointer;
 }
+.manage-bg span.sort-indicator{
+  margin-left: 15px;
+}

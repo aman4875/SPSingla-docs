@@ -65,6 +65,7 @@ $("#doc_selected_site").on("change", function () {
 $("#doc_completion_date").on("change", function () {
     const date = $(this).val();
     $("#doc_revised_date").val(date);
+    $("#doc_revised_date").datepicker("update", date);
 
     if (dplEndingMonths > 0) {
         dplEndingOnDate(dplEndingMonths);
@@ -112,4 +113,5 @@ function dplEndingOnDate(dplEndingMonths) {
         completionDate.getFullYear();
 
     $("#doc_dlp_ending").val(newCompletionDate).trigger("change");
+    $("#doc_dlp_ending").datepicker("update", newCompletionDate);
 }
