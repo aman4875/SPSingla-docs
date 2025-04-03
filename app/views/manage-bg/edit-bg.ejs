@@ -376,7 +376,7 @@
                                                                     for="doc_bg_amendment_number">BG
                                                                     Amendment Number</label>
                                                                 <div class="form-control-wrap">
-                                                                    <input type="number" class="form-control"
+                                                                    <input type="text" class="form-control"
                                                                         placeholder="BG Amendment Number"
                                                                         id="doc_bg_amendment_number"
                                                                         name="doc_bg_amendment_number"
@@ -445,7 +445,7 @@
                                                                 <label class="form-label" for="doc_bg_amount">BG
                                                                     Amount</label>
                                                                 <div class="form-control-wrap">
-                                                                    <input type="text" id="doc_bg_amount"
+                                                                    <input type="number" id="doc_bg_amount"
                                                                         autocomplete="off" name="doc_bg_amount"
                                                                         placeholder="BG Amount" class="form-control"
                                                                         value="<%= manageBgData ? manageBgData.doc_bg_amount : '' %>" />
@@ -752,6 +752,9 @@
 
         $("#documentForm").submit(function () {
             event.preventDefault();
+            if (!this.checkValidity()) {
+                return false;
+            }
             if (validationFlag.isFlag) {
                 return NioApp.Toast(`${validationFlag.msg}`, "error");
             }
