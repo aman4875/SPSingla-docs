@@ -574,6 +574,9 @@
 
         $("#documentForm").submit(function () {
             event.preventDefault();
+            if (!this.checkValidity()) {
+                return false;
+            }
             if (validationFlag.isFlag) {
                 return NioApp.Toast(`${validationFlag.msg}`, "error");
             }
