@@ -209,7 +209,7 @@
                                                             </div>
                                                             <div class="col-md-4">
                                                                 <div class="form-group">
-                                                                    <label class="form-label" for="doc_DLP_period">DLP
+                                                                    <label class="form-label" for="doc_dlp_period">DLP
                                                                         Period
                                                                         (in months)</label>
                                                                     <div class="form-control-wrap">
@@ -259,13 +259,28 @@
                                                             <div class="col-md-4">
                                                                 <div class="form-group">
                                                                     <label class="form-label"
-                                                                        for="doc_performance_security">Performance Security</label>
+                                                                        for="doc_performance_security">Performance
+                                                                        Security</label>
                                                                     <div class="form-control-wrap">
                                                                         <input type="number" class="form-control"
                                                                             placeholder="Performance Security"
                                                                             id="doc_performance_security"
                                                                             name="doc_performance_security"
                                                                             value="<%= projectData ? projectData.doc_performance_security : '' %>" />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <label class="form-label"
+                                                                        for="doc_performance_security">Additional
+                                                                        Performance Security</label>
+                                                                    <div class="form-control-wrap">
+                                                                        <input type="number" class="form-control"
+                                                                            placeholder="Additional Performance Security"
+                                                                            id="doc_additional_performance_security"
+                                                                            name="doc_additional_performance_security"
+                                                                            value="<%= projectData ? projectData.doc_additional_performance_security : '' %>" />
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -307,7 +322,7 @@
                                                                         <select
                                                                             class="form-select form-control js-select2"
                                                                             id="doc_type" name="doc_type"
-                                                                            data-placeholder="Select or Type">
+                                                                            data-placeholder="Select or Type" required>
                                                                             <option label="empty" value=""></option>
                                                                             <% types.forEach(type=> { %>
                                                                                 <option data-id="<%= type.id %>"
@@ -379,7 +394,7 @@
                                                                 </div>
                                                             </div>
 
-                                                            <div class="col-md-4">
+                                                            <div class="col-md-8">
                                                                 <div class="form-group">
                                                                     <label class="form-label" for="doc_bg_number">BG
                                                                         Number</label>
@@ -543,6 +558,12 @@
             });
 
 
+            $(".date-picker").datepicker({
+                dateFormat: "dd/mm/yy", // or your expected format
+                autoclose: true,
+                todayHighlight: true
+            });
+
             $("#manage-project").on("change", function () {
                 let selectedOption = $(this).find(":selected")
 
@@ -570,6 +591,7 @@
                     success: function (response) {
                         if (response.status === 1) {
                             updateFormValues(response.project);
+                            setDateFields(response.project)
                         } else {
                             alert('Error fetching projects');
                         }
@@ -641,16 +663,17 @@
                     "doc_completion_date",
                     "doc_dlp_period",
                     "doc_retention_amount",
-                    "doc_revised_date",
-                    "doc_dlp_ending",
+
                     "doc_total_mobilisation_amount",
                     "doc_bal_mobilisation_amount",
                     "doc_agreement_no",
-                    "doc_agreement_date"
+                    "doc_agreement_date",
+                    "doc_performance_security",
+                    "doc_additional_performance_security"
                 ];
 
                 keysArray.forEach(key => {
-                    $(`#${key}`).val(newData[0][key])
+                    $(`#${key}`).val(newData[0][key]).trigger("")
                 });
 
                 if (newData && newData.length) {
@@ -658,6 +681,38 @@
                 }
                 $("#uploadDocumentBtn").removeClass("upload-btn")
             }
+
+            function setDateFields(newData) {
+                const dateFields = ["doc_revised_date",
+                    "doc_dlp_ending",]
+
+                dateFields.forEach(key => {
+                    const $el = $(`#${key}`);
+                    const value = newData[0][key];
+
+                    if ($el.hasClass("date-picker") && value && typeof value === 'string') {
+                        // Expecting "DD/MM/YYYY"
+                        const parts = value.split('/');
+                        if (parts.length === 3) {
+                            const [day, month, year] = parts;
+                            const formattedDate = new Date(`${year}-${month}-${day}`); // Convert to "YYYY-MM-DD"
+
+                            if (!isNaN(formattedDate)) {
+                                $el.datepicker("setDate", formattedDate);
+                            } else {
+                                console.warn(`Invalid date in ${key}:`, value);
+                                $el.datepicker("setDate", null);
+                            }
+                        } else {
+                            console.warn(`Unexpected format in ${key}:`, value);
+                            $el.datepicker("setDate", null);
+                        }
+                    } else {
+                        $el.datepicker("setDate", null); // Clear if empty or not string
+                    }
+                });
+            }
+
 
             $("#documentForm").submit(function (event) {
                 event.preventDefault();

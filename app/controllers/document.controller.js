@@ -1116,7 +1116,7 @@ documentController.getFilteredProjects = async (req, res) => {
 documentController.getProjectsBg = async (req, res) => {
 	try {
 		let inputs = req.body;
-		let projectCode = req.query;
+		let projectID = req.query;
 
 		let token = req.session.token;
 		const page = inputs.page || 1;
@@ -1153,10 +1153,10 @@ documentController.getProjectsBg = async (req, res) => {
 					ELSE 0
 				END AS future_bg_amount,
 				CASE
-					WHEN TO_DATE(d.doc_claim_date, 'DD/MM/YYYY')
-						BETWEEN CURRENT_DATE AND CURRENT_DATE + INTERVAL '30 days'
-					THEN true
-					ELSE false
+				WHEN TO_DATE(d.doc_claim_date, 'DD/MM/YYYY')
+					BETWEEN CURRENT_DATE AND CURRENT_DATE + INTERVAL '45 days'
+				THEN true
+				ELSE false
 				END AS claim_pass
 			FROM
 				doc_manage_bg AS d
@@ -1168,8 +1168,8 @@ documentController.getProjectsBg = async (req, res) => {
 		let conditions = [];
 		let joins = "";
 
-		if (projectCode.project && projectCode.project !== "null" && projectCode.project.trim() !== "") {
-			conditions.push(`d.project_code = '${projectCode.project}'`)
+		if (projectID.project && projectID.project !== "null" && projectID.project.trim() !== "") {
+			conditions.push(`d.master_project_id = '${projectID.project}'`)
 		}
 		// Handle filters from inputs.activeFilter
 		for (const [field, filter] of Object.entries(inputs?.activeFilter)) {
@@ -1260,27 +1260,38 @@ documentController.getProjectsBg = async (req, res) => {
 			baseQuery += " WHERE " + conditions.join(" AND ");
 		}
 
+		const subqueryConditions = conditions.map(cond =>
+			cond
+			  .replace(/\bd\./g, 'd2.')
+			  .replace(/\bpm\./g, 'pm2.')
+		  );
 		// total count of documents
 		let countQuery = `
-			SELECT 
-				d.*,
-				pm.doc_code, 
-				pm.doc_work_name,
-				pm.doc_department,
-				pm.doc_financial_date,
-				pm.doc_agreement_no,
-				pm.doc_agreement_date,
-				pm.doc_completion_date,
-				pm.doc_awarded,
-				pm.doc_dlp_period, 
-				(SELECT COUNT(DISTINCT doc_id) FROM doc_manage_bg) AS total_count
-			FROM 
-				doc_manage_bg AS d
-			LEFT JOIN 
-				projects_master AS pm ON d.project_code = pm.doc_code
-			${conditions.length ? " WHERE " + conditions.join(" AND ") : ""}
-
+		SELECT 
+		  d.*,
+		  pm.doc_code, 
+		  pm.doc_work_name,
+		  pm.doc_department,
+		  pm.doc_financial_date,
+		  pm.doc_agreement_no,
+		  pm.doc_agreement_date,
+		  pm.doc_completion_date,
+		  pm.doc_awarded,
+		  pm.doc_dlp_period, 
+			(
+			SELECT COUNT(DISTINCT d2.doc_id) 
+			FROM doc_manage_bg AS d2
+			LEFT JOIN projects_master AS pm2 ON d2.master_project_id = pm2.doc_id
+			${conditions.length ? "WHERE " + subqueryConditions.join(" AND ") : ""}
+			) AS total_count
+		FROM 
+		  doc_manage_bg AS d
+		LEFT JOIN 
+		  projects_master AS pm ON d.master_project_id = pm.doc_id
+		${conditions.length ? "WHERE " + conditions.join(" AND ") : ""}
 	  `;
+
+	  
 		let { rows: countResult } = await pool.query(countQuery);
 		const totalDocuments = countResult[0]?.total_count;
 		const totalPages = Math.ceil(totalDocuments / pageSize);
@@ -1292,32 +1303,36 @@ documentController.getProjectsBg = async (req, res) => {
         LIMIT ${pageSize}
         OFFSET ${offset}`
 
-		if (Object.keys(inputs?.activeFilter).length > 0 || projectCode.project !== "null") {
+		if (Object.keys(inputs?.activeFilter).length > 0 || projectID.project !== "null") {
 			query = `
-			WITH fetched_docs AS(
+			WITH filtered_docs AS(
 			${baseQuery}
 			${orderByClause}
-			LIMIT ${pageSize}
-			OFFSET ${offset}
-		)
-		SELECT
-		Jsonb_build_object(
-			'data', Jsonb_agg(fetched_docs),
-			'total_bg_amount', COALESCE(
-				SUM(CASE 
-						WHEN fetched_docs.future_bg_amount > 0 THEN fetched_docs.future_bg_amount
-						ELSE 0
-					END), 0)
-		) AS result
-	    FROM fetched_docs`}
+		),
 
+		fetched_docs AS (
+		  SELECT * FROM filtered_docs
+		  ORDER BY doc_id DESC
+		  LIMIT ${pageSize}
+		  OFFSET ${offset}
+		)
+
+		SELECT
+			Jsonb_build_object(
+				'data', Jsonb_agg(fetched_docs),
+				'total_bg_amount', COALESCE(
+					(SELECT SUM(fd.future_bg_amount) FROM filtered_docs fd),
+					0
+				)
+			) AS result
+		FROM fetched_docs;`}
 
 		// Execute the main query
 		let { rows: documents } = await pool.query(query);
 		let totalBgAmount = null
 		let docs = documents
 
-		if (Object.keys(inputs?.activeFilter).length > 0 || projectCode.project !== "null") {
+		if (Object.keys(inputs?.activeFilter).length > 0 || projectID.project !== "null") {
 			docs = documents[0]?.result?.data;
 			totalBgAmount = documents[0]?.result?.total_bg_amount;
 		}
@@ -1711,7 +1726,7 @@ documentController.getProjectById = async (req, res) => {
 		if (project.length === 0) {
 			return res.json({ status: 0, msg: "Project not found" });
 		}
-
+        console.log(project)
 		return res.json({ status: 1, msg: "success", project });
 	} catch (error) {
 		console.log("🚀 ~ documentController.deleteProjectPdf ~ error:", error)

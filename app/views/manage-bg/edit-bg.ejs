@@ -235,7 +235,8 @@
                                                         <div class="col-md-4">
                                                             <div class="form-group">
                                                                 <label class="form-label"
-                                                                    for="doc_performance_security">Performance Security</label>
+                                                                    for="doc_performance_security">Performance
+                                                                    Security</label>
                                                                 <div class="form-control-wrap">
                                                                     <input type="number" class="form-control"
                                                                         placeholder="Tota Mobilisation Amount"
@@ -245,6 +246,22 @@
                                                                 </div>
                                                             </div>
                                                         </div>
+
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label"
+                                                                    for="doc_performance_security">Additional
+                                                                    Performance Security</label>
+                                                                <div class="form-control-wrap">
+                                                                    <input type="number" class="form-control"
+                                                                        placeholder="Additional Performance Security"
+                                                                        id="doc_additional_performance_security"
+                                                                        name="doc_additional_performance_security"
+                                                                        value="<%= manageBgData ? manageBgData.doc_additional_performance_security : '' %>" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
                                                         <div class="col-md-4">
                                                             <div class="form-group">
                                                                 <label class="form-label"
@@ -281,7 +298,8 @@
                                                                 <div class="form-control-wrap">
                                                                     <select class="form-select form-control js-select2"
                                                                         id="doc_type" name="doc_type"
-                                                                        data-placeholder="Select or Enter Type">
+                                                                        data-placeholder="Select or Enter Type"
+                                                                        required>
                                                                         <option label="empty" value=""></option>
                                                                         <% types.forEach(type=> { %>
                                                                             <option data-id="<%= type.id %>"
@@ -370,7 +388,7 @@
                                                             </div>
                                                         </div>
 
-                                                        <div class="col-md-4">
+                                                        <div class="col-md-8">
                                                             <div class="form-group">
                                                                 <label class="form-label"
                                                                     for="doc_bg_amendment_number">BG

@@ -49,7 +49,9 @@ $(document).ready(function () {
         const $state = $(state.element);
         const name = $state.data('name');
         const code = $state.data('code');
+        const projectMasterId = $state.data('project-id')
         projectCode = code
+        projectID = projectMasterId
         // Use your desired icon classes
         fetchProjects()
         return `<span><em class="icon ni ni-folder" style="margin-right:5px;"></em>${name}</span>`;
