@@ -162,6 +162,7 @@ $('#resetFilters').on('click', function () {
         };
         resetSortFilter()
         projectCode = null
+        projectID = null
         // reset dropdowns 
         const resetFields = [
             '#doc_awarded',
