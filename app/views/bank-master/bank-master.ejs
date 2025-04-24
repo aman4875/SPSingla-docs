@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zxx" class="js">
+
+<head>
+    <base href="../" />
+    <meta charset="utf-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" />
+    <!-- Fav Icon  -->
+    <link rel="shortcut icon" href="/app/assets/images/favicon.png" />
+    <!-- Page Title  -->
+    <title>Bank Master | Bank Master Controller</title>
+    <!-- StyleSheets  -->
+    <link rel="stylesheet" href="/app/assets/css/dashlite.css" />
+    <link id="skin-default" rel="stylesheet" href="/app/assets/css/theme.css" />
+    <style>
+        .is-alter .js-select2~.invalid {
+            bottom: 40px;
+        }
+    </style>
+</head>
+
+<body class="nk-body bg-lighter npc-general has-sidebar">
+    <div class="nk-app-root">
+        <div class="nk-main">
+            <%- include('./common/sidebar' , {active : "bank-master" }); -%>
+                <div class="nk-wrap">
+                    <%- include('./common/navbar',{headerText:"Bank Master Controller"}); -%>
+                        <div class="nk-content">
+                            <div class="container-fluid">
+                                <div class="nk-content-inner">
+                                    <div class="nk-content-body">
+                                        <div class="nk-block-head nk-block-head-sm">
+                                            <div class="nk-block-between">
+                                                <div class="nk-block-head-content">
+                                                    <h3 class="nk-block-title page-title">Bank Master</h3>
+                                                </div>
+                                                <!-- .nk-block-head-content -->
+                                                <div class="nk-block-head-content">
+                                                    <div class="toggle-wrap nk-block-tools-toggle">
+                                                        <a href="#" class="btn btn-icon btn-trigger toggle-expand me-n1"
+                                                            data-target="pageMenu"><em
+                                                                class="icon ni ni-menu-alt-r"></em></a>
+                                                        <div class="toggle-expand-content" data-content="pageMenu">
+                                                            <ul class="nk-block-tools g-3">
+                                                                <li class="nk-block-tools-opt">
+                                                                    <div class="drodown">
+                                                                <li class="nk-block-tools-opt">
+                                                                    <a class="preview-item"><button type="button"
+                                                                            class="btn btn-primary"
+                                                                            data-bs-toggle="modal"
+                                                                            data-bs-target="#modalForm"><em
+                                                                                class="icon ni ni-plus"
+                                                                                style="font-size: 13px"></em> &nbsp; Add
+                                                                            User</button></a>
+                                                                </li>
+                                                        </div>
+                                                        </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="nk-block">
+                                        <div class="card card-bordered card-stretch">
+                                            <div class="card-inner-group">
+                                                <!-- .card-inner -->
+                                                <div class="card-inner p-0">
+                                                    <div class="nk-tb-list nk-tb-ulist is-compact">
+                                                        <div class="nk-tb-item nk-tb-head" id="bankList">
+                                                            <div class="nk-tb-col tb-col-sm"><span class="sub-text">SR
+                                                                    NO.</span></div>
+                                                            <div class="nk-tb-col tb-col-md"><span class="sub-text">Bank
+                                                                    Code</span></div>
+                                                            <div class="nk-tb-col tb-col-md"><span class="sub-text">Bank
+                                                                    Name</span></div>
+                                                            <div class="nk-tb-col tb-col-md"><span class="sub-text">Bank
+                                                                    Brnach</span></div>
+                                                            <div class="nk-tb-col nk-tb-col-tools text-end"><span
+                                                                    class="sub-text">ACTIONS</span></div>
+                                                        </div>
+                                                        <span id="bankList" style="display: none;"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="nk-add-product toggle-slide toggle-slide-right"
+                                        data-content="addProduct" data-toggle-screen="any" data-toggle-overlay="true"
+                                        data-toggle-body="true" data-simplebar>
+                                        <div class="nk-block-head">
+                                            <div class="nk-block-head-content">
+                                                <h5 class="nk-block-title">New User</h5>
+                                                <div class="nk-block-des">
+                                                    <p>Add information and add new user.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <%- include('./common/footer'); -%>
+                </div>
+        </div>
+    </div>
+    </div>
+
+    <div class="modal fade" id="modalForm">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <spna class="modal_title">Add</spna> Bank
+                    </h5>
+                    <a href="#" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <em class="icon ni ni-cross"></em>
+                    </a>
+                </div>
+                <div class="modal-body" style="padding: 1.25rem">
+                    <form id="bankForm" class="form-validate is-alter">
+                        <div class="form-group">
+                            <label class="form-label" for="user_name">Bank Code</label>
+                            <div class="form-control-wrap">
+                                <input type="text" placeholder="Enter Bank Code" class="form-control" name="bank_code"
+                                    id="bank_code" required />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="user_email">Bank Name </label>
+                            <div class="form-control-wrap">
+                                <input type="text" placeholder="Enter Bank Name" class="form-control" name="bank_name"
+                                    id="bank_name" required />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="user_password">Bank Branch</label>
+                            <div class="form-control-wrap">
+                                <input type="text" placeholder="Enter Bank Brnach" name="bank_branch"
+                                    class="form-control" id="bank_branch" required />
+                            </div>
+                        </div>
+                        <div class="form-group" style="display: flex; justify-content: space-between">
+                            <button data-bs-dismiss="modal" type="button" aria-label="Close"
+                                class="btn btn-light">Cancel</button>
+                            <button id="saveUserButton" class="btn btn-primary">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <input type="hidden" id="hidden_input_user" value="" />
+    </div>
+
+    <script src="/app/assets/js/bundle.js"></script>
+    <script src="/app/assets/js/scripts.js"></script>
+    <script src="/app/assets/js/charts/gd-default.js"></script>
+    <script>
+        let users = $("#hidden_input_user").val();
+        let isFetching = false;
+        if (users) users = {}
+
+        function handleEditClicked(userId) {
+            let user = users.find((u) => u.user_id === userId);
+            if (user) {
+                $("#user_name").val(user.user_name);
+                $("#user_email").val(user.user_email).prop("disabled", true);
+                $("#user_password").val(user.user_password);
+                $("#user_role").val(user.user_role).trigger("change");
+                $("#user_status").val(user.user_status.toString()).trigger("change");
+                $(".modal_title").text("Edit");
+                $("#modalForm").modal("show");
+                $("#bank_guarantee_status").prop("checked", user.bank_guarantee_status);
+            }
+        }
+
+        $("#modalForm").on("hidden.bs.modal", function (e) {
+            $("#user_name").val("");
+            $("#user_email").val("").prop("disabled", false);
+            $("#user_password").val("");
+            $("#user_role").val("").trigger("change");
+            $("#user_status").val("").trigger("change");
+            $(".modal_title").text("Add");
+        });
+
+        $("#bankForm").submit(function (event) {
+            event.preventDefault();
+            if (!this.checkValidity()) {
+                return false;
+            }
+            NioApp.handleButtonState("saveUserButton", "Save", true);
+            let formData = {
+                bank_code: $("#bank_code").val(),
+                bank_name: $("#bank_name").val(),
+                bank_branch: $("#bank_branch").val(),
+            };
+
+
+            let url = "/bank-master/add-bank";
+            let method = "POST";
+
+            fetch(url, {
+                method: method,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(formData),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.status === 200) {
+                        NioApp.handleButtonState("saveUserButton", "Save", false);
+                        $("#modalForm").modal("hide");
+                        $(this)[0].reset();
+                        getAllBanks()
+                    } else {
+                        NioApp.handleButtonState("saveUserButton", "Save", false);
+                        alert(data.msg);
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                });
+        });
+
+
+        function renderBankList(list) {
+            let bankList = $("#bankList");
+            let rows = ""
+            list.forEach((item, index) => {
+                let html = `
+                <div class="nk-tb-item">
+                    <div class="nk-tb-col tb-col-sm">
+                        <span>${index + 1}</span>
+                    </div>
+                    <div class="nk-tb-col tb-col-md">
+                        <span>${item.bank_code}</span>
+                    </div>
+                    <div class="nk-tb-col tb-col-md">
+                        <span>${item.bank_name}</span>
+                    </div>
+                    <div class="nk-tb-col tb-col-md">
+                        <span>${item.bank_branch}</span>
+                    </div>
+                    <div class="nk-tb-col nk-tb-col-tools text-end">
+                        <ul class="nk-tb-actions gx-1 my-n1">
+                            <li class="nk-tb">
+                                <span href="#" class="btn btn-trigger btn-icon">
+                                    <em class="icon ni ni-edit"></em>
+                                </span>
+                                <span href="#" class="btn btn-trigger btn-icon">
+                                    <em style="color: #d84040;" class="icon ni ni-trash-fill"></em>
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                `;
+                rows += html;
+            });
+            
+            bankList.after(rows);
+        }
+
+        function getAllBanks() {
+            if (isFetching) return; // Exit if already fetching
+			isFetching = true;
+            const url = "/bank-master/get-all-banks";
+            fetch(url, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.status === 200) {
+                        isFetching = false;
+                        renderBankList(data.data);
+
+                    } else {
+                        isFetching = false;
+                        alert(data.msg);
+                    }
+                })
+                .catch((error) => {
+                    isFetching = false;
+                    console.error("Error:", error);
+                });
+        }
+
+        $(document).ready(function () {
+            getAllBanks();
+        });
+
+    </script>
+</body>
+
+</html>
