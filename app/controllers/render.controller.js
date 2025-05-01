@@ -595,4 +595,16 @@ renderController.settings = async (req, res) => {
 	}
 };
 
+renderController.renderBankMaster = async (req, res) => {
+	let token = req.session.token;
+
+	try {
+
+		return res.render("bank-master/bank-master", {  token});
+	} catch (err) {
+		console.log(err);
+		return res.send({ status: 0, msg: "Something Went Wrong" });
+	}
+};
+
 module.exports = renderController;

@@ -19,6 +19,7 @@ router.get("/edit-document/:id", authMiddleware.checkLoginStatus, renderControll
 router.get("/edit-project/:id", authMiddleware.checkLoginStatus, renderController.editProject);
 router.get("/edit-bg/:id", authMiddleware.checkLoginStatus, renderController.editBG);
 router.get("/settings", authMiddleware.checkLoginStatus, renderController.settings);
+router.get("/bank-master", authMiddleware.checkLoginStatus, renderController.renderBankMaster);
 
 
 module.exports = router;
