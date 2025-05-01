@@ -1726,7 +1726,7 @@ documentController.getProjectById = async (req, res) => {
 		if (project.length === 0) {
 			return res.json({ status: 0, msg: "Project not found" });
 		}
-        console.log(project)
+
 		return res.json({ status: 1, msg: "success", project });
 	} catch (error) {
 		console.log("🚀 ~ documentController.deleteProjectPdf ~ error:", error)

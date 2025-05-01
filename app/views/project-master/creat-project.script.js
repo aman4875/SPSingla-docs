@@ -73,7 +73,6 @@ $("#doc_completion_date").on("change", function () {
 });
 
 $("#doc_revised_date").on("change", function () {
-    console.log("revised date changed");
     if (dplEndingMonths > 0) {
         dplEndingOnDate(dplEndingMonths);
     }

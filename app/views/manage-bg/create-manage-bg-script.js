@@ -100,7 +100,6 @@ function fetchAllBeneficiary() {
         url: url,
         type: 'GET',
         success: function (response) {
-            console.log(response);
             if (response.status === 1) {
                 let $dropdown = $("#doc_beneficiary_name");
 
