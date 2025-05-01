@@ -18,6 +18,16 @@
         .is-alter .js-select2~.invalid {
             bottom: 40px;
         }
+
+        div#bankListContainer {
+            display: table-row;
+        }
+
+        div#bankListContainer>div {
+            min-height: 200px;
+            padding: 20px 0;
+            min-width: 100%;
+        }
     </style>
 </head>
 
@@ -53,7 +63,7 @@
                                                                             data-bs-target="#modalForm"><em
                                                                                 class="icon ni ni-plus"
                                                                                 style="font-size: 13px"></em> &nbsp; Add
-                                                                            User</button></a>
+                                                                            Bank</button></a>
                                                                 </li>
                                                         </div>
                                                         </li>
@@ -69,7 +79,7 @@
                                                 <!-- .card-inner -->
                                                 <div class="card-inner p-0">
                                                     <div class="nk-tb-list nk-tb-ulist is-compact">
-                                                        <div class="nk-tb-item nk-tb-head" id="bankList">
+                                                        <div class="nk-tb-item nk-tb-head">
                                                             <div class="nk-tb-col tb-col-sm"><span class="sub-text">SR
                                                                     NO.</span></div>
                                                             <div class="nk-tb-col tb-col-md"><span class="sub-text">Bank
@@ -81,7 +91,7 @@
                                                             <div class="nk-tb-col nk-tb-col-tools text-end"><span
                                                                     class="sub-text">ACTIONS</span></div>
                                                         </div>
-                                                        <span id="bankList" style="display: none;"></span>
+                                                        <div id="bankListContainer"></div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -104,6 +114,31 @@
                         </div>
                         <%- include('./common/footer'); -%>
                 </div>
+        </div>
+    </div>
+    <button style="display: none" id="open-modal" type="button" class="btn btn-primary" data-bs-toggle="modal"
+        data-bs-target="#staticBackdrop">
+        Launch static backdrop modal
+    </button>
+
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Delete Bank</h5>
+                    <button type="button" id="closeModal" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this bank ? </p>
+                </div>
+                <div class="modal-footer" id="modalAction">
+                    <button type="button" class="btn btn-secondary" id="rejectModelBtn"
+                        data-bs-dismiss="modal">No</button>
+                    <button type="button" id="confirmDelete" class="btn btn-primary">Yes</button>
+                </div>
+            </div>
         </div>
     </div>
     </div>
@@ -143,46 +178,90 @@
                             </div>
                         </div>
                         <div class="form-group" style="display: flex; justify-content: space-between">
-                            <button data-bs-dismiss="modal" type="button" aria-label="Close"
+                            <button id="cancleSavebank" data-bs-dismiss="modal" type="button" aria-label="Close"
                                 class="btn btn-light">Cancel</button>
-                            <button id="saveUserButton" class="btn btn-primary">Save</button>
+                            <button id="saveUserButton" class="btn btn-primary modal_btn_text">Save</button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
-        <input type="hidden" id="hidden_input_user" value="" />
+    </div>
+    <div class="modal fade" id="EditmodalForm">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <spna class="modal_title">Edit</spna> Bank
+                    </h5>
+                    <a href="#" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <em class="icon ni ni-cross"></em>
+                    </a>
+                </div>
+                <div class="modal-body" style="padding: 1.25rem">
+                    <form id="bankForm" class="form-validate is-alter">
+                        <div class="form-group">
+                            <label class="form-label" for="bank_code_edit">Bank Code</label>
+                            <div class="form-control-wrap">
+                                <input type="text" placeholder="Enter Bank Code" class="form-control"
+                                    name="bank_code_edit" id="bank_code_edit" required />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="bank_name_edit">Bank Name </label>
+                            <div class="form-control-wrap">
+                                <input type="text" placeholder="Enter Bank Name" class="form-control"
+                                    name="bank_name_edit" id="bank_name_edit" required />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="bank_branch_edit">Bank Branch</label>
+                            <div class="form-control-wrap">
+                                <input type="text" placeholder="Enter Bank Brnach" name="bank_branch_edit"
+                                    class="form-control" id="bank_branch_edit" required />
+                            </div>
+                        </div>
+                        <div class="form-group" style="display: flex; justify-content: space-between">
+                            <button id="cancleSavebank" data-bs-dismiss="modal" type="button" aria-label="Close"
+                                class="btn btn-light">Cancel</button>
+                            <button id="editBank" class="btn btn-primary modal_btn_text">Update</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="/app/assets/js/bundle.js"></script>
     <script src="/app/assets/js/scripts.js"></script>
     <script src="/app/assets/js/charts/gd-default.js"></script>
+    <script src="/app/views//bank-master/bank-master-script.js"></script>
     <script>
-        let users = $("#hidden_input_user").val();
         let isFetching = false;
-        if (users) users = {}
+        let docIdToDelete = null;
+        let docIdToEdit = null;
+        let initialFormDataEntries = {
+            bank_code: null,
+            bank_name: null,
+            bank_branch: null,
+        };
 
-        function handleEditClicked(userId) {
-            let user = users.find((u) => u.user_id === userId);
-            if (user) {
-                $("#user_name").val(user.user_name);
-                $("#user_email").val(user.user_email).prop("disabled", true);
-                $("#user_password").val(user.user_password);
-                $("#user_role").val(user.user_role).trigger("change");
-                $("#user_status").val(user.user_status.toString()).trigger("change");
-                $(".modal_title").text("Edit");
-                $("#modalForm").modal("show");
-                $("#bank_guarantee_status").prop("checked", user.bank_guarantee_status);
-            }
-        }
+        $(document).on("click", ".editBtn", function (event) {
+            const bankCode = $(this).data("code");
+            const bankName = $(this).data("name");
+            const bankBranch = $(this).data("branch");
+            const docId = $(this).data("id");
+            docIdToEdit = docId
 
-        $("#modalForm").on("hidden.bs.modal", function (e) {
-            $("#user_name").val("");
-            $("#user_email").val("").prop("disabled", false);
-            $("#user_password").val("");
-            $("#user_role").val("").trigger("change");
-            $("#user_status").val("").trigger("change");
-            $(".modal_title").text("Add");
+            $("#bank_code_edit").val(bankCode).trigger("change");
+            $("#bank_name_edit").val(bankName).trigger("change");
+            $("#bank_branch_edit").val(bankBranch).trigger("change");
+            $("#EditmodalForm").modal("show");
+            initialFormDataEntries = {
+                bank_code: bankCode,
+                bank_name: bankName,
+                bank_branch: bankBranch,
+            };
         });
 
         $("#bankForm").submit(function (event) {
@@ -197,7 +276,6 @@
                 bank_branch: $("#bank_branch").val(),
             };
 
-
             let url = "/bank-master/add-bank";
             let method = "POST";
 
@@ -211,13 +289,20 @@
                 .then((response) => response.json())
                 .then((data) => {
                     if (data.status === 200) {
+                        NioApp.Toast(
+                            "<h5>Saved Successfully</h5><p>Document created successfully!</p>",
+                            "success"
+                        );
                         NioApp.handleButtonState("saveUserButton", "Save", false);
-                        $("#modalForm").modal("hide");
                         $(this)[0].reset();
-                        getAllBanks()
+                        getAllBanks();
+                        $("#modalForm").modal("hide");
                     } else {
                         NioApp.handleButtonState("saveUserButton", "Save", false);
-                        alert(data.msg);
+                        NioApp.Toast(
+                            `<h5>Failed to Save</h5><p>${data.msg || 'Document could not be saved!'}</p>`,
+                            "error"
+                        );
                     }
                 })
                 .catch((error) => {
@@ -226,47 +311,9 @@
         });
 
 
-        function renderBankList(list) {
-            let bankList = $("#bankList");
-            let rows = ""
-            list.forEach((item, index) => {
-                let html = `
-                <div class="nk-tb-item">
-                    <div class="nk-tb-col tb-col-sm">
-                        <span>${index + 1}</span>
-                    </div>
-                    <div class="nk-tb-col tb-col-md">
-                        <span>${item.bank_code}</span>
-                    </div>
-                    <div class="nk-tb-col tb-col-md">
-                        <span>${item.bank_name}</span>
-                    </div>
-                    <div class="nk-tb-col tb-col-md">
-                        <span>${item.bank_branch}</span>
-                    </div>
-                    <div class="nk-tb-col nk-tb-col-tools text-end">
-                        <ul class="nk-tb-actions gx-1 my-n1">
-                            <li class="nk-tb">
-                                <span href="#" class="btn btn-trigger btn-icon">
-                                    <em class="icon ni ni-edit"></em>
-                                </span>
-                                <span href="#" class="btn btn-trigger btn-icon">
-                                    <em style="color: #d84040;" class="icon ni ni-trash-fill"></em>
-                                </span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                `;
-                rows += html;
-            });
-            
-            bankList.after(rows);
-        }
-
         function getAllBanks() {
             if (isFetching) return; // Exit if already fetching
-			isFetching = true;
+            isFetching = true;
             const url = "/bank-master/get-all-banks";
             fetch(url, {
                 method: "GET",
@@ -277,12 +324,11 @@
                 .then((response) => response.json())
                 .then((data) => {
                     if (data.status === 200) {
+                        $(".table-content").remove()
                         isFetching = false;
                         renderBankList(data.data);
-
                     } else {
                         isFetching = false;
-                        alert(data.msg);
                     }
                 })
                 .catch((error) => {
@@ -291,10 +337,73 @@
                 });
         }
 
+        $("#EditmodalForm form").submit(function (event) {
+            event.preventDefault();
+
+            // Call checkValidity on the form element
+            if (!this.checkValidity()) {
+                return false;
+            }
+            let formData = {
+                bank_code: $("#bank_code_edit").val(),
+                bank_name: $("#bank_name_edit").val(),
+                bank_branch: $("#bank_branch_edit").val(),
+            }
+
+            const keys = Object.keys(formData);
+            const initialKeys = Object.keys(initialFormDataEntries);
+            let hasChanges = false;
+
+            keys.forEach(key => {
+                const newValue = formData[key];
+                const initialValue = initialFormDataEntries[key];
+
+                // Convert both values to strings for consistent comparison
+                const newValueStr = newValue !== undefined && newValue !== null ? newValue.toString().trim() : "";
+                const initialValueStr = initialValue !== undefined && initialValue !== null ? initialValue.toString().trim() : "";
+
+                if (newValueStr !== initialValueStr) {
+                    hasChanges = true;
+                }
+            });
+
+            
+            if (!hasChanges) {
+                return NioApp.Toast("<h5>No Changes</h5><p>No changes to save</p>", "info");
+            }
+            
+            formData.docId = docIdToEdit;
+            console.log("🚀 ~ formData:", formData)
+            fetch("/bank-master/edit-bank", {
+                method: "post",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(formData),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.status === 200) {
+                        NioApp.Toast(
+                            "<h5>Updated Successfully</h5><p>Bank updated successfully!</p>",
+                            "success"
+                        );
+                        getAllBanks();
+                        $("#EditmodalForm").modal("hide");
+                    } else {
+                        NioApp.Toast(
+                            "<h5>Error</h5><p>Failed to update the bank!</p>",
+                            "error"
+                        );
+                    }
+                })
+                .catch((error) => console.error("Error:", error));
+        });
+
+
         $(document).ready(function () {
             getAllBanks();
         });
-
     </script>
 </body>
 
