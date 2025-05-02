@@ -607,4 +607,16 @@ renderController.renderBankMaster = async (req, res) => {
 	}
 };
 
+renderController.renderFdr = async (req, res) => {
+	let token = req.session.token;
+
+	try {
+
+		return res.render("fdr/fdr", {  token});
+	} catch (err) {
+		console.log(err);
+		return res.send({ status: 0, msg: "Something Went Wrong" });
+	}
+};
+
 module.exports = renderController;
