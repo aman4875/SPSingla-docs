@@ -600,7 +600,7 @@ renderController.renderBankMaster = async (req, res) => {
 
 	try {
 
-		return res.render("bank-master/bank-master", {  token});
+		return res.render("bank-master/bank-master", { token });
 	} catch (err) {
 		console.log(err);
 		return res.send({ status: 0, msg: "Something Went Wrong" });
@@ -609,10 +609,18 @@ renderController.renderBankMaster = async (req, res) => {
 
 renderController.renderFdr = async (req, res) => {
 	let token = req.session.token;
-
 	try {
+		return res.render("fdr/fdr", { token });
+	} catch (err) {
+		console.log(err);
+		return res.send({ status: 0, msg: "Something Went Wrong" });
+	}
+};
 
-		return res.render("fdr/fdr", {  token});
+renderController.renderAddFdr = async (req, res) => {
+	let token = req.session.token;
+	try {
+		return res.render("fdr/add-fdr", { token });
 	} catch (err) {
 		console.log(err);
 		return res.send({ status: 0, msg: "Something Went Wrong" });

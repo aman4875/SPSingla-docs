@@ -639,7 +639,7 @@
 			$.ajax({
 				type: "POST",
 				url: "/docs/get-filtered-projects",
-				data: JSON.stringify(filters),
+				
 				contentType: "application/json",
 				success: function (response) {
 					isFetching = false; // Reset flag

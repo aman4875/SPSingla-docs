@@ -40,7 +40,7 @@
                                                         </div>
                                                     </div>
 
-                                                    <a href="/project/create-project"
+                                                    <a href="/add-fdr" id="addFdrButton"
                                                         class="btn btn-white btn-dim btn-outline-light"><em
                                                             class="icon ni ni-plus-sm"></em><span>Add
                                                             FDR</span></a>
@@ -150,11 +150,13 @@
                                                                 </div>
                                                                 <%}%>
                                                                     <div class="nk-tb-col ">
-                                                                        <span data-field="doc_bank_name">Bank Name</span><span
+                                                                        <span data-field="doc_bank_name">Bank
+                                                                            Name</span><span
                                                                             class="sort-indicator"></span>
                                                                     </div>
                                                                     <div class="nk-tb-col">
-                                                                        <span data-field="doc_purpose">Purpose</span><span
+                                                                        <span
+                                                                            data-field="doc_purpose">Purpose</span><span
                                                                             class="sort-indicator"></span>
                                                                     </div>
                                                                     <div class="nk-tb-col">
@@ -162,62 +164,72 @@
                                                                             class="sort-indicator"></span>
                                                                     </div>
                                                                     <div class="nk-tb-col date">
-                                                                        <span data-field="doc_original_issue_date">Original issue date</span><span
+                                                                        <span
+                                                                            data-field="doc_original_issue_date">Original
+                                                                            issue date</span><span
                                                                             class="sort-indicator"></span>
                                                                     </div>
                                                                     <div class="nk-tb-col">
-                                                                        <span data-field="doc_interest_payout_clause">INTEREST PAYOUT CLAUSE</span><span
+                                                                        <span
+                                                                            data-field="doc_interest_payout_clause">INTEREST
+                                                                            PAYOUT CLAUSE</span><span
                                                                             class="sort-indicator"></span>
                                                                     </div>
                                                                     <div class="nk-tb-col date">
-                                                                        <span data-field="doc_deposit_amount">DEPOSIT AMOUNT</span><span
+                                                                        <span data-field="doc_deposit_amount">DEPOSIT
+                                                                            AMOUNT</span><span
                                                                             class="sort-indicator"></span>
                                                                     </div>
 
                                                                     <div class="nk-tb-col date">
-                                                                        <span data-field="doc_interest_rate">INTEREST RATE</span><span
+                                                                        <span data-field="doc_interest_rate">INTEREST
+                                                                            RATE</span><span
                                                                             class="sort-indicator"></span>
                                                                     </div>
                                                                     <div class="nk-tb-col">
-                                                                        <span
-                                                                            data-field="doc_tds_rate">TDS rate</span><span
+                                                                        <span data-field="doc_tds_rate">TDS
+                                                                            rate</span><span
                                                                             class="sort-indicator"></span>
                                                                     </div>
                                                                     <div class="nk-tb-col">
-                                                                        <span data-field="doc_tenor">TENOR (in months)</span><span
+                                                                        <span data-field="doc_tenor">TENOR (in
+                                                                            months)</span><span
                                                                             class="sort-indicator"></span>
                                                                     </div>
 
                                                                     <div class="nk-tb-col date">
-                                                                        <span data-field="doc_new_tenor date">NEW TENOR(in months)</span><span
-                                                                            class="sort-indicator"></span>
-                                                                    </div>
-                                                                    <div class="nk-tb-col">
-                                                                        <span data-field="doc_renewal">Renewal</span><span
-                                                                            class="sort-indicator"></span>
-                                                                    </div>
-                                                                    <div class="nk-tb-col">
-                                                                        <span
-                                                                            data-field="doc_renewal_date">ISSUE DATE/RENEWAL DATE</span><span
+                                                                        <span data-field="doc_new_tenor date">NEW
+                                                                            TENOR(in months)</span><span
                                                                             class="sort-indicator"></span>
                                                                     </div>
                                                                     <div class="nk-tb-col">
                                                                         <span
-                                                                            data-field="doc_renewal_amount">RENEWAL AMOUNT</span><span
+                                                                            data-field="doc_renewal">Renewal</span><span
                                                                             class="sort-indicator"></span>
                                                                     </div>
                                                                     <div class="nk-tb-col">
-                                                                        <span
-                                                                            data-field="doc_maturity_date">MATURITY DATE</span><span
+                                                                        <span data-field="doc_renewal_date">ISSUE
+                                                                            DATE/RENEWAL DATE</span><span
                                                                             class="sort-indicator"></span>
                                                                     </div>
                                                                     <div class="nk-tb-col">
-                                                                        <span
-                                                                            data-field="doc_maturity_amount">MATURITY AMOUNT</span><span
+                                                                        <span data-field="doc_renewal_amount">RENEWAL
+                                                                            AMOUNT</span><span
+                                                                            class="sort-indicator"></span>
+                                                                    </div>
+                                                                    <div class="nk-tb-col">
+                                                                        <span data-field="doc_maturity_date">MATURITY
+                                                                            DATE</span><span
+                                                                            class="sort-indicator"></span>
+                                                                    </div>
+                                                                    <div class="nk-tb-col">
+                                                                        <span data-field="doc_maturity_amount">MATURITY
+                                                                            AMOUNT</span><span
                                                                             class="sort-indicator"></span>
                                                                     </div>
                                                                     <div class="nk-tb-col no-click">
-                                                                        <span data-field="doc_interest">Acc. Interest</span><span
+                                                                        <span data-field="doc_interest">Acc.
+                                                                            Interest</span><span
                                                                             class="sort-indicator "></span>
                                                                     </div>
                                                                     <div class="nk-tb-col no-click">
@@ -225,7 +237,8 @@
                                                                             class="sort-indicator "></span>
                                                                     </div>
                                                                     <div class="nk-tb-col no-click">
-                                                                        <span data-field="doc_closed_on">CLOSED ON</span><span
+                                                                        <span data-field="doc_closed_on">CLOSED
+                                                                            ON</span><span
                                                                             class="sort-indicator "></span>
                                                                     </div>
                                                         </div>
@@ -295,19 +308,230 @@
     <script src="/app/assets/js/bundle.js"></script>
     <script src="/app/assets/js/scripts.js"></script>
     <script src="/app/assets/js/charts/gd-default.js"></script>
-    <script src="/app/views/project-master/project-script.js"></script>
+    <script src="/app/views/Fdr/script-fdr.js"></script>
     <script>
         let isFetching = false;
         let docIdToDelete = null;
         let totalPages
         let filters = {
-            limit: 10,
             page: 1,
-            sort: {},
-            activeFilter: {},
-            isDate: false
+            limit: 10,
         };
+        function renderTabledata(response) {
+            if (response.payload.documents && response.payload.documents.length > 0) {
+                $("#table-status").empty();
 
+                let rowsHtml = "";
+                response.payload.documents.forEach((data) => {
+                    let rowHtml = `
+                <div class="nk-tb-item text-left table-content ${data.claim_pass ? "rowHighlight" : ""}">
+                     <%if(token.user_role != 3){%>
+                      <div class="nk-tb-col text-start editDocument">
+                       <span style="margin-right: 8px;">
+                         <a href="/edit-bg/${btoa(data.doc_id)}">
+                           <em class="icon ni ni-edit-fill"></em>
+                         </a>
+                       </span>
+                     <span class="${data.doc_bg_selected ? 'disable' : ''}" 
+                        id="deleteDoc" 
+                        style="cursor: pointer;" 
+                        data-code="${data.doc_code}" 
+                        data-id="${data.doc_id}"
+                        data-project-id="${data.master_project_id}">
+                       <em style="color: #d84040;" class="icon ni ni-trash-fill"></em>
+                    </span>
+                </div>
+                    <%}%>
+                        <div class="nk-tb-col text-start">
+                            <span>
+                                ${data.doc_code || "-"}
+                            </span>
+                        </div>
+                        <div class="nk-tb-col text-start">
+                            <span>
+                                ${data.doc_work_name || "-"}
+                            </span>
+                        </div>
+                        <div class="nk-tb-col text-start">
+                            <span>
+                                ${data.doc_department || "-"}
+                            </span>
+                        </div>
+                        <div class="nk-tb-col text-start">
+                            <span>
+                                ${data.doc_financial_date || "-"}
+                            </span>
+                        </div>
+                        <div class="nk-tb-col text-start">
+                            <span>
+                                ${data.doc_agreement_no || "-"}
+                            </span>
+                        </div>
+                        <div class="nk-tb-col text-start">
+                            <span>
+                                ${data.doc_agreement_date || "-"}
+                            </span>
+                        </div>
+                        <div class="nk-tb-col text-start">
+                            <span>
+                                ${data.doc_completion_date || "-"}
+                            </span>
+                        </div>
+                        <div class="nk-tb-col text-start">
+                            <span>
+                                ${data.doc_awarded == true ? "Yes" : "No" || "-"}
+                            </span>
+                        </div>
+                        <div class="nk-tb-col text-start">
+                            <span>
+                                ${data.doc_dlp_period || "-"}
+                            </span>
+                        </div>
+                        <div class="nk-tb-col text-start">
+                            <span>
+                                ${data.doc_revised_date || "-"}
+                            </span>
+                        </div>
+                        <div class="nk-tb-col text-start">
+                            <span>
+                                ${data.doc_dlp_ending || "-"}
+                            </span>
+                        </div>
+                        <div class="nk-tb-col text-start">
+                            <span>
+                                ${data.doc_performance_security || "-"}
+                            </span>
+                        </div>
+                        <div class="nk-tb-col text-start">
+                            <span>
+                                ${data.doc_additional_performance_security || "-"}
+                            </span>
+                        </div>
+                        <div class="nk-tb-col text-start">
+                            <span>
+                                ${data.doc_bal_mobilisation_amount || "-"}
+                            </span>
+                        </div>
+                        <div class="nk-tb-col text-start">
+                            <span>
+                                ${data.doc_retention_amount || "-"}
+                            </span>
+                        </div>
+                        <div class="nk-tb-col text-start">
+                            <span>
+                                ${data.doc_type || "-"}
+                            </span>
+                        </div>
+                        <div class="nk-tb-col text-start">
+                            <span>
+                                ${data.doc_bank_name || "-"}
+                            </span>
+                        </div>
+                        <div class="nk-tb-col text-start">
+                            <span>
+                                ${data.doc_issuing_branch || "-"}
+                            </span>
+                        </div>
+                        <div class="nk-tb-col text-start">
+                            <span>
+                                ${data.doc_beneficiary_name || "-"}
+                            </span>
+                        </div>
+                        <div class="nk-tb-col text-start">
+                            <span>
+                                ${data.doc_bg_number || "-"}
+                            </span>
+                        </div>
+                        <div class="nk-tb-col text-start">
+                            <span>
+                                ${data.doc_bg_amendment_number || "-"}
+                            </span>
+                        </div>
+                        <div class="nk-tb-col text-start">
+                            <span>
+                                ${data.doc_applicant_name || "-"}
+                            </span>
+                        </div>
+                        <div class="nk-tb-col text-start">
+                            <span>
+                                ${data.doc_issue_date || "-"}
+                            </span>
+                        </div>
+                        <div class="nk-tb-col text-start">
+                            <span>
+                                ${data.doc_claim_date || "-"}
+                            </span>
+                        </div>
+                        <div class="nk-tb-col text-start">
+                            <span>
+                                ${data.doc_bg_amount || "-"}
+                            </span>
+                        </div>
+                        <div class="nk-tb-col text-start">
+                            <span>
+                                ${data.doc_expiry_date || "-"}
+                            </span>
+                        </div>
+                        <div class="nk-tb-col text-start">
+                            <span>
+                                ${data.doc_bg_cancelled_date || "-"}
+                            </span>
+                        </div>
+                        <div class="nk-tb-col text-start">
+                            <span>
+                            ${renderPdfLinks(data?.attachments)} 
+                            </span>
+                        </div>
+                    </div>
+                    `
+                    rowsHtml += rowHtml;
+                })
+                $("#table-filters").after(rowsHtml);
+
+
+            } else {
+                console.log("No Records Found");
+                $('table-status').removeClass('d-none');
+                $("#table-status").html(`<div class="text-center"><p>No Records Found</p></div>`);
+                $('#table-bg-amount').addClass('d-none');
+            }
+        }
+
+
+
+
+        $(document).ready(() => {
+            // fetchAllfdrs().then((data) => {
+            //     if (data.status === 1) {
+            //         totalPages = data.totalPages
+            //         renderTable(data.data, data.totalPages)
+            //     } else {
+            //         NioApp.Toast(`<h5>Something Went Wrong</h5>${data.msg || `<p>Error while Document deleted</p>`}`, "error");
+            //     }
+            // })
+        })
+
+
+
+        fetchAllfdrs = () => {
+            // fetch('/project/get-fdrs', {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/json',
+            //     },
+            //     body: JSON.stringify({
+            //         page: 1,
+            //         limit: 10,
+            //     }).then((response) => {
+            //         if (response.status === 200) {
+            //             return response.json()
+            //         } else {
+            //             throw new Error('Network response was not ok')
+            //         }
+            //     })
+            // })
+
+        }
 
 
     </script>
