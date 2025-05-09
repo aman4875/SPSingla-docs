@@ -282,3 +282,8 @@ $(document).ready(function () {
   setApplicant();
   setTypes();
 });
+
+$('.js-select2').select2({
+  placeholder: 'Select an option',
+  width: 'resolve'
+});

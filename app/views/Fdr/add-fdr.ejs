@@ -15,6 +15,9 @@
     <link id="skin-default" rel="stylesheet" href="/app/assets/css/theme.css" />
     <link rel="stylesheet" href="/app/views/project-master/style.css" />
     <style>
+        .fdr-section label.form-label {
+            text-transform: capitalize;
+        }
     </style>
 </head>
 
@@ -24,7 +27,7 @@
             <%- include('./common/sidebar' , {active : "fdr" }); -%>
                 <div class="nk-wrap">
 
-                    <div class="nk-content">
+                    <div class="nk-content fdr-section">
                         <div class="container-fluid">
                             <div class="nk-content-inner">
                                 <div class="nk-content-body">
@@ -55,9 +58,20 @@
                                                                 <label class="form-label" for="doc_bank_name">Bank
                                                                     Name</label>
                                                                 <div class="form-control-wrap">
-                                                                    <input type="text" class="form-control"
-                                                                        placeholder="Document Code" id="doc_bank_name"
-                                                                        name="doc_bank_name" value="" required />
+                                                                    <select class="form-select form-control js-select2 "
+                                                                        data-filter="single" id="select-site"
+                                                                        name="doc_bank_name"
+                                                                        data-placeholder="Select Folder" required>
+                                                                        <option value="select-site">Select Bank Name
+                                                                        </option>
+                                                                        <% banks.forEach(bank=> { %>
+                                                                            <option data-code="<%= bank.bank_code%>"
+                                                                                id="<%= bank.doc_id %>"
+                                                                                value="<%= bank.bank_name %>">
+                                                                                <%= bank.bank_name %>
+                                                                            </option>
+                                                                            <% }); %>
+                                                                    </select>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -67,7 +81,7 @@
                                                                     for="doc_purpose">Purpose</label>
                                                                 <div class="form-control-wrap">
                                                                     <input type="text" class="form-control"
-                                                                        placeholder="Name of Work" id="doc_purpose"
+                                                                        placeholder="Purpose" id="doc_purpose"
                                                                         name="doc_purpose" value="" required />
                                                                 </div>
                                                             </div>
@@ -78,7 +92,7 @@
                                                                     NO</label>
                                                                 <div class="form-control-wrap">
                                                                     <input type="text" class="form-control"
-                                                                        placeholder="Department Name" id="doc_fdr_no"
+                                                                        placeholder="FDR NO" id="doc_fdr_no"
                                                                         name="doc_fdr_no" value="" required />
                                                                 </div>
                                                             </div>
@@ -94,7 +108,7 @@
                                                                     <input type="text" required
                                                                         id="doc_original_issue_date" autocomplete="off"
                                                                         name="doc_original_issue_date"
-                                                                        placeholder="Original issue date"
+                                                                        placeholder="Original Issue Date"
                                                                         class="form-control date-picker" value="" />
                                                                 </div>
                                                             </div>
@@ -103,12 +117,12 @@
                                                         <div class="col-md-4">
                                                             <div class="form-group">
                                                                 <label class="form-label"
-                                                                    for="doc_interest_payout_clause">INTEREST PAYOUT
-                                                                    CLAUSE</label>
+                                                                    for="doc_interest_payout_clause">Interest Payout
+                                                                    clause</label>
                                                                 <div class="form-control-wrap">
                                                                     <div class="input-group">
-                                                                        <input type="number" class="form-control"
-                                                                            placeholder="Agreement No"
+                                                                        <input type="text" class="form-control"
+                                                                            placeholder="Interest Payout Clause"
                                                                             id="doc_interest_payout_clause"
                                                                             name="doc_interest_payout_clause" value=""
                                                                             required />
@@ -121,11 +135,11 @@
                                                         <div class="col-md-4">
                                                             <div class="form-group">
                                                                 <label class="form-label"
-                                                                    for="doc_deposit_amount">DEPOSIT AMOUNT</label>
+                                                                    for="doc_deposit_amount">Deposit amount</label>
                                                                 <div class="form-control-wrap">
                                                                     <div class="input-group">
                                                                         <input type="number" class="form-control"
-                                                                            placeholder="Agreement No"
+                                                                            placeholder="Deposit Amount"
                                                                             id="doc_deposit_amount"
                                                                             name="doc_deposit_amount" value=""
                                                                             required />
@@ -134,14 +148,15 @@
                                                                 </div>
                                                             </div>
                                                         </div>
+
                                                         <div class="col-md-4">
                                                             <div class="form-group">
                                                                 <label class="form-label"
-                                                                    for="doc_deposit_amount">INTEREST RATET</label>
+                                                                    for="doc_deposit_amount">Interest rate</label>
                                                                 <div class="form-control-wrap">
                                                                     <div class="input-group">
                                                                         <input type="number" class="form-control"
-                                                                            placeholder="Agreement No"
+                                                                            placeholder="Interest Rate"
                                                                             id="doc_interest_rate"
                                                                             name="doc_interest_rate" value=""
                                                                             required />
@@ -157,64 +172,61 @@
                                                                     rate</label>
                                                                 <div class="form-control-wrap">
                                                                     <input type="number" class="form-control"
-                                                                        placeholder="DLP Period" id="doc_tds_rate"
+                                                                        placeholder="DS Rate" id="doc_tds_rate"
                                                                         name="doc_tds_rate" value="" required />
                                                                 </div>
                                                                 <small id="error-msg" class="text-danger"
                                                                     style="display:none;"></small>
                                                             </div>
                                                         </div>
+
                                                         <div class="col-md-4">
                                                             <div class="form-group">
-                                                                <label class="form-label" for="doc_tenor">TENOR (in
+                                                                <label class="form-label" for="doc_tenor">Tenor (in
                                                                     months)</label>
                                                                 <div class="form-control-wrap focused">
                                                                     <div class="form-icon form-icon-right"></div>
                                                                     <input type="text" id="doc_tenor" autocomplete="off"
-                                                                        name="doc_tenor"
-                                                                        placeholder="Revised Completion"
+                                                                        name="doc_tenor" placeholder="Tenor (in months)"
                                                                         class="form-control" value="" />
                                                                 </div>
                                                             </div>
                                                         </div>
+
                                                         <div class="col-sm-4">
                                                             <div class="form-group">
-                                                                <label class="form-label" for="doc_DLP_ending">DLP
-                                                                    Ending on</label>
+                                                                <label class="form-label" for="doc_new_tenor">New
+                                                                    Tenor (in months)</label>
                                                                 <div class="form-control-wrap focused">
-                                                                    <div class="form-icon form-icon-right"><em
-                                                                            class="icon ni ni-calendar-alt"></em></div>
-                                                                    <input type="text" id="doc_dlp_ending"
-                                                                        autocomplete="off" name="doc_dlp_ending"
-                                                                        placeholder="DLP Ending on"
-                                                                        class="form-control date-picker" value="" />
+                                                                    <div class="form-icon form-icon-right"></div>
+                                                                    <input type="text" id="doc_new_tenor"
+                                                                        autocomplete="off" name="doc_new_tenor"
+                                                                        placeholder="New Tenor (in months)"
+                                                                        class="form-control" value="" />
                                                                 </div>
                                                             </div>
                                                         </div>
+
                                                         <div class="col-md-4">
                                                             <div class="form-group">
                                                                 <label class="form-label"
-                                                                    for="doc_total_mobilisation_amount">Performance
-                                                                    Security</label>
+                                                                    for="doc_renewal">Renewal</label>
                                                                 <div class="form-control-wrap">
-                                                                    <input type="number" class="form-control"
-                                                                        placeholder="Tota Mobilisation Amount"
-                                                                        id="doc_performance_security"
-                                                                        name="doc_performance_security" value="" />
+                                                                    <input type="text" class="form-control"
+                                                                        placeholder="Renewal" id="doc_renewal"
+                                                                        name="doc_renewal" value="" />
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="col-md-8">
+
+                                                        <div class="col-md-4">
                                                             <div class="form-group">
-                                                                <label class="form-label"
-                                                                    for="doc_additional_performance_security">Additional
-                                                                    Performance
-                                                                    Security</label>
+                                                                <label class="form-label" for="doc_renewal_date">Issue
+                                                                    Date / Renewal Date</label>
                                                                 <div class="form-control-wrap">
-                                                                    <input type="number" class="form-control"
-                                                                        placeholder="Additional Performance Security"
-                                                                        id="doc_additional_performance_security"
-                                                                        name="doc_additional_performance_security"
+                                                                    <input type="text" class="form-control date-picker"
+                                                                        placeholder="Issue Date / Renewal Dates"
+                                                                        id="doc_renewal_date" name="doc_renewal_date"
                                                                         value="" />
                                                                 </div>
                                                             </div>
@@ -222,45 +234,83 @@
                                                         <div class="col-md-4">
                                                             <div class="form-group">
                                                                 <label class="form-label"
-                                                                    for="doc_bal_mobilisation_amount">Balance
-                                                                    Mobilisation Amount</label>
+                                                                    for="doc_renewal_amount">Renewal
+                                                                    Amount</label>
                                                                 <div class="form-control-wrap">
-                                                                    <input type="number" class="form-control"
-                                                                        placeholder="Balance Mobilisation Amount"
-                                                                        id="doc_bal_mobilisation_amount"
-                                                                        name="doc_bal_mobilisation_amount" value="" />
+                                                                    <input type="text" class="form-control"
+                                                                        placeholder="Renewal Amount"
+                                                                        id="doc_renewal_amount"
+                                                                        name="doc_renewal_amount" value="" />
                                                                 </div>
                                                             </div>
                                                         </div>
                                                         <div class="col-md-4">
                                                             <div class="form-group">
                                                                 <label class="form-label"
-                                                                    for="doc_retention_amount">Retention Amount
-                                                                    as on Date</label>
+                                                                    for="doc_maturity_date">Maturity
+                                                                    Date</label>
                                                                 <div class="form-control-wrap">
-                                                                    <input type="number" class="form-control"
-                                                                        placeholder="Retention Amount as on Date"
-                                                                        id="doc_retention_amount"
-                                                                        name="doc_retention_amount" value="" />
+                                                                    <input type="text" class="form-control date-picker"
+                                                                        placeholder="Maturity Date"
+                                                                        id="doc_maturity_date" name="doc_maturity_date"
+                                                                        value="" />
                                                                 </div>
                                                             </div>
                                                         </div>
 
-                                                        <div class="col-md-4" id="pdfUploadContainer">
+                                                        <div class="col-md-4">
                                                             <div class="form-group">
-                                                                <label class="form-label" for="doc_file">Upload
-                                                                    PDF</label>
+                                                                <label class="form-label"
+                                                                    for="doc_maturity_amount">Maturity
+                                                                    Amount</label>
                                                                 <div class="form-control-wrap">
-                                                                    <input type="file" accept=".pdf"
-                                                                        class="form-control" placeholder="Upload File"
-                                                                        id="doc_file" name="doc_file" />
+                                                                    <input type="number" class="form-control"
+                                                                        placeholder="Maturity Amount"
+                                                                        id="doc_maturity_amount"
+                                                                        name="doc_maturity_amount" value="" />
                                                                 </div>
                                                             </div>
                                                         </div>
+
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label" for="doc_interest">Acc.
+                                                                    Interest</label>
+                                                                <div class="form-control-wrap">
+                                                                    <input type="number" class="form-control"
+                                                                        placeholder="Acc. Interest" id="doc_interest"
+                                                                        name="doc_interest" value="" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label" for="doc_tds">TDS</label>
+                                                                <div class="form-control-wrap">
+                                                                    <input type="number" class="form-control"
+                                                                        placeholder="TDS" id="doc_tds" name="doc_tds"
+                                                                        value="" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label" for="doc_closed_on">Closed
+                                                                    on</label>
+                                                                <div class="form-control-wrap">
+                                                                    <input type="text" class="form-control date-picker"
+                                                                        placeholder="Closed On" id="doc_closed_on"
+                                                                        name="doc_closed_on" value="" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
                                                         <div class="col-md-12">
                                                             <div class="form-group">
                                                                 <button id="uploadDocumentBtn" type="submit"
-                                                                    class="btn btn-lg btn-primary">Upload</button>
+                                                                    class="btn btn-lg btn-primary">Save</button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -307,19 +357,15 @@
     <script src="/app/assets/js/bundle.js"></script>
     <script src="/app/assets/js/scripts.js"></script>
     <script src="/app/assets/js/charts/gd-default.js"></script>
-    <script src="/app/views/project-master/creat-project.script.js"></script>
+    <script src="/app/views/Fdr/add-fdr-script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/decimal.js@10.4.3/decimal.min.js"></script>
     <script>
-        let fileName = null
         let projectData = {
             projectCode: null,
             projectName: null
         }
         let closedByBackdropClick = false;
         let dplEndingMonths = 0
-
-        $("#doc_file").on("change", function () {
-            fileName = this.files[0].name;
-        });
 
 
         $("#documentForm").submit(function (event) {
@@ -328,14 +374,18 @@
                 return false;
             }
 
+            const selectedOption = $('#select-site option:selected');
+            const bankCode = selectedOption.data('code');
+            const bankDocId = selectedOption.attr('id');
             NioApp.handleButtonState("uploadDocumentBtn", "Upload", true);
 
             let formData = new FormData(this);
-            formData.append("doc_pdf_name", fileName);
+            formData.append("bank_code", bankCode);
+            formData.append("bank_id", bankDocId);
             // Your AJAX request
             $.ajax({
                 type: "POST",
-                url: "/docs/create-project",
+                url: "/fdr/create-fdr",
                 data: formData,
                 processData: false,
                 contentType: false,
@@ -343,7 +393,7 @@
                     if (response.status == 1) {
                         NioApp.handleButtonState("uploadDocumentBtn", "Upload", false);
                         NioApp.Toast("<h5>Document Uploaded</h5><p>Document Uploaded Successfully</p>", "success");
-                        window.location.href = '/project-master'
+                        window.location.href = '/fdr'
                     } else if (response.status == 0) {
                         NioApp.handleButtonState("uploadDocumentBtn", "Upload", false);
                         NioApp.Toast(`<h5>Error Occurred</h5><p>${response.msg}</p>`, "error");
@@ -356,6 +406,59 @@
                 },
             });
         });
+
+        $(document).ready(function (params) {
+            const bindEvents = "change keyup";
+            function calculateAccountInterest(principal, annualRatePercent, startDateStr) {
+                const now = new Date();
+                const startDate = new Date(startDateStr);
+
+                const msInDay = 1000 * 60 * 60 * 24;
+                const diffMs = now.getTime() - startDate.getTime();
+                const diffDaysDecimal = new Decimal(diffMs).div(msInDay);
+
+                if (diffDaysDecimal.lte(0)) return "0.00";
+
+                const principalDecimal = new Decimal(principal);
+                const rateDecimal = new Decimal(annualRatePercent).div(100);
+
+                const interest = principalDecimal
+                    .mul(rateDecimal)
+                    .div(365)
+                    .mul(diffDaysDecimal);
+
+                return interest.toFixed(2);
+            }
+            function calculateTDS(interest, tdsRate) {
+                if (interest <= 0) return "0.00";
+                if (tdsRate <= 0) return "0.00";
+                return interest * tdsRate;
+            }
+
+            $("#doc_renewal_date, #doc_renewal_amount, #doc_interest_rate").on(bindEvents, function () {
+                const principal = parseFloat($("#doc_renewal_amount").val());
+                const annualRatePercent = parseFloat($("#doc_interest_rate").val());
+                const startDateStr = $("#doc_renewal_date").val();
+                const tdsRate = parseFloat($("#doc_tds_rate").val());
+
+                if (isNaN(principal) || isNaN(annualRatePercent) || startDateStr === "" || isNaN(tdsRate)) {
+                    $("#doc_interest").val("0.00");
+                    return;
+                }
+
+                const interest = calculateAccountInterest(principal, annualRatePercent, startDateStr);
+                const tds = calculateTDS(interest, tdsRate);
+                $("#doc_interest").val(interest);
+                $("#doc_tds").val(tds);
+
+
+            });
+            console.log("Interest:", calculateAccountInterest(15950054, 7, "6/2/2023"));
+        });
+
+
+
+
 
     </script>
 </body>

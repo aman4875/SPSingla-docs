@@ -546,6 +546,7 @@
 
         <script src="/app/assets/js/bundle.js"></script>
         <script src="/app/assets/js/scripts.js"></script>
+        <script src="/app/assets/js/charts/gd-default.js"></script>
         <script src="/app/views/manage-bg/create-manage-bg-script.js"></script>
         <script>
 
@@ -558,10 +559,12 @@
             });
 
 
-            $(".date-picker").datepicker({
-                dateFormat: "dd/mm/yy", // or your expected format
-                autoclose: true,
-                todayHighlight: true
+            $(document).ready(function () {
+                $(".date-picker").datepicker({
+                    dateFormat: "dd/mm/yy", // Day/Month/Year format
+                    autoclose: true,
+                    todayHighlight: true
+                });
             });
 
             $("#manage-project").on("change", function () {

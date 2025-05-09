@@ -317,6 +317,7 @@
             page: 1,
             limit: 10,
         };
+
         function renderTabledata(response) {
             if (response.payload.documents && response.payload.documents.length > 0) {
                 $("#table-status").empty();
@@ -337,7 +338,6 @@
                         style="cursor: pointer;" 
                         data-code="${data.doc_code}" 
                         data-id="${data.doc_id}"
-                        data-project-id="${data.master_project_id}">
                        <em style="color: #d84040;" class="icon ni ni-trash-fill"></em>
                     </span>
                 </div>
@@ -498,41 +498,29 @@
         }
 
 
-
-
-        $(document).ready(() => {
-            // fetchAllfdrs().then((data) => {
-            //     if (data.status === 1) {
-            //         totalPages = data.totalPages
-            //         renderTable(data.data, data.totalPages)
-            //     } else {
-            //         NioApp.Toast(`<h5>Something Went Wrong</h5>${data.msg || `<p>Error while Document deleted</p>`}`, "error");
-            //     }
-            // })
-        })
-
-
-
-        fetchAllfdrs = () => {
-            // fetch('/project/get-fdrs', {
-            //     method: 'POST',
-            //     headers: {
-            //         'Content-Type': 'application/json',
-            //     },
-            //     body: JSON.stringify({
-            //         page: 1,
-            //         limit: 10,
-            //     }).then((response) => {
-            //         if (response.status === 200) {
-            //             return response.json()
-            //         } else {
-            //             throw new Error('Network response was not ok')
-            //         }
-            //     })
-            // })
+        function fetchAllfdrs() {
+            fetch('/fdr/get-all-fdrs', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    page: 1,
+                    limit: 10,
+                }).then((response) => {
+                    if (response.status === 200) {
+                        return response.json()
+                    } else {
+                        throw new Error('Network response was not ok')
+                    }
+                })
+            })
 
         }
 
+        (function () {
+            fetchAllfdrs()
+        })();
 
     </script>
 </body>
