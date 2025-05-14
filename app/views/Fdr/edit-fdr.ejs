@@ -15,9 +15,6 @@
     <link id="skin-default" rel="stylesheet" href="/app/assets/css/theme.css" />
     <link rel="stylesheet" href="/app/views/project-master/style.css" />
     <style>
-        .fdr-section label.form-label {
-            text-transform: capitalize;
-        }
     </style>
 </head>
 
@@ -35,7 +32,7 @@
                                         <div class="nk-block-head nk-block-head-sm">
                                             <div class="nk-block-between g-3">
                                                 <div class="nk-block-head-content d-flex">
-                                                    <h3 class="nk-block-title page-title">Add FDR</h3>
+                                                    <h3 class="nk-block-title page-title">Edit FDR</h3>
                                                     <button id="saveDraftButton"
                                                         style="margin: -5px 20px 5px 20px; min-width: 88px"
                                                         class="btn btn-sm btn-dim btn-outline-primary d-none text-center">Save
@@ -53,10 +50,12 @@
                                             <div class="card-inner">
                                                 <form id="documentForm" class="form-validate is-alter">
                                                     <div class="row g-gs">
+
                                                         <div class="col-md-4">
                                                             <div class="form-group">
                                                                 <label class="form-label" for="doc_bank_name">Bank
                                                                     Name</label>
+
                                                                 <div class="form-control-wrap">
                                                                     <select class="form-select form-control js-select2"
                                                                         data-filter="single" id="select-site"
@@ -67,7 +66,9 @@
                                                                         <% banks.forEach(bank=> { %>
                                                                             <option data-code="<%= bank.bank_code %>"
                                                                                 id="<%= bank.doc_id %>"
-                                                                                value="<%= bank.bank_name %>">
+                                                                                value="<%= bank.bank_name %>"
+                                                                                <%=fdrData.doc_bank_name===bank.bank_name
+                                                                                ? "selected" : "" %>>
                                                                                 <%= bank.bank_name %>
                                                                             </option>
                                                                             <% }); %>
@@ -83,7 +84,8 @@
                                                                 <div class="form-control-wrap">
                                                                     <input type="text" class="form-control"
                                                                         placeholder="Purpose" id="doc_purpose"
-                                                                        name="doc_purpose" value="" required />
+                                                                        name="doc_purpose"
+                                                                        value="<%= fdrData.doc_purpose %>" required />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -94,7 +96,8 @@
                                                                 <div class="form-control-wrap">
                                                                     <input type="text" class="form-control"
                                                                         placeholder="FDR NO" id="doc_fdr_no"
-                                                                        name="doc_fdr_no" value="" required />
+                                                                        name="doc_fdr_no"
+                                                                        value="<%= fdrData.doc_fdr_no %>" required />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -110,7 +113,8 @@
                                                                         id="doc_original_issue_date" autocomplete="off"
                                                                         name="doc_original_issue_date"
                                                                         placeholder="Original Issue Date"
-                                                                        class="form-control date-picker" value="" />
+                                                                        class="form-control date-picker"
+                                                                        value="<%= fdrData.doc_original_issue_date %>" />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -128,7 +132,10 @@
                                                                         <option label="empty" value=""></option>
                                                                         <% payoutClauseData.forEach(data=> { %>
                                                                             <option data-id="<%= data.id %>"
-                                                                                value="<%= data.clause_name %>">
+                                                                                value="<%= data.clause_name %>"
+                                                                                <%=fdrData.doc_interest_payout_clause===data.clause_name
+                                                                                ? "selected" : "" %>
+                                                                                >
                                                                                 <%= data.clause_name %>
                                                                             </option>
                                                                             <% }); %>
@@ -146,7 +153,8 @@
                                                                         <input type="number" class="form-control"
                                                                             placeholder="Deposit Amount"
                                                                             id="doc_deposit_amount"
-                                                                            name="doc_deposit_amount" value=""
+                                                                            name="doc_deposit_amount"
+                                                                            value="<%= fdrData.doc_deposit_amount %>"
                                                                             required />
 
                                                                     </div>
@@ -163,7 +171,8 @@
                                                                         <input type="number" class="form-control"
                                                                             placeholder="Interest Rate"
                                                                             id="doc_interest_rate"
-                                                                            name="doc_interest_rate" value=""
+                                                                            name="doc_interest_rate"
+                                                                            value="<%= fdrData.doc_interest_rate %>"
                                                                             required />
 
                                                                     </div>
@@ -178,7 +187,8 @@
                                                                 <div class="form-control-wrap">
                                                                     <input type="number" class="form-control"
                                                                         placeholder="DS Rate" id="doc_tds_rate"
-                                                                        name="doc_tds_rate" value="" required />
+                                                                        name="doc_tds_rate"
+                                                                        value="<%= fdrData.doc_tds_rate %>" required />
                                                                 </div>
                                                                 <small id="error-msg" class="text-danger"
                                                                     style="display:none;"></small>
@@ -194,7 +204,8 @@
                                                                     <input required type="text" id="doc_tenor"
                                                                         autocomplete="off" name="doc_tenor"
                                                                         placeholder="Tenor (in months)"
-                                                                        class="form-control" value="" />
+                                                                        class="form-control"
+                                                                        value="<%= fdrData.doc_tenor %>" />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -208,7 +219,8 @@
                                                                     <input required type="text" id="doc_new_tenor"
                                                                         autocomplete="off" name="doc_new_tenor"
                                                                         placeholder="New Tenor (in months)"
-                                                                        class="form-control" value="" />
+                                                                        class="form-control"
+                                                                        value="<%= fdrData.doc_new_tenor %>" />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -220,7 +232,8 @@
                                                                 <div class="form-control-wrap">
                                                                     <input required type="text" class="form-control"
                                                                         placeholder="Renewal" id="doc_renewal"
-                                                                        name="doc_renewal" value="" />
+                                                                        name="doc_renewal"
+                                                                        value="<%= fdrData.doc_renewal %>" />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -234,7 +247,7 @@
                                                                         class="form-control date-picker"
                                                                         placeholder="Issue Date / Renewal Dates"
                                                                         id="doc_renewal_date" name="doc_renewal_date"
-                                                                        value="" />
+                                                                        value="<%= fdrData.doc_renewal_date %>" />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -247,7 +260,8 @@
                                                                     <input required type="text" class="form-control"
                                                                         placeholder="Renewal Amount"
                                                                         id="doc_renewal_amount"
-                                                                        name="doc_renewal_amount" value="" />
+                                                                        name="doc_renewal_amount"
+                                                                        value="<%= fdrData.doc_renewal_amount %>" />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -261,7 +275,7 @@
                                                                         class="form-control date-picker"
                                                                         placeholder="Maturity Date"
                                                                         id="doc_maturity_date" name="doc_maturity_date"
-                                                                        value="" />
+                                                                        value="<%= fdrData.doc_maturity_date %>" />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -275,7 +289,8 @@
                                                                     <input required type="number" class="form-control"
                                                                         placeholder="Maturity Amount"
                                                                         id="doc_maturity_amount"
-                                                                        name="doc_maturity_amount" value="" />
+                                                                        name="doc_maturity_amount"
+                                                                        value="<%= fdrData.doc_maturity_amount %>" />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -288,7 +303,7 @@
                                                                     <input step="any" required type="number"
                                                                         class="form-control" placeholder="Acc. Interest"
                                                                         id="doc_interest" name="doc_interest"
-                                                                        value="" />
+                                                                        value="<%= fdrData.doc_interest %>" />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -299,7 +314,8 @@
                                                                 <div class="form-control-wrap">
                                                                     <input step="any" required type="number"
                                                                         class="form-control" placeholder="TDS"
-                                                                        id="doc_tds" name="doc_tds" value="" />
+                                                                        id="doc_tds" name="doc_tds"
+                                                                        value="<%= fdrData.doc_tds %>" />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -312,7 +328,8 @@
                                                                     <input step="any" required type="number"
                                                                         class="form-control" placeholder="Closed On"
                                                                         id="doc_margin_available"
-                                                                        name="doc_margin_available" value="" />
+                                                                        name="doc_margin_available"
+                                                                        value="<%= fdrData.doc_margin_available %>" />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -324,7 +341,8 @@
                                                                 <div class="form-control-wrap">
                                                                     <input type="text" class="form-control date-picker"
                                                                         placeholder="Closed On" id="doc_closed_on"
-                                                                        name="doc_closed_on" value="" />
+                                                                        name="doc_closed_on"
+                                                                        value="<%= fdrData.doc_closed_on %>" />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -346,127 +364,147 @@
                     </div>
                     <%- include('./common/footer'); -%>
                 </div>
+
         </div>
-    </div>
-    <script src="/app/assets/js/bundle.js"></script>
-    <script src="/app/assets/js/scripts.js"></script>
-    <script src="/app/assets/js/charts/gd-default.js"></script>
-    <script src="/app/views/Fdr/add-fdr-script.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/decimal.js@10.4.3/decimal.min.js"></script>
-    <script>
-        let projectData = {
-            projectCode: null,
-            projectName: null
-        }
-        let closedByBackdropClick = false;
-        let dplEndingMonths = 0
+        <script src="/app/assets/js/bundle.js"></script>
+        <script src="/app/assets/js/scripts.js"></script>
+        <script src="/app/assets/js/charts/gd-default.js"></script>
+        <script src="/app/views/Fdr/edit-fdr-script.js"></script>
+        <script>
+            const doc_Id = JSON.parse(`<%- JSON.stringify(fdrData.doc_id) %>`);
+            let projectData = {
+                projectCode: null,
+                projectName: null
+            }
+            let closedByBackdropClick = false;
+            let dplEndingMonths = 0
+            let initialFormDataEntries = JSON.parse(`<%- JSON.stringify(fdrData) %>`);
 
 
-        $(document).ready(function () {
-            $("#documentForm").submit(function (event) {
-                event.preventDefault();
-                if (!this.checkValidity()) {
-                    return false;
-                }
-                console.log("Form submitted successfully!");
+            $(document).ready(function () {
+                $("#documentForm").submit(function (event) {
+                    event.preventDefault();
+                    if (!this.checkValidity()) {
+                        return false;
+                    }
 
-                const selectedOption = $('#select-site option:selected');
-                const bankCode = selectedOption.data('code');
-                const bankDocId = selectedOption.attr('id');
-                NioApp.handleButtonState("uploadDocumentBtn", "Upload", true);
 
-                let formData = new FormData(this);
-                formData.append("bank_code", bankCode);
-                formData.append("bank_id", bankDocId);
-                // Your AJAX request
-                $.ajax({
-                    type: "POST",
-                    url: "/fdr/create-fdr",
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function (response) {
-                        if (response.status == 1) {
+                    const selectedOption = $('#select-site option:selected');
+                    const bankCode = selectedOption.data('code');
+                    const bankDocId = selectedOption.attr('id');
+                    console.log(initialFormDataEntries)
+                    let form = $(this).closest("form")[0];
+                    let formData = new FormData(this);
+                    formData.append("bank_code", bankCode);
+                    formData.append("bank_id", bankDocId);
+                    formData.append("doc_id", doc_Id);
+                    let newFormDataEntries = {};
+
+                    formData.forEach((value, key) => {
+                        newFormDataEntries[key] = value;
+                    });
+
+                    let hasChanges = Object.keys(newFormDataEntries).some(key => newFormDataEntries[key]?.trim() !== initialFormDataEntries[key]?.trim());
+                    if (!hasChanges) {
+                        return NioApp.Toast("<h5>No Changes</h5><p>No changes to save</p>", "info");
+                    }
+
+                    NioApp.handleButtonState("uploadDocumentBtn", "Update", true);
+
+
+
+                    // Your AJAX request
+                    $.ajax({
+                        type: "POST",
+                        url: "/fdr/edit-fdr",
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function (response) {
+                            if (response.status == 1) {
+                                NioApp.handleButtonState("uploadDocumentBtn", "Upload", false);
+                                NioApp.Toast("<h5>Document Uploaded</h5><p>Document Uploaded Successfully</p>", "success");
+                                window.location.href = '/fdr'
+                            } else if (response.status == 0) {
+                                NioApp.handleButtonState("uploadDocumentBtn", "Upload", false);
+                                NioApp.Toast(`<h5>Error Occurred</h5><p>${response.msg}</p>`, "error");
+                            } else NioApp.Toast("<h5>Something Went Wrong</h5><p>Error while uploading Document</p>", "error");
+                        },
+                        error: function (xhr, status, error) {
                             NioApp.handleButtonState("uploadDocumentBtn", "Upload", false);
-                            NioApp.Toast("<h5>Document Uploaded</h5><p>Document Uploaded Successfully</p>", "success");
-                            window.location.href = '/fdr'
-                        } else if (response.status == 0) {
-                            NioApp.handleButtonState("uploadDocumentBtn", "Upload", false);
-                            NioApp.Toast(`<h5>Error Occurred</h5><p>${response.msg}</p>`, "error");
-                        } else NioApp.Toast("<h5>Something Went Wrong</h5><p>Error while uploading Document</p>", "error");
-                    },
-                    error: function (xhr, status, error) {
-                        NioApp.handleButtonState("uploadDocumentBtn", "Upload", false);
-                        NioApp.Toast("<h5>Something Went Wrong</h5><p>Error while uploading Document</p>", "error");
-                        console.error("Error saving draft:", error);
-                    },
+                            NioApp.Toast("<h5>Something Went Wrong</h5><p>Error while uploading Document</p>", "error");
+                            console.error("Error saving draft:", error);
+                        },
+                    });
                 });
             });
-        });
-        
-        function parseDDMMYYYY(dateStr) {
-            const [dd, mm, yyyy] = dateStr.split('/');
-            return new Date(`${yyyy}-${mm}-${dd}`);
-        }
 
-        $(document).ready(function (params) {
-            const bindEvents = "change keyup";
-            function calculateAccountInterest(principal, annualRatePercent, startDateStr) {
-                const now = new Date();
-                const startDate = parseDDMMYYYY(startDateStr);
-
-                const msInDay = 1000 * 60 * 60 * 24;
-                const diffMs = new Decimal(now.getTime()).minus(startDate.getTime());
-                const diffDaysDecimal = diffMs.div(msInDay);
-                if (diffDaysDecimal.lte(0)) return "0.00";
-
-                const principalDecimal = new Decimal(principal);
-                const rateDecimal = new Decimal(annualRatePercent).div(100);
-
-                const interest = principalDecimal
-                    .mul(rateDecimal)
-                    .div(365)
-                    .mul(diffDaysDecimal);
-
-                return interest.toFixed(2);
+            function parseDDMMYYYY(dateStr) {
+                const [dd, mm, yyyy] = dateStr.split('/');
+                return new Date(`${yyyy}-${mm}-${dd}`);
             }
 
+            $(document).ready(function (params) {
+                const bindEvents = "change keyup";
+                function calculateAccountInterest(principal, annualRatePercent, startDateStr) {
+                    const now = new Date();
+                    const startDate = parseDDMMYYYY(startDateStr);
 
-            function calculateTDS(accruedInterest, tdsRate = 10.0) {
-                if (isNaN(accruedInterest) || accruedInterest <= 0) return "0.00";
-                const tdsAmount = (tdsRate / 100) * accruedInterest;
-                return tdsAmount.toFixed(2);
-            }
+                    const msInDay = 1000 * 60 * 60 * 24;
+                    const diffMs = new Decimal(now.getTime()).minus(startDate.getTime());
+                    const diffDaysDecimal = diffMs.div(msInDay);
+                    if (diffDaysDecimal.lte(0)) return "0.00";
 
+                    const principalDecimal = new Decimal(principal);
+                    const rateDecimal = new Decimal(annualRatePercent).div(100);
 
-            function calculateMarginAvailable(renewalAmount, accruedInterest, tdsAmount) {
-                if (isNaN(renewalAmount) || renewalAmount <= 0 || !tdsAmount) return "0.00";
-                const netInterest = accruedInterest - tdsAmount;
-                const marginAvailable = renewalAmount + netInterest;
-                return marginAvailable.toFixed(2);
-            }
+                    const interest = principalDecimal
+                        .mul(rateDecimal)
+                        .div(365)
+                        .mul(diffDaysDecimal);
 
-            $("#doc_renewal_date, #doc_renewal_amount, #doc_interest_rate, #doc_tds_rate").on(bindEvents, function () {
-                const principal = parseFloat($("#doc_renewal_amount").val());
-                const annualRatePercent = parseFloat($("#doc_interest_rate").val());
-                const startDateStr = $("#doc_renewal_date").val();
-                const tdsRate = parseFloat($("#doc_tds_rate").val());
-
-                if (isNaN(principal) || isNaN(annualRatePercent) || startDateStr === "") {
-                    $("#doc_interest").val("0.00");
-                    return;
+                    return interest.toFixed(2);
                 }
 
-                const interest = calculateAccountInterest(principal, annualRatePercent, startDateStr);
-                const tds = calculateTDS(interest, tdsRate);
-                const marginAvailable = calculateMarginAvailable(principal, interest, tds)
-                $("#doc_interest").val(interest).trigger("change");
-                $("#doc_tds").val(tds).trigger("change");
-                $("#doc_margin_available").val(marginAvailable).trigger("change");
-            });
-        });
 
-    </script>
+                function calculateTDS(accruedInterest, tdsRate = 10.0) {
+                    if (isNaN(accruedInterest) || accruedInterest <= 0) return "0.00";
+                    const tdsAmount = (tdsRate / 100) * accruedInterest;
+                    return tdsAmount.toFixed(2);
+                }
+
+
+                function calculateMarginAvailable(renewalAmount, accruedInterest, tdsAmount) {
+                    if (isNaN(renewalAmount) || renewalAmount <= 0 || !tdsAmount) return "0.00";
+                    const netInterest = accruedInterest - tdsAmount;
+                    const marginAvailable = renewalAmount + netInterest;
+                    return marginAvailable.toFixed(2);
+                }
+
+                $("#doc_renewal_date, #doc_renewal_amount, #doc_interest_rate, #doc_tds_rate").on(bindEvents, function () {
+                    const principal = parseFloat($("#doc_renewal_amount").val());
+                    const annualRatePercent = parseFloat($("#doc_interest_rate").val());
+                    const startDateStr = $("#doc_renewal_date").val();
+                    const tdsRate = parseFloat($("#doc_tds_rate").val());
+
+                    if (isNaN(principal) || isNaN(annualRatePercent) || startDateStr === "") {
+                        $("#doc_interest").val("0.00");
+                        return;
+                    }
+
+                    const interest = calculateAccountInterest(principal, annualRatePercent, startDateStr);
+                    const tds = calculateTDS(interest, tdsRate);
+                    const marginAvailable = calculateMarginAvailable(principal, interest, tds)
+                    $("#doc_interest").val(interest).trigger("change");
+                    $("#doc_tds").val(tds).trigger("change");
+                    $("#doc_margin_available").val(marginAvailable).trigger("change");
+                });
+            });
+
+
+
+
+        </script>
 </body>
 
 </html>

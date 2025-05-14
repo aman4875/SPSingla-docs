@@ -22,6 +22,7 @@ router.get("/settings", authMiddleware.checkLoginStatus, renderController.settin
 router.get("/bank-master", authMiddleware.checkLoginStatus, renderController.renderBankMaster);
 router.get("/fdr", authMiddleware.checkLoginStatus, renderController.renderFdr);
 router.get("/add-fdr", authMiddleware.checkLoginStatus, renderController.renderAddFdr);
+router.get("/edit-fdr/:id", authMiddleware.checkLoginStatus, renderController.renderEditFdr);
 
 
 module.exports = router;

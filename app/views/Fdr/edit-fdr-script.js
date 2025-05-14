@@ -90,7 +90,7 @@ function getAllClause() {
     },
   });
 }
+
 $(document).ready(function () {
   setClause();
 });
-

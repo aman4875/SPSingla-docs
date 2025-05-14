@@ -15,6 +15,15 @@
     <link id="skin-default" rel="stylesheet" href="/app/assets/css/theme.css" />
     <link rel="stylesheet" href="/app/views/project-master/style.css" />
     <style>
+        .nk-tb-col {
+            pointer-events: none;
+            cursor: none;
+        }
+
+        .editDocument {
+            pointer-events: auto;
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -156,17 +165,18 @@
                                                                     </div>
                                                                     <div class="nk-tb-col">
                                                                         <span
-                                                                            data-field="doc_purpose">Purpose</span><span
+                                                                            data-field="doc_purpose">PURPOSE</span><span
                                                                             class="sort-indicator"></span>
                                                                     </div>
                                                                     <div class="nk-tb-col">
-                                                                        <span data-field="doc_fdr_no">FDR NO</span><span
+                                                                        <span data-field="doc_fdr_no">FDR
+                                                                            NO.</span><span
                                                                             class="sort-indicator"></span>
                                                                     </div>
                                                                     <div class="nk-tb-col date">
                                                                         <span
-                                                                            data-field="doc_original_issue_date">Original
-                                                                            issue date</span><span
+                                                                            data-field="doc_original_issue_date">ORIGINAL
+                                                                            ISSUE DATE</span><span
                                                                             class="sort-indicator"></span>
                                                                     </div>
                                                                     <div class="nk-tb-col">
@@ -227,23 +237,31 @@
                                                                             AMOUNT</span><span
                                                                             class="sort-indicator"></span>
                                                                     </div>
-                                                                    <div class="nk-tb-col no-click">
-                                                                        <span data-field="doc_interest">Acc.
+                                                                    <div class="nk-tb-col">
+                                                                        <span data-field="doc_interest">Account
                                                                             Interest</span><span
-                                                                            class="sort-indicator "></span>
+                                                                            class="sort-indicator"></span>
                                                                     </div>
-                                                                    <div class="nk-tb-col no-click">
+                                                                    <div class="nk-tb-col">
                                                                         <span data-field="doc_tds">TDS</span><span
-                                                                            class="sort-indicator "></span>
+                                                                            class="sort-indicator"></span>
                                                                     </div>
-                                                                    <div class="nk-tb-col no-click">
+                                                                    <div class="nk-tb-col">
+                                                                        <span data-field="doc_margin_available">Margin
+                                                                            Available</span><span
+                                                                            class="sort-indicator"></span>
+                                                                    </div>
+                                                                    <div class="nk-tb-col">
                                                                         <span data-field="doc_closed_on">CLOSED
                                                                             ON</span><span
-                                                                            class="sort-indicator "></span>
+                                                                            class="sort-indicator"></span>
                                                                     </div>
+
                                                         </div>
 
+                                                        <div class="nk-tb-item nk-tb-head" id="table-filters">
 
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div id="table-status" class="card-inner text-center">
@@ -294,7 +312,7 @@
                         aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Are you sure you want to delete this document ? </p>
+                    <p>Are you sure you want to delete this FDR document ? </p>
                 </div>
                 <div class="modal-footer" id="modalAction">
                     <button type="button" class="btn btn-secondary" id="rejectModelBtn"
@@ -318,172 +336,99 @@
             limit: 10,
         };
 
+        $('#scroll-left').on('click', function () {
+            $('.scrollable-datatable').animate({ scrollLeft: '-=300' }, 200);
+        });
+
+        $('#scroll-right').on('click', function () {
+            $('.scrollable-datatable').animate({ scrollLeft: '+=300' }, 200);
+        });
+
         function renderTabledata(response) {
             if (response.payload.documents && response.payload.documents.length > 0) {
                 $("#table-status").empty();
+                $(".table-content").empty();
 
                 let rowsHtml = "";
                 response.payload.documents.forEach((data) => {
                     let rowHtml = `
-                <div class="nk-tb-item text-left table-content ${data.claim_pass ? "rowHighlight" : ""}">
-                     <%if(token.user_role != 3){%>
-                      <div class="nk-tb-col text-start editDocument">
-                       <span style="margin-right: 8px;">
-                         <a href="/edit-bg/${btoa(data.doc_id)}">
-                           <em class="icon ni ni-edit-fill"></em>
-                         </a>
-                       </span>
-                     <span class="${data.doc_bg_selected ? 'disable' : ''}" 
-                        id="deleteDoc" 
-                        style="cursor: pointer;" 
-                        data-code="${data.doc_code}" 
-                        data-id="${data.doc_id}"
-                       <em style="color: #d84040;" class="icon ni ni-trash-fill"></em>
-                    </span>
-                </div>
-                    <%}%>
-                        <div class="nk-tb-col text-start">
-                            <span>
-                                ${data.doc_code || "-"}
+                        <div class="nk-tb-item text-left table-content ${data.claim_pass ? "rowHighlight" : ""}">
+                        <% if(token.user_role != 3) { %>
+                            <div class="nk-tb-col text-start editDocument">
+                            <span style="margin-right: 8px;">
+                                <a href="/edit-fdr/${btoa(data.doc_id)}">
+                                <em class="icon ni ni-edit-fill"></em>
+                                </a>
                             </span>
+                            <span class="${data.doc_bg_selected ? 'disable' : ''}" 
+                                    id="deleteDoc" 
+                                    style="cursor: pointer;" 
+                                    data-bank_id="${data.bank_id}" 
+                                    data-id="${data.doc_id}">
+                                <em style="color: #d84040;" class="icon ni ni-trash-fill"></em>
+                            </span>
+                            </div>
+                        <% } %>
+
+                        <div class="nk-tb-col text-start">
+                            <span>${data.doc_bank_name || "-"}</span>
                         </div>
                         <div class="nk-tb-col text-start">
-                            <span>
-                                ${data.doc_work_name || "-"}
-                            </span>
+                            <span>${data.doc_purpose || "-"}</span>
                         </div>
                         <div class="nk-tb-col text-start">
-                            <span>
-                                ${data.doc_department || "-"}
-                            </span>
+                            <span>${data.doc_fdr_no || "-"}</span>
                         </div>
                         <div class="nk-tb-col text-start">
-                            <span>
-                                ${data.doc_financial_date || "-"}
-                            </span>
+                            <span>${data.doc_original_issue_date || "-"}</span>
                         </div>
                         <div class="nk-tb-col text-start">
-                            <span>
-                                ${data.doc_agreement_no || "-"}
-                            </span>
+                            <span>${data.doc_interest_payout_clause || "-"}</span>
                         </div>
                         <div class="nk-tb-col text-start">
-                            <span>
-                                ${data.doc_agreement_date || "-"}
-                            </span>
+                            <span>${data.doc_deposit_amount || "-"}</span>
                         </div>
                         <div class="nk-tb-col text-start">
-                            <span>
-                                ${data.doc_completion_date || "-"}
-                            </span>
+                            <span>${data.doc_interest_rate ? data.doc_interest_rate + ".00%" : "-"}</span>
                         </div>
                         <div class="nk-tb-col text-start">
-                            <span>
-                                ${data.doc_awarded == true ? "Yes" : "No" || "-"}
-                            </span>
+                            <span>${data.doc_tds_rate ? data.doc_tds_rate + ".00%" : "-"}</span>
                         </div>
                         <div class="nk-tb-col text-start">
-                            <span>
-                                ${data.doc_dlp_period || "-"}
-                            </span>
+                            <span>${data.doc_tenor || "-"}</span>
                         </div>
                         <div class="nk-tb-col text-start">
-                            <span>
-                                ${data.doc_revised_date || "-"}
-                            </span>
+                            <span>${data.doc_new_tenor || "-"}</span>
                         </div>
                         <div class="nk-tb-col text-start">
-                            <span>
-                                ${data.doc_dlp_ending || "-"}
-                            </span>
+                            <span>${data.doc_renewal || "-"}</span>
                         </div>
                         <div class="nk-tb-col text-start">
-                            <span>
-                                ${data.doc_performance_security || "-"}
-                            </span>
+                            <span>${data.doc_renewal_date || "-"}</span>
                         </div>
                         <div class="nk-tb-col text-start">
-                            <span>
-                                ${data.doc_additional_performance_security || "-"}
-                            </span>
+                            <span>${data.doc_renewal_amount || "-"}</span>
                         </div>
                         <div class="nk-tb-col text-start">
-                            <span>
-                                ${data.doc_bal_mobilisation_amount || "-"}
-                            </span>
+                            <span>${data.doc_maturity_date || "-"}</span>
                         </div>
                         <div class="nk-tb-col text-start">
-                            <span>
-                                ${data.doc_retention_amount || "-"}
-                            </span>
+                            <span>${data.doc_maturity_amount || "-"}</span>
                         </div>
                         <div class="nk-tb-col text-start">
-                            <span>
-                                ${data.doc_type || "-"}
-                            </span>
+                            <span>${data.doc_interest || "-"}</span>
                         </div>
                         <div class="nk-tb-col text-start">
-                            <span>
-                                ${data.doc_bank_name || "-"}
-                            </span>
+                            <span>${data.doc_tds || "-"}</span>
                         </div>
                         <div class="nk-tb-col text-start">
-                            <span>
-                                ${data.doc_issuing_branch || "-"}
-                            </span>
+                            <span>${data.doc_margin_available || "-"}</span>
                         </div>
                         <div class="nk-tb-col text-start">
-                            <span>
-                                ${data.doc_beneficiary_name || "-"}
-                            </span>
+                            <span>${data.doc_closed_on || "-"}</span>
                         </div>
-                        <div class="nk-tb-col text-start">
-                            <span>
-                                ${data.doc_bg_number || "-"}
-                            </span>
-                        </div>
-                        <div class="nk-tb-col text-start">
-                            <span>
-                                ${data.doc_bg_amendment_number || "-"}
-                            </span>
-                        </div>
-                        <div class="nk-tb-col text-start">
-                            <span>
-                                ${data.doc_applicant_name || "-"}
-                            </span>
-                        </div>
-                        <div class="nk-tb-col text-start">
-                            <span>
-                                ${data.doc_issue_date || "-"}
-                            </span>
-                        </div>
-                        <div class="nk-tb-col text-start">
-                            <span>
-                                ${data.doc_claim_date || "-"}
-                            </span>
-                        </div>
-                        <div class="nk-tb-col text-start">
-                            <span>
-                                ${data.doc_bg_amount || "-"}
-                            </span>
-                        </div>
-                        <div class="nk-tb-col text-start">
-                            <span>
-                                ${data.doc_expiry_date || "-"}
-                            </span>
-                        </div>
-                        <div class="nk-tb-col text-start">
-                            <span>
-                                ${data.doc_bg_cancelled_date || "-"}
-                            </span>
-                        </div>
-                        <div class="nk-tb-col text-start">
-                            <span>
-                            ${renderPdfLinks(data?.attachments)} 
-                            </span>
-                        </div>
-                    </div>
-                    `
+                        </div>`;
+
                     rowsHtml += rowHtml;
                 })
                 $("#table-filters").after(rowsHtml);
@@ -497,26 +442,80 @@
             }
         }
 
+        function updatePagination(totalPages, currentPage) {
+            const $pagination = $('#table-pagination .pagination');
+            $pagination.empty();
 
-        function fetchAllfdrs() {
-            fetch('/fdr/get-all-fdrs', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    page: 1,
-                    limit: 10,
-                }).then((response) => {
-                    if (response.status === 200) {
-                        return response.json()
-                    } else {
-                        throw new Error('Network response was not ok')
-                    }
-                })
-            })
+            // Previous button
+            $pagination.append(`<li class="paginate_button page-item ${currentPage === 1 ? 'disabled' : 'previous'}" id="DataTables_Table_2_previous"><a aria-controls="DataTables_Table_2" role="link" data-dt-idx="previous" tabindex="0" class="page-link">Prev</a></li>`);
 
+            // Helper function to create a page item
+            const createPageItem = (page, active = false) => {
+                return `<li class="paginate_button page-item ${active ? 'active' : ''}"><a href="#" aria-controls="DataTables_Table_2" role="link" data-dt-idx="${page}" tabindex="0" class="page-link">${page}</a></li>`;
+            };
+
+            // Render first 3 pages
+            for (let i = 1; i <= 3; i++) {
+                if (i <= totalPages) {
+                    $pagination.append(createPageItem(i, i === currentPage));
+                }
+            }
+
+            // Render middle dots if necessary
+            if (currentPage > 4 && totalPages > 6) {
+                $pagination.append('<li class="paginate_button page-item disabled"><a href="#" class="page-link">...</a></li>');
+            }
+
+            // Render current page in middle if it's not in the first or last 3 pages
+            if (currentPage > 3 && currentPage < totalPages - 2) {
+                $pagination.append(createPageItem(currentPage, true));
+            }
+
+            // Render middle dots if necessary
+            if (currentPage < totalPages - 3 && totalPages > 6) {
+                $pagination.append('<li class="paginate_button page-item disabled"><a href="#" class="page-link">...</a></li>');
+            }
+
+            // Render last 3 pages
+            for (let i = totalPages - 2; i <= totalPages; i++) {
+                if (i > 3) {
+                    $pagination.append(createPageItem(i, i === currentPage));
+                }
+            }
+
+            // Next button
+            $pagination.append(`<li class="paginate_button page-item ${currentPage === totalPages ? 'disabled' : 'next'}" id="DataTables_Table_2_next"><a aria-controls="DataTables_Table_2" role="link" data-dt-idx="next" tabindex="0" class="page-link">Next</a></li>`);
         }
+        function fetchAllfdrs() {
+            if (isFetching) return;
+            isFetching = true;
+            $("#table-status").html(`<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>`);
+            $.ajax({
+                type: "POST",
+                url: "/fdr/get-all-fdrs",
+                data: JSON.stringify(filters),
+                contentType: "application/json",
+                success: function (response) {
+                    isFetching = false; // Reset flag
+                    if (response.status == 1) {
+                        renderTabledata(response)
+                        totalPages = response.payload.totalPages || 1;
+                        updatePagination(totalPages, filters.page);
+                    } else {
+                        $("#table-status").html(`<div class="text-center"><p>Something Went Wrong</p></div>`);
+                        $(".scrollable-datatable").css({ 'overflow': 'none !important' });
+                    }
+                },
+                error: function (xhr, status, error) {
+                    isFetching = false; // Reset flag
+                    console.log(error);
+                    $("#table-status").html(`<div class="text-center"><p>Something Went Wrong</p></div>`);
+                    $(".scrollable-datatable").css({ 'overflow': 'none !important' });
+                },
+            });
+        }
+
+
 
         (function () {
             fetchAllfdrs()
