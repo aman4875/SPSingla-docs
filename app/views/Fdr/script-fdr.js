@@ -7,6 +7,7 @@ $(document).on("click", "#deleteDocument", function (event) {
     url: "/fdr/delete-fdr",
     data: {
       docIdToDelete: docIdToDelete,
+      bank_id:bankID
     },
     success: function (response) {
       if (response.status == 1) {
@@ -47,6 +48,7 @@ $(document).on("click", "#deleteDoc", function (event) {
   let openModal = document.getElementById("open-modal");
 
   docIdToDelete = $(this).data("id"); // Using .data() to get 'data-id'
+  bankID = $(this).data("bank_id")
 
   if (docIdToDelete) {
     openModal.click();

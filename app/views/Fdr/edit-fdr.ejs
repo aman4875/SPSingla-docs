@@ -286,7 +286,8 @@
                                                                     for="doc_maturity_amount">Maturity
                                                                     Amount</label>
                                                                 <div class="form-control-wrap">
-                                                                    <input required type="number" class="form-control"
+                                                                    <input step="any" required type="number"
+                                                                        class="form-control"
                                                                         placeholder="Maturity Amount"
                                                                         id="doc_maturity_amount"
                                                                         name="doc_maturity_amount"
@@ -370,6 +371,7 @@
         <script src="/app/assets/js/scripts.js"></script>
         <script src="/app/assets/js/charts/gd-default.js"></script>
         <script src="/app/views/Fdr/edit-fdr-script.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/decimal.js@10.4.3/decimal.min.js"></script>
         <script>
             const doc_Id = JSON.parse(`<%- JSON.stringify(fdrData.doc_id) %>`);
             let projectData = {
@@ -500,9 +502,6 @@
                     $("#doc_margin_available").val(marginAvailable).trigger("change");
                 });
             });
-
-
-
 
         </script>
 </body>

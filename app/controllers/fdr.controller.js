@@ -9,7 +9,7 @@ class fdrController {
       const page = inputs.page || 1;
       const pageSize = inputs.limit || 10;
       const offset = (page - 1) * pageSize;
-      let orderByClause = "";
+      let orderByClause = "ORDER BY d.doc_id DESC";
       let baseQuery = `SELECT * FROM fdr_menu d`;
       let conditions = [];
       let joins = "";
@@ -160,15 +160,28 @@ class fdrController {
   };
 
   deleteFdr = async (req, res) => {
-    const { docIdToDelete } = req.body;
+    const { docIdToDelete, bank_id } = req.body;
 
     if (!docIdToDelete) {
       return res.status(400).json({ message: "Project ID is required" });
     }
-
     try {
       const deleteQuery = `DELETE FROM fdr_menu WHERE doc_id = $1`;
       await pool.query(deleteQuery, [docIdToDelete]);
+
+      const { rows: checkForBanks } = await pool.query(
+        `SELECT * FROM fdr_menu WHERE bank_id = $1 AND doc_id <> $2`,
+        [bank_id, docIdToDelete]
+      );
+
+      if (checkForBanks.length === 0) {
+        console.log(bank_id);
+        await pool.query(`
+		    UPDATE bank_master
+            SET bank_code_status = false
+            WHERE doc_id = '${bank_id}'`);
+      }
+
       res.json({ status: 1, msg: "Document deleted successfully!" });
     } catch (error) {
       console.error("Error deleting document:", error);
