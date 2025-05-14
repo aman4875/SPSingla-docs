@@ -319,6 +319,7 @@ documentController.editDocument = async (req, res) => {
 		res.send({ status: 0, msg: "Internal Server Error" });
 	}
 };
+
 documentController.editProject = async (req, res) => {
 	try {
 		let { newFormDataEntries, doc_id } = req.body;
