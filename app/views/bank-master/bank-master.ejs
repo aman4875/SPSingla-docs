@@ -28,6 +28,14 @@
             padding: 20px 0;
             min-width: 100%;
         }
+
+        .disable {
+            pointer-events: none;
+            opacity: 0.5;
+        }
+        .sub-text{
+            text-transform: uppercase;
+        }
     </style>
 </head>
 
@@ -367,11 +375,11 @@
                 }
             });
 
-            
+
             if (!hasChanges) {
                 return NioApp.Toast("<h5>No Changes</h5><p>No changes to save</p>", "info");
             }
-            
+
             formData.docId = docIdToEdit;
             fetch("/bank-master/edit-bank", {
                 method: "post",

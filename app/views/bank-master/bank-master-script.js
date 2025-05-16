@@ -28,8 +28,7 @@ function renderBankList(list) {
                           data-branch="${item.bank_branch}">
                             <em class="icon ni ni-edit"></em>
                         </span>
-                        <span data-id="${item.doc_id
-      }" class="btn btn-trigger btn-icon" id="deleteBank">
+                        <span data-id="${item.doc_id}" class="${  item.bank_code_status ?'disable btn btn-trigger btn-icon' :'btn btn-trigger btn-icon'}" id="deleteBank">
                             <em style="color: #d84040;" class="icon ni ni-trash-fill"></em>
                         </span>
                     </li>

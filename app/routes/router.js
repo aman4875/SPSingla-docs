@@ -7,6 +7,7 @@ let sitesRouter = require("./sites.router.js");
 const AIRouter = require("./ai.router.js")
 const dashboardRouter = require('./dashboard.router.js')
 const bankMasterRouter = require('./bank-master.router.js')
+const fdrRouter = require('./fdr.router.js')
 const adminController = require('./admin.router.js')
 
 router.use("/", renderRouter);
@@ -18,6 +19,7 @@ router.use("/ai", AIRouter)
 router.use("/dashboard", dashboardRouter)
 router.use("/admin", adminController)
 router.use("/bank-master", bankMasterRouter)
+router.use("/fdr", fdrRouter)
 
 router.use((req, res) => {
   res.render("404.ejs");

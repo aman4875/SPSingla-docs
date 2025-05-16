@@ -523,7 +523,6 @@ renderController.renderCreateProjectMaster = async (req, res) => {
 	let query = `SELECT * FROM sites WHERE site_parent_id = 0`;
 	let { rows: sites } = await pool.query(query);
 	res.render("project-master/create-project", { token, sites });
-	console.log("🚀 ~ renderController.renderCreateProjectMaster= ~ sites:", sites)
 }
 
 renderController.renderCreateBg = async (req, res) => {
@@ -600,11 +599,64 @@ renderController.renderBankMaster = async (req, res) => {
 
 	try {
 
-		return res.render("bank-master/bank-master", {  token});
+		return res.render("bank-master/bank-master", { token });
 	} catch (err) {
 		console.log(err);
 		return res.send({ status: 0, msg: "Something Went Wrong" });
 	}
 };
+
+renderController.renderFdr = async (req, res) => {
+	let token = req.session.token;
+	try {
+		return res.render("fdr/fdr", { token });
+	} catch (err) {
+		console.log(err);
+		return res.send({ status: 0, msg: "Something Went Wrong" });
+	}
+};
+
+renderController.renderAddFdr = async (req, res) => {
+	let token = req.session.token;
+	const query = `SELECT * FROM bank_master`;
+	const { rows: banks } = await pool.query(query);
+	const payoutClause = `SELECT * FROM fdr_payout_clause`;
+	const renewalQuery = `SELECT * FROM renewal_types`
+	const purposeQuery = `SELECT * FROM purpose_types`
+	try {
+		const { rows: payoutClauseData } = await pool.query(payoutClause);
+		const {rows:renewalTypes} = await pool.query(renewalQuery)
+		const {rows:purposeTypes} = await pool.query(purposeQuery)
+		
+		return res.render("fdr/add-fdr", { token, banks, payoutClauseData, renewalTypes, purposeTypes });
+	} catch (err) {
+		console.log(err);
+		return res.send({ status: 0, msg: "Something Went Wrong" });
+	}
+};
+
+renderController.renderEditFdr = async (req, res) => {
+	let token = req.session.token;
+	try {
+		let doc_id = Buffer.from(req.params.id, "base64").toString("utf-8");
+		let query = `SELECT * FROM fdr_menu WHERE doc_id = $1`;
+		const bankQuery = `SELECT * FROM bank_master`;
+		const payoutClause = `SELECT * FROM fdr_payout_clause`;
+		const renewalQuery = `SELECT * FROM renewal_types`
+		const purposeQuery = `SELECT * FROM purpose_types`
+		const { rows: banks } = await pool.query(bankQuery);
+		const { rows: payoutClauseData } = await pool.query(payoutClause);
+		const {rows:data} = await pool.query(query, [doc_id])
+		const {rows:renewalTypes} = await pool.query(renewalQuery)
+		const {rows:purposeTypes} = await pool.query(purposeQuery)
+		const fdrData = data[0]
+
+		return res.render("fdr/edit-fdr", { token, fdrData, banks, payoutClauseData, renewalTypes,purposeTypes  })
+
+	} catch (error) {
+		console.log("🚀 ~ renderController.renderEditFdr= ~ error:", error)
+		return res.send({ status: 0, msg: "Something Went Wrong" });
+	}
+}
 
 module.exports = renderController;

@@ -1,16 +1,16 @@
-function setApplicant() {
-  let $dropdown = $("#doc_applicant_name");
+function setClause() {
+  let $dropdown = $("#doc_interest_payout_clause");
 
   $dropdown.select2({
     width: "100%",
     tags: true,
-    placeholder: "Select or Enter Beneficiary Name",
+    placeholder: "Select or Type",
     allowClear: true,
     createTag: function (params) {
       var term = $.trim(params.term);
       var exists = false;
 
-      $("#doc_applicant_name option").each(function () {
+      $("#doc_interest_payout_clause option").each(function () {
         if ($(this).val().toLowerCase() === term.toLowerCase()) {
           exists = true;
           return false;
@@ -31,15 +31,14 @@ function setApplicant() {
 
   $dropdown.off("select2:select").on("select2:select", function (e) {
     var selectedValue = e.params.data.id;
-
     if (e.params.data.newTag) {
       $.ajax({
-        url: "/docs/save-applicant/",
+        url: "/fdr/save-clause/",
         method: "POST",
-        data: { applicant_name: selectedValue },
+        data: { clause_name: selectedValue },
         success: function (response) {
           if (response.status == 1) {
-            getAllApplicantNames();
+            getAllClause();
           }
         },
         error: function (error) {
@@ -58,26 +57,144 @@ function setApplicant() {
   });
 }
 
-function getAllApplicantNames() {
-  const url = `/docs/get-applican-names`;
+function setRenewal() {
+  let $dropdown = $("#doc_renewal");
+
+  $dropdown.select2({
+    width: "100%",
+    tags: true,
+    placeholder: "Select or Type",
+    allowClear: true,
+    createTag: function (params) {
+      var term = $.trim(params.term);
+      var exists = false;
+
+      $("#doc_renewal option").each(function () {
+        if ($(this).val().toLowerCase() === term.toLowerCase()) {
+          exists = true;
+          return false;
+        }
+      });
+
+      if (exists) {
+        return null;
+      }
+
+      return {
+        id: term,
+        text: term,
+        newTag: true,
+      };
+    },
+  });
+
+  $dropdown.off("select2:select").on("select2:select", function (e) {
+    var selectedValue = e.params.data.id;
+    if (e.params.data.newTag) {
+      $.ajax({
+        url: "/fdr/save-new-renewal/",
+        method: "POST",
+        data: { renewal: selectedValue },
+        success: function (response) {
+          if (response.status == 1) {
+            getAllRenewal();
+          }
+        },
+        error: function (error) {
+          console.log("Error saving:", error);
+        },
+      });
+    }
+  });
+
+  $dropdown.off("select2:clear").on("select2:clear", function () {
+    let selectedValue = $dropdown.val();
+    if (selectedValue) {
+      $dropdown.find(`option[value="${selectedValue}"]`).remove();
+      $dropdown.trigger("change"); // Update Select2
+    }
+  });
+}
+
+function setPurpose() {
+  let $dropdown = $("#doc_purpose");
+
+  $dropdown.select2({
+    width: "100%",
+    tags: true,
+    placeholder: "Select or Type",
+    allowClear: true,
+    createTag: function (params) {
+      var term = $.trim(params.term);
+      var exists = false;
+
+      $("#doc_purpose option").each(function () {
+        if ($(this).val().toLowerCase() === term.toLowerCase()) {
+          exists = true;
+          return false;
+        }
+      });
+
+      if (exists) {
+        return null;
+      }
+
+      return {
+        id: term,
+        text: term,
+        newTag: true,
+      };
+    },
+  });
+
+  $dropdown.off("select2:select").on("select2:select", function (e) {
+    var selectedValue = e.params.data.id;
+    if (e.params.data.newTag) {
+      $.ajax({
+        url: "/fdr/save-purpose",
+        method: "POST",
+        data: { purpose: selectedValue },
+        success: function (response) {
+          if (response.status == 1) {
+            getAllPurpose();
+          }
+        },
+        error: function (error) {
+          console.log("Error saving:", error);
+        },
+      });
+    }
+  });
+
+  $dropdown.off("select2:clear").on("select2:clear", function () {
+    let selectedValue = $dropdown.val();
+    if (selectedValue) {
+      $dropdown.find(`option[value="${selectedValue}"]`).remove();
+      $dropdown.trigger("change"); // Update Select2
+    }
+  });
+}
+
+function getAllPurpose() {
+  const url = `/fdr/get-all-purpose`;
   $.ajax({
     url: url,
     type: "GET",
     success: function (response) {
       if (response.status === 1) {
-        let $dropdown = $("#doc_applicant_name");
+        let $dropdown = $("#doc_purpose");
 
         let currentValue = $dropdown.val();
         $dropdown.select2("destroy").empty();
-        response.payload.forEach((applicant) => {
-          let option = `<option value="${applicant.applicant_name}">
-                                    ${applicant.applicant_name}
+        response.data.forEach((data) => {
+          let option = `<option value="${data.purpose}">
+                                    ${data.purpose}
                                   </option>`;
           $dropdown.append(option);
         });
 
         // Reinitialize Select2
-        setApplicant();
+        setPurpose();
 
         // Restore previous selection
         if (currentValue) {
@@ -91,26 +208,27 @@ function getAllApplicantNames() {
   });
 }
 
-function fetchAllBeneficiary() {
-  const url = `/docs/get-Beneficiary`;
+function getAllClause() {
+  const url = `/fdr/get-all-clause`;
   $.ajax({
     url: url,
     type: "GET",
     success: function (response) {
+      console.log(response);
       if (response.status === 1) {
-        let $dropdown = $("#doc_beneficiary_name");
+        let $dropdown = $("#doc_interest_payout_clause");
 
         let currentValue = $dropdown.val();
         $dropdown.select2("destroy").empty();
-        response.payload.forEach((beneficiary) => {
-          let option = `<option value="${beneficiary.beneficiary_code}">
-                                    ${beneficiary.beneficiary_code}
+        response.data.forEach((data) => {
+          let option = `<option value="${data.clause_name}">
+                                    ${data.clause_name}
                                   </option>`;
           $dropdown.append(option);
         });
 
         // Reinitialize Select2
-        setBeneficiary();
+        setClause();
 
         // Restore previous selection
         if (currentValue) {
@@ -124,146 +242,27 @@ function fetchAllBeneficiary() {
   });
 }
 
-function setBeneficiary() {
-  let $dropdown = $("#doc_beneficiary_name");
-
-  $dropdown.select2({
-    width: "100%",
-    tags: true,
-    placeholder: "Select or Enter Beneficiary Name",
-    allowClear: true,
-    createTag: function (params) {
-      var term = $.trim(params.term);
-      var exists = false;
-
-      $("#doc_beneficiary_name option").each(function () {
-        if ($(this).val().toLowerCase() === term.toLowerCase()) {
-          exists = true;
-          return false;
-        }
-      });
-
-      if (exists) {
-        return null;
-      }
-
-      return {
-        id: term,
-        text: term,
-        newTag: true,
-      };
-    },
-  });
-
-  $dropdown.off("select2:select").on("select2:select", function (e) {
-    var selectedValue = e.params.data.id;
-
-    if (e.params.data.newTag) {
-      $.ajax({
-        url: "/docs/save-beneficiary/",
-        method: "POST",
-        data: { beneficiary_code: selectedValue },
-        success: function (response) {
-          if (response.status == 1) {
-            fetchAllBeneficiary();
-          }
-        },
-        error: function (error) {
-          console.log("Error saving:", error);
-        },
-      });
-    }
-  });
-
-  $dropdown.off("select2:clear").on("select2:clear", function () {
-    let selectedValue = $dropdown.val();
-    if (selectedValue) {
-      $dropdown.find(`option[value="${selectedValue}"]`).remove();
-      $dropdown.trigger("change"); // Update Select2
-    }
-  });
-}
-
-function setTypes() {
-  let $dropdown = $("#doc_type");
-
-  $dropdown.select2({
-    width: "100%",
-    tags: true,
-    placeholder: "Select or Enter Beneficiary Name",
-    allowClear: true,
-    createTag: function (params) {
-      var term = $.trim(params.term);
-      var exists = false;
-
-      $("#doc_type option").each(function () {
-        if ($(this).val().toLowerCase() === term.toLowerCase()) {
-          exists = true;
-          return false;
-        }
-      });
-
-      if (exists) {
-        return null;
-      }
-
-      return {
-        id: term,
-        text: term,
-        newTag: true,
-      };
-    },
-  });
-
-  $dropdown.off("select2:select").on("select2:select", function (e) {
-    var selectedValue = e.params.data.id;
-
-    if (e.params.data.newTag) {
-      $.ajax({
-        url: "/docs/save-type/",
-        method: "POST",
-        data: { type: selectedValue },
-        success: function (response) {
-          if (response.status == 1) {
-            getAllTypes();
-          }
-        },
-        error: function (error) {
-          console.log("Error saving:", error);
-        },
-      });
-    }
-  });
-
-  $dropdown.off("select2:clear").on("select2:clear", function () {
-    let selectedValue = $dropdown.val();
-    if (selectedValue) {
-      $dropdown.find(`option[value="${selectedValue}"]`).remove();
-      $dropdown.trigger("change"); // Update Select2
-    }
-  });
-}
-
-function getAllTypes() {
-  const url = `/docs/get-all-types`;
+function getAllRenewal() {
+  const url = `/fdr/get-all-renewal`;
   $.ajax({
     url: url,
     type: "GET",
     success: function (response) {
+      console.log(response);
       if (response.status === 1) {
-        let $dropdown = $("#doc_type");
+        let $dropdown = $("#doc_renewal");
 
         let currentValue = $dropdown.val();
         $dropdown.select2("destroy").empty();
-        response.payload.forEach((type) => {
-          let option = `<option value="${type.type_name}">
-                                    ${type.type_name}
+        response.data.forEach((data) => {
+          let option = `<option value="${data.renewal}">
+                                    ${data.renewal}
                                   </option>`;
           $dropdown.append(option);
         });
 
         // Reinitialize Select2
-        setTypes();
+        setRenewal();
 
         // Restore previous selection
         if (currentValue) {
@@ -278,12 +277,7 @@ function getAllTypes() {
 }
 
 $(document).ready(function () {
-  setBeneficiary();
-  setApplicant();
-  setTypes();
-});
-
-$('.js-select2').select2({
-  placeholder: 'Select an option',
-  width: 'resolve'
+  setClause();
+  setRenewal();
+  setPurpose();
 });
