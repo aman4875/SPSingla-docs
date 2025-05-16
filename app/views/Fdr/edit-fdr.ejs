@@ -381,6 +381,7 @@
             let closedByBackdropClick = false;
             let dplEndingMonths = 0
             let initialFormDataEntries = JSON.parse(`<%- JSON.stringify(fdrData) %>`);
+            let preBankId = JSON.parse(`<%- JSON.stringify(fdrData.bank_id) %>`)
 
 
             $(document).ready(function () {
@@ -394,12 +395,14 @@
                     const selectedOption = $('#select-site option:selected');
                     const bankCode = selectedOption.data('code');
                     const bankDocId = selectedOption.attr('id');
-                    console.log(initialFormDataEntries)
                     let form = $(this).closest("form")[0];
                     let formData = new FormData(this);
                     formData.append("bank_code", bankCode);
                     formData.append("bank_id", bankDocId);
                     formData.append("doc_id", doc_Id);
+                    if (bankDocId !== preBankId) {
+                        formData.append("preBankId", preBankId);
+                    }
                     let newFormDataEntries = {};
 
                     formData.forEach((value, key) => {

@@ -181,7 +181,6 @@ class fdrController {
       );
 
       if (checkForBanks.length === 0) {
-        console.log(bank_id);
         await pool.query(`
 		    UPDATE bank_master
             SET bank_code_status = false
@@ -198,6 +197,8 @@ class fdrController {
   editFdr = async (req, res) => {
     try {
       let inputs = req.body;
+      const preBankId = (inputs && inputs?.preBankId) || null;
+      if (preBankId) delete inputs.preBankId;
       const docId = inputs && inputs.doc_id;
       delete inputs.doc_id;
       let token = req.session.token;
@@ -247,6 +248,20 @@ class fdrController {
         generateInsertQuery(inputs);
 
       await pool.query(insertQuery, insertValues);
+
+      if (preBankId != null) {
+        const { rows: checkIfBankExists } = await pool.query(
+          `SELECT * FROM fdr_menu WHERE bank_id = $1`,
+          [preBankId]
+        );
+
+        if (checkIfBankExists.length === 0) {
+          await pool.query(`
+		        UPDATE bank_master
+            SET bank_code_status = false
+            WHERE doc_id = '${preBankId}'`);
+        }
+      }
 
       res.send({ status: 1, msg: "Success" });
     } catch (error) {
