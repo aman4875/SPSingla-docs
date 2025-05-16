@@ -609,7 +609,7 @@ renderController.renderBankMaster = async (req, res) => {
 renderController.renderFdr = async (req, res) => {
 	let token = req.session.token;
 	try {
-		return res.render("fdr/fdr", { token });
+		return res.render("Fdr/Fdr", { token });
 	} catch (err) {
 		console.log(err);
 		return res.send({ status: 0, msg: "Something Went Wrong" });
@@ -628,7 +628,7 @@ renderController.renderAddFdr = async (req, res) => {
 		const {rows:renewalTypes} = await pool.query(renewalQuery)
 		const {rows:purposeTypes} = await pool.query(purposeQuery)
 		
-		return res.render("fdr/add-fdr", { token, banks, payoutClauseData, renewalTypes, purposeTypes });
+		return res.render("Fdr/add-fdr", { token, banks, payoutClauseData, renewalTypes, purposeTypes });
 	} catch (err) {
 		console.log(err);
 		return res.send({ status: 0, msg: "Something Went Wrong" });
@@ -651,7 +651,7 @@ renderController.renderEditFdr = async (req, res) => {
 		const {rows:purposeTypes} = await pool.query(purposeQuery)
 		const fdrData = data[0]
 
-		return res.render("fdr/edit-fdr", { token, fdrData, banks, payoutClauseData, renewalTypes,purposeTypes  })
+		return res.render("Fdr/edit-fdr", { token, fdrData, banks, payoutClauseData, renewalTypes,purposeTypes  })
 
 	} catch (error) {
 		console.log("🚀 ~ renderController.renderEditFdr= ~ error:", error)
