@@ -10,7 +10,13 @@ class fdrController {
       const pageSize = inputs.limit || 10;
       const offset = (page - 1) * pageSize;
       let orderByClause = "ORDER BY d.doc_id DESC";
-      let baseQuery = `SELECT * FROM fdr_menu d`;
+      let baseQuery = `SELECT
+                *,
+                CASE
+                  WHEN d.doc_interest_rate < MAX(d.doc_interest_rate) OVER () THEN true
+                  ELSE false
+                END AS is_lowest_interest_rate
+              FROM fdr_menu d `;
       let conditions = [];
       let joins = "";
 
@@ -36,7 +42,7 @@ class fdrController {
         LIMIT ${pageSize}
         OFFSET ${offset}
       `;
-
+      console.log(query);
       // Execute the main query
       let { rows: documents } = await pool.query(query);
       return res.json({

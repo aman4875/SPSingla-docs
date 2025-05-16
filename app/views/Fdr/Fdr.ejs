@@ -19,6 +19,11 @@
             pointer-events: auto;
             cursor: pointer;
         }
+
+        .rowHighlight {
+            background-color: #ffe6e6;
+            border-left: 4px solid #ff4d4d;
+        }
     </style>
 </head>
 
@@ -340,6 +345,8 @@
             $('.scrollable-datatable').animate({ scrollLeft: '+=300' }, 200);
         });
 
+
+
         function renderTabledata(response) {
             if (response.payload.documents && response.payload.documents.length > 0) {
                 $("#table-status").empty();
@@ -348,7 +355,7 @@
                 let rowsHtml = "";
                 response.payload.documents.forEach((data) => {
                     let rowHtml = `
-                        <div class="nk-tb-item text-left table-content ${data.claim_pass ? "rowHighlight" : ""}">
+                        <div class="nk-tb-item text-left table-content ${data.is_lowest_interest_rate ? "rowHighlight" : ""}">
                         <% if(token.user_role != 3) { %>
                             <div class="nk-tb-col text-start editDocument">
                             <span style="margin-right: 8px;">
@@ -483,6 +490,9 @@
             $pagination.append(`<li class="paginate_button page-item ${currentPage === totalPages ? 'disabled' : 'next'}" id="DataTables_Table_2_next"><a aria-controls="DataTables_Table_2" role="link" data-dt-idx="next" tabindex="0" class="page-link">Next</a></li>`);
         }
         function fetchAllfdrs() {
+            $("#table-status").empty();
+            $(".table-content").empty();
+
             if (isFetching) return;
             isFetching = true;
             $("#table-status").html(`<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>`);

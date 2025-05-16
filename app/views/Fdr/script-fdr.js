@@ -7,7 +7,7 @@ $(document).on("click", "#deleteDocument", function (event) {
     url: "/fdr/delete-fdr",
     data: {
       docIdToDelete: docIdToDelete,
-      bank_id:bankID
+      bank_id: bankID,
     },
     success: function (response) {
       if (response.status == 1) {
@@ -48,9 +48,42 @@ $(document).on("click", "#deleteDoc", function (event) {
   let openModal = document.getElementById("open-modal");
 
   docIdToDelete = $(this).data("id"); // Using .data() to get 'data-id'
-  bankID = $(this).data("bank_id")
+  bankID = $(this).data("bank_id");
 
   if (docIdToDelete) {
     openModal.click();
   }
 });
+
+$(".filter-limit a").click(function (event) {
+  event.preventDefault();
+  const selectedLimit = $(this).data("limit");
+  filters.limit = selectedLimit;
+  $(".filter-limit li").removeClass("active");
+  $(this).parent().addClass("active");
+  fetchAllfdrs();
+});
+
+function handlePaginationClick(event) {
+  event.preventDefault();
+  const $target = $(event.target).closest("li");
+  let newPage = filters.page;
+
+  if ($target.hasClass("previous") && filters.page > 1) {
+    newPage--;
+  } else if ($target.hasClass("next") && filters.page < totalPages) {
+    newPage++;
+  } else {
+    const clickedPage = parseInt($target.find("a").text());
+    if (!isNaN(clickedPage)) {
+      newPage = clickedPage;
+    }
+  }
+
+  if (newPage !== filters.page) {
+    filters.page = newPage;
+    fetchAllfdrs();
+  }
+}
+
+$("#table-pagination").on("click", "a", handlePaginationClick);
