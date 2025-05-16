@@ -88,7 +88,7 @@
             </li>
             <li
               class="nk-menu-item <%= typeof active !== 'undefined' && active == 'fdr' ? 'active current-page' : '' %>"">
-              <a href="/fdr" class="nk-menu-link">
+              <a href=" /fdr" class="nk-menu-link">
               <span class="nk-menu-icon"><em class="icon ni ni-bag"></em></span>
               <span class="nk-menu-text">FDR</span>
               </a>
@@ -138,6 +138,16 @@
                 </li>
                 <% } %>
 
+                  <% if (token.fdr_status==true) { %>
+                    <li
+                      class="nk-menu-item <%= typeof active !== 'undefined' && active == 'fdr' ? 'active current-page' : '' %>"">
+                       <a href=" /fdr" class="nk-menu-link">
+                      <span class="nk-menu-icon"><em class="icon ni ni-bag"></em></span>
+                      <span class="nk-menu-text">FDR</span>
+                      </a>
+                    </li>
+
+                    <% } %>
 
             </ul>
             <%}%>

@@ -5,15 +5,18 @@ userController.saveUser = async (req, res) => {
 	try {
 		const inputs = req.body;
 		const query = `
-        INSERT INTO users (user_name, user_email, user_password, user_role, user_status, bank_guarantee_status)
-        VALUES ($1, $2, $3, $4, $5, $6)
+        INSERT INTO users (user_name, user_email, user_password, user_role, user_status, bank_guarantee_status, FDR_status)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
         ON CONFLICT (user_email)
         DO UPDATE SET
           user_name = EXCLUDED.user_name,
           user_password = EXCLUDED.user_password,
           user_role = EXCLUDED.user_role,
           user_status = EXCLUDED.user_status,
-          bank_guarantee_status = EXCLUDED.bank_guarantee_status`; // Removed incorrect semicolon
+          bank_guarantee_status = EXCLUDED.bank_guarantee_status,
+		  FDR_status = EXCLUDED.FDR_status
+		  `; 
+		  
 
 		let updatedUser = await pool.query(query, [
 			inputs.user_name,
@@ -21,7 +24,8 @@ userController.saveUser = async (req, res) => {
 			inputs.user_password,
 			inputs.user_role,
 			inputs.user_status,
-			inputs.bank_guarantee_status
+			inputs.bank_guarantee_status,
+			inputs.FDR_status
 		]);
 
 		if (updatedUser.rowCount > 0) { // Check if rows were affected
