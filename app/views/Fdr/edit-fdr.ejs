@@ -82,13 +82,25 @@
                                                                 <label class="form-label"
                                                                     for="doc_purpose">Purpose</label>
                                                                 <div class="form-control-wrap">
-                                                                    <input type="text" class="form-control"
-                                                                        placeholder="Purpose" id="doc_purpose"
-                                                                        name="doc_purpose"
-                                                                        value="<%= fdrData.doc_purpose %>" required />
+                                                                    <select class="form-select form-control js-select2"
+                                                                        id="doc_purpose" name="doc_purpose"
+                                                                        data-placeholder="Select or Enter Purpose"
+                                                                        required>
+                                                                        <option label="empty" value=""></option>
+                                                                        <% purposeTypes.forEach(data=> { %>
+                                                                            <option data-id="<%= data.id %>"
+                                                                                  value="<%= data.purpose %>"
+                                                                                <%=fdrData.doc_purpose===data.purpose
+                                                                                ? "selected" : "" %>
+                                                                                >
+                                                                                <%= data.purpose %>
+                                                                            </option>
+                                                                            <% }); %>
+                                                                    </select>
                                                                 </div>
                                                             </div>
                                                         </div>
+
                                                         <div class="col-md-4">
                                                             <div class="form-group">
                                                                 <label class="form-label" for="doc_fdr_no">FDR
@@ -225,15 +237,27 @@
                                                             </div>
                                                         </div>
 
+
                                                         <div class="col-md-4">
                                                             <div class="form-group">
                                                                 <label class="form-label"
                                                                     for="doc_renewal">Renewal</label>
                                                                 <div class="form-control-wrap">
-                                                                    <input required type="text" class="form-control"
-                                                                        placeholder="Renewal" id="doc_renewal"
-                                                                        name="doc_renewal"
-                                                                        value="<%= fdrData.doc_renewal %>" />
+                                                                    <select class="form-select form-control js-select2"
+                                                                        id="doc_renewal" name="doc_renewal"
+                                                                        data-placeholder="Select or Type" required>
+                                                                        <option label="empty" value=""></option>
+                                                                        <% renewalTypes.forEach(data=> { %>
+                                                                            <option data-id="<%= data.id %>"
+                                                                                     value="<%= data.renewal %>"
+                                                                                <%=fdrData.doc_renewal===data.renewal
+                                                                                ? "selected" : "" %>
+                                                                                >
+                                                                                <%= data.renewal %>
+                                                                            </option>
+                                                                            <% }); %>
+                                                                    </select>
+
                                                                 </div>
                                                             </div>
                                                         </div>

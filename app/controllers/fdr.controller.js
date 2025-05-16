@@ -135,6 +135,36 @@ class fdrController {
     }
   };
 
+  getAllRenewal = async (req, res) => {
+    try {
+      const query = `SELECT * FROM renewal_types ORDER BY id`;
+      const { rows: data } = await pool.query(query);
+      res.send({
+        status: 1,
+        msg: "success",
+        data: data,
+      });
+    } catch (error) {
+      console.error("Error saving FDR data:", error);
+      res.send({ status: 0, msg: "Something went wrong" });
+    }
+  };
+
+  getAllPurpose = async (req, res) => {
+    try {
+      const query = `SELECT * FROM purpose_types ORDER BY id`;
+      const { rows: data } = await pool.query(query);
+      res.send({
+        status: 1,
+        msg: "success",
+        data: data,
+      });
+    } catch (error) {
+      console.error("Error saving FDR data:", error);
+      res.send({ status: 0, msg: "Something went wrong" });
+    }
+  };
+
   saveClause = async (req, res) => {
     const inputs = req.body;
     const clause_name = inputs?.clause_name || null;
@@ -153,6 +183,66 @@ class fdrController {
       res.send({
         status: 1,
         msg: "Clause saved successfully!",
+        data: rows[0],
+      });
+    } catch (error) {
+      console.error("Error saving clause:", error);
+      res.send({
+        status: 0,
+        msg: "Something went wrong",
+        data: null,
+      });
+    }
+  };
+
+  saveRenewal = async (req, res) => {
+    const inputs = req.body;
+    const renewal = inputs?.renewal || null;
+
+    if (!renewal) {
+      return res.status(400).json({ message: "renewal is required" });
+    }
+
+    const saveClauseQuery = `
+      INSERT INTO renewal_types (renewal)
+      VALUES ($1)
+      RETURNING *;`;
+
+    try {
+      const { rows } = await pool.query(saveClauseQuery, [renewal]);
+      res.send({
+        status: 1,
+        msg: "Clause saved successfully!",
+        data: rows[0],
+      });
+    } catch (error) {
+      console.error("Error saving clause:", error);
+      res.send({
+        status: 0,
+        msg: "Something went wrong",
+        data: null,
+      });
+    }
+  };
+
+  savePurpose = async (req, res) => {
+    const inputs = req.body;
+    const purpose = inputs?.purpose || null;
+
+    if (!purpose) {
+      return res.status(400).json({ message: "purpose is required" });
+    }
+
+    const saveClauseQuery = `
+      INSERT INTO purpose_types (purpose)
+      VALUES ($1)
+      RETURNING *;`;
+
+    try {
+      const { rows } = await pool.query(saveClauseQuery, [purpose]);
+      res.send({
+        status: 1,
+        msg: "success",
         data: rows[0],
       });
     } catch (error) {
