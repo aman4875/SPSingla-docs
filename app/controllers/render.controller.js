@@ -608,8 +608,11 @@ renderController.renderBankMaster = async (req, res) => {
 
 renderController.renderFdr = async (req, res) => {
 	let token = req.session.token;
+	const bankQuery = `SELECT * FROM bank_master`;
+	const query = `SELECT * FROM bank_master`;
+	const { rows: banks } = await pool.query(query);
 	try {
-		return res.render("Fdr/Fdr", { token });
+		return res.render("Fdr/Fdr", { token, banks });
 	} catch (err) {
 		console.log(err);
 		return res.send({ status: 0, msg: "Something Went Wrong" });

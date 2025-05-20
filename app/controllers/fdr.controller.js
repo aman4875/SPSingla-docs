@@ -3,30 +3,67 @@ const getCurrentDateTime = require("../utils/getCurrentDateTime.js");
 
 class fdrController {
   getAllFdrData = async (req, res) => {
+    let token = req.session.token;
+
+    if (token?.user_role != "0" && token?.bank_guarantee_status == false) {
+      return res.json({
+        status: 1,
+        msg: "no permission",
+        payload: {
+          documents: [],
+          totalPages: 0,
+          currentPage: 0,
+        },
+      });
+    }
+
     try {
       let inputs = req.body;
-      let token = req.session.token;
+      const { selectedBankId } = req.query;
       const page = inputs.page || 1;
       const pageSize = inputs.limit || 10;
       const offset = (page - 1) * pageSize;
       let orderByClause = "ORDER BY d.doc_id DESC";
-      let baseQuery = `SELECT
-                *,
-                CASE
-                  WHEN d.doc_interest_rate < MAX(d.doc_interest_rate) OVER () THEN true
-                  ELSE false
-                END AS is_lowest_interest_rate
-              FROM fdr_menu d `;
+      let baseQuery = `
+          SELECT
+            *,
+            CASE
+              WHEN d.doc_interest_rate < MAX(d.doc_interest_rate) OVER () THEN true
+              ELSE false
+            END AS is_lowest_interest_rate
+          FROM fdr_menu d
+          ${
+            selectedBankId !== "null"
+              ? `WHERE d.bank_id = '${selectedBankId}'`
+              : ""
+          }`;
+
+      const rowSummary = `
+            SELECT
+              SUM(COALESCE("doc_deposit_amount", 0)) AS total_deposit_amount,
+              SUM(COALESCE("doc_renewal_amount", 0)) AS total_renewal_amount,
+              SUM(COALESCE("doc_maturity_amount", 0)) AS total_maturity_amount,
+              SUM(COALESCE("doc_interest", 0)) AS total_interest,
+              SUM(COALESCE("doc_tds", 0)) AS total_tds,
+              SUM(COALESCE("doc_margin_available", 0)) AS total_margin_available
+            FROM fdr_menu ${
+              selectedBankId !== "null"
+                ? `WHERE fdr_menu.bank_id = '${selectedBankId}'`
+                : ""
+            }`;
+
       let conditions = [];
+      if (selectedBankId !== "null") {
+        conditions.push(`d.bank_id = '${selectedBankId}'`);
+      }
       let joins = "";
 
       // Query to get the total count of documents
       let countQuery = `
-		SELECT COUNT(DISTINCT d.doc_id) as total
-		FROM fdr_menu d
-		${joins}
-		${conditions.length ? " WHERE " + conditions.join(" AND ") : ""}
-	  `;
+          SELECT COUNT(DISTINCT d.doc_id) as total
+          FROM fdr_menu d
+          ${joins}
+          ${conditions.length ? " WHERE " + conditions.join(" AND ") : ""}`;
 
       let { rows: countResult } = await pool.query(countQuery);
 
@@ -45,6 +82,7 @@ class fdrController {
       console.log(query);
       // Execute the main query
       let { rows: documents } = await pool.query(query);
+      let { rows: aggregatedAmountRow } = await pool.query(rowSummary);
       return res.json({
         status: 1,
         msg: "Success",
@@ -52,6 +90,7 @@ class fdrController {
           documents,
           totalPages,
           currentPage: page,
+          aggregatedAmountRow,
         },
       });
     } catch (err) {

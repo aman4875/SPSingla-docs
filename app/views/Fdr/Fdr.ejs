@@ -24,13 +24,18 @@
             background-color: #ffe6e6;
             border-left: 4px solid #ff4d4d;
         }
+        .rowSummary .nk-tb-col {
+            color: #3c4d62;
+            padding-top: 5px !important;
+            padding-bottom: 5px !important;
+        }
     </style>
 </head>
 
 <body class="nk-body bg-lighter npc-general has-sidebar">
     <div class="nk-app-root">
         <div class="nk-main">
-            <%- include('./common/sidebar' , {subItems:{active:"fdr"} }); -%>
+            <%- include('./common/sidebar' , {active:"fdr" }); -%>
                 <div class="nk-wrap project-master">
                     <%- include('./common/navbar',{headerText:"FDR Controller"}); -%>
                         <div class="nk-content">
@@ -43,9 +48,28 @@
                                                     <div class="nk-block-head-content">
                                                         <div class="row align-items-center">
                                                             <div class="col">
-                                                                <h3 class="nk-block-title page-title">FDR Menu
-                                                                </h3>
+                                                                <h3 class="nk-block-title page-title">FDR</h3>
                                                             </div>
+                                                            <div class="col  px-0 ">
+                                                                <div class="nk-tb-col px-0 py-0 replied-vide-select">
+                                                                    <select class="form-select form-control js-select2"
+                                                                        data-filter="single" id="select_bank"
+                                                                        name="doc_bank_name"
+                                                                        data-placeholder="Select Bank">
+                                                                        <option value="" disabled selected>Select Bank
+                                                                        </option>
+                                                                        <% banks.forEach(bank=> { %>
+                                                                            <option data-code="<%= bank.bank_code %>"
+                                                                                id="<%= bank.doc_id %>"
+                                                                                value="<%= bank.bank_name %>">
+                                                                                <%= bank.bank_name %>
+                                                                            </option>
+                                                                            <% }); %>
+                                                                    </select>
+                                                                </div>
+
+                                                            </div>
+
                                                         </div>
                                                     </div>
 
@@ -81,6 +105,7 @@
                                                                                         data-target="cardTools"><em
                                                                                             class="icon ni ni-arrow-left"></em></a>
                                                                                 </li>
+
                                                                                 <li>
                                                                                     <div class="dropdown mr-2">
                                                                                         <a href="#"
@@ -89,10 +114,12 @@
                                                                                             <em
                                                                                                 class="icon ni ni-setting"></em>
                                                                                         </a>
+
                                                                                         <div
                                                                                             class="dropdown-menu dropdown-menu-xs dropdown-menu-end">
                                                                                             <ul
                                                                                                 class="filter-limit link-check">
+
                                                                                                 <li><span>Show</span>
                                                                                                 </li>
                                                                                                 <li class="active">
@@ -112,6 +139,14 @@
                                                                                         </div>
 
                                                                                     </div>
+                                                                                </li>
+                                                                                <li>
+                                                                                    <a id="resetFilters"
+                                                                                        class="btn btn-dim btn-outline-primary">
+                                                                                        <em
+                                                                                            class="icon ni ni-reload-alt"></em>
+                                                                                        <span>Reset Filter</span>
+                                                                                    </a>
                                                                                 </li>
                                                                             </ul>
                                                                         </div>
@@ -335,7 +370,10 @@
         let filters = {
             page: 1,
             limit: 10,
+            activeFilter: {}
         };
+        let selectedBankId = null
+        let docLastIndex = null
 
         $('#scroll-left').on('click', function () {
             $('.scrollable-datatable').animate({ scrollLeft: '-=300' }, 200);
@@ -346,16 +384,16 @@
         });
 
 
-
         function renderTabledata(response) {
+            docLastIndex = response.payload.documents.length
             if (response.payload.documents && response.payload.documents.length > 0) {
                 $("#table-status").empty();
                 $(".table-content").empty();
 
                 let rowsHtml = "";
-                response.payload.documents.forEach((data) => {
+                response.payload.documents.forEach((data, index) => {
                     let rowHtml = `
-                        <div class="nk-tb-item text-left table-content ${data.is_lowest_interest_rate ? "rowHighlight" : ""}">
+                        <div ${docLastIndex === ++index ? "id=lastIndex" : ""} class="nk-tb-item text-left table-content ${data.is_lowest_interest_rate ? "rowHighlight" : ""}">
                         <% if(token.user_role != 3) { %>
                             <div class="nk-tb-col text-start editDocument">
                             <span style="margin-right: 8px;">
@@ -436,6 +474,10 @@
                 })
                 $("#table-filters").after(rowsHtml);
 
+                if (selectedBankId !== null) {
+                }
+                rendersummaryRow(response.payload)
+
 
             } else {
                 console.log("No Records Found");
@@ -489,16 +531,18 @@
             // Next button
             $pagination.append(`<li class="paginate_button page-item ${currentPage === totalPages ? 'disabled' : 'next'}" id="DataTables_Table_2_next"><a aria-controls="DataTables_Table_2" role="link" data-dt-idx="next" tabindex="0" class="page-link">Next</a></li>`);
         }
+
         function fetchAllfdrs() {
             $("#table-status").empty();
-            $(".table-content").empty();
+            $(".table-content").remove();
+            docLastIndex = null
 
             if (isFetching) return;
             isFetching = true;
             $("#table-status").html(`<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>`);
             $.ajax({
                 type: "POST",
-                url: "/fdr/get-all-fdrs",
+                url: `/fdr/get-all-fdrs?selectedBankId=${selectedBankId ? selectedBankId : null}`,
                 data: JSON.stringify(filters),
                 contentType: "application/json",
                 success: function (response) {
@@ -521,12 +565,45 @@
             });
         }
 
-
-
         (function () {
             fetchAllfdrs()
         })();
 
+        $(document).ready(function () {
+            $("#select_bank").on("change", function () {
+                const selectedOption = $(this).find("option:selected");
+                const docId = selectedOption.attr("id");
+                selectedBankId = docId;
+                if ((selectedBankId !== undefined) & (selectedBankId !== null)) {
+                    fetchAllfdrs();
+                }
+            });
+        });
+
+        $("#resetFilters").on("click", function () {
+            if (Object.keys(filters.activeFilter).length || selectedBankId !== null) {
+                filters = {
+                    limit: 10,
+                    page: 1,
+                };
+                selectedBankId = null;
+                const resetFields = ["#select_bank"];
+
+                resetFields.forEach((selector) => {
+                    const $field = $(selector);
+
+                    if ($field.length) {
+                        if ($field.hasClass("select2-hidden-accessible")) {
+                            $field.val(null).trigger("change");
+                        } else {
+                            $field.val("");
+                        }
+                    }
+                });
+
+                fetchAllfdrs();
+            }
+        });
     </script>
 </body>
 

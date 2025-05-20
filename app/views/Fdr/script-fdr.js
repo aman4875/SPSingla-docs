@@ -87,3 +87,72 @@ function handlePaginationClick(event) {
 }
 
 $("#table-pagination").on("click", "a", handlePaginationClick);
+
+function rendersummaryRow(data) {
+  const rowSummary = data.aggregatedAmountRow[0];
+
+  const rowHTML = `
+<div class="nk-tb-item text-left table-content rowSummary">
+    <div class="nk-tb-col text-start editDocument">
+    <b>TOTAL :</b>
+    </div>
+    <div class="nk-tb-col text-start">
+
+    </div>
+    <div class="nk-tb-col text-start">
+
+    </div>
+    <div class="nk-tb-col text-start">
+
+    </div>
+    <div class="nk-tb-col text-start">
+
+    </div>
+    <div class="nk-tb-col text-start">
+
+    </div>
+    <div class="nk-tb-col text-start">
+    <b>${rowSummary?.total_deposit_amount || 0}</b>
+    </div>
+    <div class="nk-tb-col text-start">
+
+    </div>
+    <div class="nk-tb-col text-start">
+
+    </div>
+    <div class="nk-tb-col text-start">
+
+    </div>
+    <div class="nk-tb-col text-start">
+
+    </div>
+    <div class="nk-tb-col text-start">
+
+    </div>
+    <div class="nk-tb-col text-start">
+
+    </div>
+    <div class="nk-tb-col text-start">
+     <b>${rowSummary?.total_renewal_amount || 0}</b>
+    </div>
+    <div class="nk-tb-col text-start">
+
+    </div>
+    <div class="nk-tb-col text-start">
+    <b>${rowSummary?.total_maturity_amount || 0}</b>
+    </div>
+    <div class="nk-tb-col text-start">
+    <b>${rowSummary?.total_interest || 0}</b>
+    </div>
+    <div class="nk-tb-col text-start">
+    <b>${rowSummary?.total_tds || 0}</b>
+    </div>
+    <div class="nk-tb-col text-start">
+    <b>${rowSummary?.total_margin_available || 0}</b>
+    </div>
+    <div class="nk-tb-col text-start">
+
+    </div>
+</div>`;
+  $("#lastIndex").after(rowHTML);
+}
