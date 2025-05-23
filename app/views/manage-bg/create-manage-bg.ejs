@@ -339,14 +339,17 @@
                                                                 <div class="">
                                                                     <label class="form-label" for="doc_bank_name">Bank
                                                                         Name</label>
-                                                                    <select class=" js-select2" id="doc_bank_name"
-                                                                        name="doc_bank_name"
-                                                                        data-placeholder="Select Bank Name">
-                                                                        <option label="empty" value=""></option>
-                                                                        <% bankName.forEach(bankName=> { %>
-                                                                            <option data-id="<%= bankName.id %>"
-                                                                                value="<%= bankName.bank_name %>">
-                                                                                <%= bankName.bank_name %>
+                                                                    <select class="form-select form-control js-select2"
+                                                                        data-filter="single" id="select-site"
+                                                                        name="doc_bank_name" data-placeholder="Select Bank
+                                                                            Name" required>
+                                                                        <option value="" disabled selected>Select Bank
+                                                                            Name</option>
+                                                                        <% banks.forEach(bank=> { %>
+                                                                            <option data-code="<%= bank.bank_code %>"
+                                                                                id="<%= bank.doc_id %>"
+                                                                                value="<%= bank.bank_name %>">
+                                                                                <%= bank.bank_name %>
                                                                             </option>
                                                                             <% }); %>
                                                                     </select>
@@ -512,7 +515,87 @@
                                                                     </div>
                                                                 </div>
                                                             </div>
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <label class="form-label" for="doc_bg_commission">BG
+                                                                        Commission (% pa)</label>
+                                                                    <div class="form-control-wrap">
+                                                                        <input type="text" id="doc_bg_commission"
+                                                                            autocomplete="off" name="doc_bg_commission"
+                                                                            placeholder="BG Cancelled on"
+                                                                            class="form-control" value="" />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
 
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <label class="form-label"
+                                                                        for="doc_commission_amount">Commision
+                                                                        Amount</label>
+                                                                    <div class="form-control-wrap">
+                                                                        <input type="text" id="doc_commission_amount"
+                                                                            autocomplete="off"
+                                                                            name="doc_commission_amount"
+                                                                            placeholder="BG Cancelled on"
+                                                                            class="form-control" value="" />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <label class="form-label"
+                                                                        for="doc_commission_charged">Commision Charged
+                                                                        By Bank</label>
+                                                                    <div class="form-control-wrap">
+                                                                        <input type="text" id="doc_commission_charged"
+                                                                            autocomplete="off"
+                                                                            name="doc_commission_charged"
+                                                                            placeholder="BG Cancelled on"
+                                                                            class="form-control" value="" />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <label class="form-label"
+                                                                        for="doc_required_margin">Required Margin (% of
+                                                                        BG Amount)</label>
+                                                                    <div class="form-control-wrap">
+                                                                        <input type="text" id="doc_required_margin"
+                                                                            autocomplete="off"
+                                                                            name="doc_required_margin"
+                                                                            placeholder="BG Cancelled on"
+                                                                            class="form-control" value="" />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <label class="form-label"
+                                                                        for="doc_margin_amount">Margin Amount</label>
+                                                                    <div class="form-control-wrap">
+                                                                        <input type="text" id="doc_margin_amount"
+                                                                            autocomplete="off" name="doc_margin_amount"
+                                                                            placeholder="BG Cancelled on"
+                                                                            class="form-control" value="" />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-8">
+                                                                <div class="form-group">
+                                                                    <label class="form-label"
+                                                                        for="doc_margin_available">Margin
+                                                                        Available</label>
+                                                                    <div class="form-control-wrap">
+                                                                        <input type="text" id="doc_margin_available"
+                                                                            autocomplete="off"
+                                                                            name="doc_margin_available"
+                                                                            placeholder="BG Cancelled on"
+                                                                            class="form-control" value="" />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                             <div class="col-md-4" id="pdfUploadContainer">
                                                                 <div class="form-group">
                                                                     <label class="form-label" for="doc_file">Upload
@@ -716,6 +799,8 @@
                 });
             }
 
+            
+
 
             $("#documentForm").submit(function (event) {
                 event.preventDefault();
@@ -752,6 +837,9 @@
                     },
                 });
             });
+
+
+
 
         </script>
 </body>

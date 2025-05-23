@@ -458,10 +458,11 @@ renderController.editBG = async (req, res) => {
 		let { rows: bankName } = await pool.query(
 			`SELECT * FROM bank_names ORDER BY id DESC`
 		)
+		const { rows: banks } = await pool.query(`SELECT * FROM bank_master`);
 
 		const { rows } = await pool.query(query, [doc_id]);
 		const manageBgData = rows[0]
-		return res.render("manage-bg/edit-bg.ejs", { token, manageBgData, beneficiaryNames, applicantNames, types, bankName });
+		return res.render("manage-bg/edit-bg.ejs", { token, manageBgData, beneficiaryNames, applicantNames, types, bankName, banks });
 	} catch (error) {
 		console.error(error);
 		return res.send("Internal Server Error");
@@ -544,9 +545,9 @@ renderController.renderCreateBg = async (req, res) => {
 		`SELECT * FROM beneficiary_names ORDER BY id DESC`
 	)
 	let { rows: applicantNames } = await pool.query(
-		`SELECT * FROM applicant_names ORDER BY id DESC;
-`
+		`SELECT * FROM applicant_names ORDER BY id DESC;`
 	)
+	const { rows: banks } = await pool.query(`SELECT * FROM bank_master`);
 
 	res.render("manage-bg/create-manage-bg", {
 		token,
@@ -556,7 +557,8 @@ renderController.renderCreateBg = async (req, res) => {
 		types,
 		bankName,
 		beneficiaryNames,
-		applicantNames
+		applicantNames,
+		banks
 	});
 }
 
@@ -575,9 +577,9 @@ renderController.renderManageBg = async (req, res) => {
 	let { rows: types } = await pool.query(
 		`SELECT * FROM contract_types ORDER BY id DESC`
 	)
+	const { rows: banks } = await pool.query(`SELECT * FROM bank_master`);
 
-
-	res.render("manage-bg/manage-bg", { token, projects, applicantNames, beneficiaryNames, types });
+	res.render("manage-bg/manage-bg", { token, projects, applicantNames, beneficiaryNames, types, banks });
 }
 renderController.settings = async (req, res) => {
 	let token = req.session.token;

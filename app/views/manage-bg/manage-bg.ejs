@@ -20,6 +20,10 @@
         /* Softer red */
         border-left: 4px solid #ff4d4d;
     }
+
+    .manage-bg select#doc_bank_name~span.select2 {
+        min-width: 150px;
+    }
 </style>
 
 <body class="nk-body bg-lighter npc-general has-sidebar">
@@ -52,9 +56,7 @@
                                                                             <option value="<%= project.doc_work_name %>"
                                                                                 data-code="<%= project.doc_code %>"
                                                                                 data-name="<%= project.doc_work_name %>"
-                                                                                data-project-id="<%= project.doc_id %>"
-                                                                                
-                                                                                >
+                                                                                data-project-id="<%= project.doc_id %>">
                                                                                 <%= project.doc_code %>: <%=
                                                                                         project.doc_work_name %>
                                                                             </option>
@@ -260,12 +262,14 @@
                                                                         </div>
                                                                         <div class="nk-tb-col">
                                                                             <span
-                                                                                data-field="doc_performance_security">Performance Security</span><span
+                                                                                data-field="doc_performance_security">Performance
+                                                                                Security</span><span
                                                                                 class="sort-indicator"></span>
                                                                         </div>
                                                                         <div class="nk-tb-col">
                                                                             <span
-                                                                                data-field="doc_additional_performance_security">Additional Performance Security</span><span
+                                                                                data-field="doc_additional_performance_security">Additional
+                                                                                Performance Security</span><span
                                                                                 class="sort-indicator"></span>
                                                                         </div>
                                                                         <div class="nk-tb-col">
@@ -349,6 +353,44 @@
                                                                                 BG</span><span
                                                                                 class="sort-indicator"></span>
                                                                         </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span data-field="doc_storage_location">BG
+                                                                                Commission (% pa)</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span
+                                                                                data-field="doc_storage_location">Commision
+                                                                                Amount</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span
+                                                                                data-field="doc_storage_location">Commision
+                                                                                Charged
+                                                                                By Bank</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span
+                                                                                data-field="doc_storage_location">Required
+                                                                                Margin (% of
+                                                                                BG Amount)</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span
+                                                                                data-field="doc_storage_location">Margin
+                                                                                Amount</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span
+                                                                                data-field="doc_storage_location">Margin
+                                                                                Available</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+
                                                             </div>
 
                                                             <div class="nk-tb-item nk-tb-head" id="table-filters">
@@ -544,11 +586,24 @@
                                                                         </div>
                                                                         <div class="nk-tb-col">
                                                                             <span>
-                                                                                <input type="text"
-                                                                                    class="form-control filter-input"
+                                                                                <select
+                                                                                    class="form-select form-control js-select2 filter-input"
                                                                                     data-filter="text"
                                                                                     id="doc_bank_name"
-                                                                                    placeholder="Bank Name">
+                                                                                    name="doc_bank_name"
+                                                                                    data-placeholder="Bank Name">
+                                                                                    <option value="" disabled selected>
+                                                                                        Select Bank
+                                                                                        Name</option>
+                                                                                    <% banks.forEach(bank=> { %>
+                                                                                        <option
+                                                                                            data-code="<%= bank.bank_code %>"
+                                                                                            id="<%= bank.doc_id %>"
+                                                                                            value="<%= bank.bank_name %>">
+                                                                                            <%= bank.bank_name %>
+                                                                                        </option>
+                                                                                        <% }); %>
+                                                                                </select>
                                                                             </span>
                                                                         </div>
                                                                         <div class="nk-tb-col">
@@ -669,6 +724,64 @@
                                                                         <div class="nk-tb-col">
                                                                             <span>
 
+                                                                            </span>
+                                                                        </div>
+
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_bg_commission"
+                                                                                    placeholder="BG Commission (% pa)">
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control  filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_commission_amount"
+                                                                                    placeholder="Commision Amount">
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_commission_charged"
+                                                                                    placeholder="Commision Charged By Bank">
+                                                                            </span>
+                                                                        </div>
+
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control  filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_required_margin"
+                                                                                    placeholder="Required Margin (% of BG Amount)">
+                                                                            </span>
+                                                                        </div>
+
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control  filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_margin_amount"
+                                                                                    placeholder="Margin Amount">
+                                                                            </span>
+                                                                        </div>
+
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control  filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_margin_available"
+                                                                                    placeholder="Margin Available">
                                                                             </span>
                                                                         </div>
                                                             </div>
@@ -947,6 +1060,24 @@
                 ${renderPdfLinks(data?.attachments)} 
                 </span>
             </div>
+             <div class="nk-tb-col text-start">
+                <span>${data.doc_bg_commission || "-"}</span>
+            </div>
+             <div class="nk-tb-col text-start">
+                <span>${data.doc_margin_amount || "-"}</span>
+            </div>
+             <div class="nk-tb-col text-start">
+                <span>${data.doc_commission_charged || "-"}</span>
+            </div>
+             <div class="nk-tb-col text-start">
+                <span>${data.doc_required_margin || "-"}</span>
+            </div>
+             <div class="nk-tb-col text-start">
+                <span>${data.doc_margin_amount || "-"}</span>
+            </div>
+             <div class="nk-tb-col text-start">
+                <span>${data.doc_margin_available || "-"}</span>
+            </div>
         </div>`
                     rowsHtml += rowHtml;
                 })
@@ -1018,7 +1149,7 @@
             $.ajax({
                 type: "DELETE",
                 url: "/docs/delete-bg",
-                data: { docId: docIdToDelete, docCode: docCode ,projectIdToDelete:projectIdToDelete },
+                data: { docId: docIdToDelete, docCode: docCode, projectIdToDelete: projectIdToDelete },
                 success: function (response) {
                     if (response.status == 1) {
                         NioApp.Toast("<h5>Deleted Successfully</h5><p>Document deleted successfully!</p>", "success");

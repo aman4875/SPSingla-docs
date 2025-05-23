@@ -306,7 +306,7 @@ class fdrController {
 
       const { rows: checkForBanks } = await pool.query(
         `SELECT * FROM fdr_menu WHERE bank_id = $1 AND doc_id <> $2`,
-        [bank_id, docIdToDelete]
+        [bank_id, docIdToDelete]  
       );
 
       if (checkForBanks.length === 0) {
