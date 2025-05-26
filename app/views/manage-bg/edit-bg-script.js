@@ -287,3 +287,57 @@ $('.js-select2').select2({
   placeholder: 'Select an option',
   width: 'resolve'
 });
+
+$(document).ready(() => {
+  const $input = $("#doc_bg_commission");
+
+  $input.on("input", function () {
+    let val = $(this)
+      .val()
+      .replace(/[^0-9.]/g, "")            // Keep numbers and dot
+      .replace(/(\..*?)\..*/g, "$1");     // Allow only one dot
+    $(this).data("raw", val);               // Store raw input
+  });
+
+  $input.on("focus", function () {
+    let val = $(this).val().replace("%", ""); // Remove % for editing
+    $(this).val(val);
+  });
+
+  $input.on("blur", function () {
+    let val = $(this).data("raw") || "";
+    if (val !== "") {
+      $(this).val(val + "%"); // Just append % without modifying
+    } else {
+      $(this).val(""); // Empty if no value
+    }
+  });
+});
+
+$(document).ready(() => {
+  const $input = $("#doc_required_margin");
+
+  $input.on("input", function () {
+    let val = $(this)
+      .val()
+      .replace(/[^0-9.]/g, "")            // Keep numbers and dot
+      .replace(/(\..*?)\..*/g, "$1");     // Allow only one dot
+    $(this).data("raw", val);               // Store raw input
+  });
+
+  $input.on("focus", function () {
+    let val = $(this).val().replace("%", ""); // Remove % for editing
+    $(this).val(val);
+  });
+
+  $input.on("blur", function () {
+    let val = $(this).data("raw") || "";
+    if (val !== "") {
+      $(this).val(val + "%"); // Just append % without modifying
+    } else {
+      $(this).val(""); // Empty if no value
+    }
+  });
+});
+
+

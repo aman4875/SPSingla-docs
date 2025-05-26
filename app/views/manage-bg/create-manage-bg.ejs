@@ -455,6 +455,9 @@
                                                                         Of
                                                                         Issue</label>
                                                                     <div class="form-control-wrap">
+                                                                        <div class="form-icon form-icon-right"><em
+                                                                                class="icon ni ni-calendar-alt"></em>
+                                                                        </div>
                                                                         <input type="text" id="doc_issue_date"
                                                                             autocomplete="off" name="doc_issue_date"
                                                                             placeholder="Date Of Issue"
@@ -468,6 +471,9 @@
                                                                     <label class="form-label" for="doc_claim_date">Date
                                                                         of Claim</label>
                                                                     <div class="form-control-wrap">
+                                                                         <div class="form-icon form-icon-right"><em
+                                                                                class="icon ni ni-calendar-alt"></em>
+                                                                        </div>
                                                                         <input type="text" id="doc_claim_date"
                                                                             autocomplete="off" name="doc_claim_date"
                                                                             placeholder="Date of Claim"
@@ -493,9 +499,12 @@
                                                                     <label class="form-label" for="doc_expiry_date">Date
                                                                         of Expiry</label>
                                                                     <div class="form-control-wrap">
+                                                                         <div class="form-icon form-icon-right"><em
+                                                                                class="icon ni ni-calendar-alt"></em>
+                                                                        </div>
                                                                         <input type="text" id="doc_expiry_date"
                                                                             autocomplete="off" name="doc_expiry_date"
-                                                                            placeholder="BG Amount"
+                                                                            placeholder="Date of Expiry"
                                                                             class="form-control date-picker" value="" />
                                                                     </div>
                                                                 </div>
@@ -507,6 +516,9 @@
                                                                         for="doc_bg_cancelled_date">BG
                                                                         Cancelled on</label>
                                                                     <div class="form-control-wrap">
+                                                                         <div class="form-icon form-icon-right"><em
+                                                                                class="icon ni ni-calendar-alt"></em>
+                                                                        </div>
                                                                         <input type="text" id="doc_bg_cancelled_date"
                                                                             autocomplete="off"
                                                                             name="doc_bg_cancelled_date"
@@ -522,7 +534,7 @@
                                                                     <div class="form-control-wrap">
                                                                         <input type="text" id="doc_bg_commission"
                                                                             autocomplete="off" name="doc_bg_commission"
-                                                                            placeholder="BG Cancelled on"
+                                                                            placeholder="BG Commission (% pa)"
                                                                             class="form-control" value="" />
                                                                     </div>
                                                                 </div>
@@ -537,7 +549,7 @@
                                                                         <input type="text" id="doc_commission_amount"
                                                                             autocomplete="off"
                                                                             name="doc_commission_amount"
-                                                                            placeholder="BG Cancelled on"
+                                                                            placeholder="Commision Amount"
                                                                             class="form-control" value="" />
                                                                     </div>
                                                                 </div>
@@ -551,7 +563,7 @@
                                                                         <input type="text" id="doc_commission_charged"
                                                                             autocomplete="off"
                                                                             name="doc_commission_charged"
-                                                                            placeholder="BG Cancelled on"
+                                                                            placeholder="Commision Charged By Bank"
                                                                             class="form-control" value="" />
                                                                     </div>
                                                                 </div>
@@ -565,7 +577,7 @@
                                                                         <input type="text" id="doc_required_margin"
                                                                             autocomplete="off"
                                                                             name="doc_required_margin"
-                                                                            placeholder="BG Cancelled on"
+                                                                            placeholder="Required Margin (% of BG Amount)"
                                                                             class="form-control" value="" />
                                                                     </div>
                                                                 </div>
@@ -577,7 +589,7 @@
                                                                     <div class="form-control-wrap">
                                                                         <input type="text" id="doc_margin_amount"
                                                                             autocomplete="off" name="doc_margin_amount"
-                                                                            placeholder="BG Cancelled on"
+                                                                            placeholder="Margin Amount"
                                                                             class="form-control" value="" />
                                                                     </div>
                                                                 </div>
@@ -591,7 +603,7 @@
                                                                         <input type="text" id="doc_margin_available"
                                                                             autocomplete="off"
                                                                             name="doc_margin_available"
-                                                                            placeholder="BG Cancelled on"
+                                                                            placeholder="Margin Available"
                                                                             class="form-control" value="" />
                                                                     </div>
                                                                 </div>
@@ -799,7 +811,7 @@
                 });
             }
 
-            
+
 
 
             $("#documentForm").submit(function (event) {
