@@ -613,8 +613,9 @@ documentController.createProject = async (req, res) => {
 documentController.getFilteredDocuments = async (req, res) => {
 	try {
 		let inputs = req.body;
-		console.log("🚀 ~ documentController.getFilteredDocuments= ~ inputs:", inputs)
 		let token = req.session.token;
+		const userRole = token.user_role;
+		const userId = token.user_id;
 		const page = inputs.page || 1;
 		const pageSize = inputs.limit || 10;
 		const offset = (page - 1) * pageSize;
@@ -701,7 +702,16 @@ documentController.getFilteredDocuments = async (req, res) => {
 						) AS actionActive
 						 FROM documents d
 						 `
-		let conditions = [];
+		let conditions = [`(
+        d.doc_confidential = FALSE
+        OR (
+            d.doc_confidential = TRUE
+            AND (
+                ${userRole} = 0
+                OR d.doc_uploaded_by_id = ${userId}
+            )
+        )
+    )`];
 		let joins = "";
 		let folderQuery = ''
 		// Handle folder permissions based on user role
@@ -1230,7 +1240,6 @@ documentController.deleteProjectPdf = async (req, res) => {
 documentController.savePurpose = async (req, res) => {
 	const input = req.body;
 	const token = req?.session?.token;
-	
 	try {
 
 		if (!token) {
