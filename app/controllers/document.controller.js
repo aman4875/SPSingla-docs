@@ -834,7 +834,6 @@ documentController.getFilteredDocuments = async (req, res) => {
         OFFSET ${offset}
       `;
 
-		console.log(query)
 		// Execute the main query
 		let { rows: documents } = await pool.query(query);
 		res.json({

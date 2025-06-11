@@ -87,13 +87,20 @@ userController.saveFolder = async (req, res) => {
 			await pool.query("DELETE FROM users_sites_junction WHERE usj_site_id = $1;", [parentSiteId]);
 
 			for (let userId of inputs.user_permissions) {
-				await pool.query("INSERT INTO users_sites_junction (usj_user_id, usj_site_id) VALUES ($1, $2)", [userId, parentSiteId]);
+				await pool.query(
+					"INSERT INTO users_sites_junction (usj_user_id, usj_site_id) VALUES ($1, $2) ON CONFLICT DO NOTHING",
+					[userId, parentSiteId]
+				);
 			}
 
 			// Adding Folder Permissions
 			for (let userId of inputs.user_permissions) {
-				await pool.query("INSERT INTO users_sites_junction (usj_user_id, usj_site_id) VALUES ($1, $2)", [userId, updatedSite.site_id]);
+				await pool.query(
+					"INSERT INTO users_sites_junction (usj_user_id, usj_site_id) VALUES ($1, $2) ON CONFLICT DO NOTHING",
+					[userId, updatedSite.site_id]
+				);
 			}
+
 			res.send({ status: 1, msg: "Site saved successfully" });
 		} else {
 			res.send({ status: 0, msg: "Something went wrong" });
