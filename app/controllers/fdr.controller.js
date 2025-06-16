@@ -204,6 +204,27 @@ class fdrController {
     }
   };
 
+  getAvailableMargin = async (req, res) => {
+    try {
+      const { bank_id } = req.query;
+      const rowSummary = `
+            SELECT
+            SUM(COALESCE("doc_margin_available", 0)) AS total_margin_available 
+            FROM fdr_menu
+            WHERE fdr_menu.bank_id = '${bank_id}'`;
+      const { rows: data } = await pool.query(rowSummary);
+      const totalMarginAvailable = data[0].total_margin_available || 0;
+      res.send({
+        status: 1,
+        msg: "success",
+        totalMarginAvailable: totalMarginAvailable,
+      });
+    } catch (error) {
+      console.error("Error saving FDR data:", error);
+      res.send({ status: 0, msg: "Something went wrong" });
+    }
+  };
+
   saveClause = async (req, res) => {
     const inputs = req.body;
     const clause_name = inputs?.clause_name || null;
@@ -306,7 +327,7 @@ class fdrController {
 
       const { rows: checkForBanks } = await pool.query(
         `SELECT * FROM fdr_menu WHERE bank_id = $1 AND doc_id <> $2`,
-        [bank_id, docIdToDelete]  
+        [bank_id, docIdToDelete]
       );
 
       if (checkForBanks.length === 0) {
@@ -380,7 +401,9 @@ class fdrController {
 
       if (preBankId != null) {
         const { rows: checkIfBankExists } = await pool.query(
-          `SELECT * FROM fdr_menu WHERE bank_id = $1`,
+          `SELECT bank_id FROM fdr_menu WHERE bank_id = $1
+           INTERSECT
+           SELECT bank_id FROM doc_manage_bg WHERE bank_id = $1`,
           [preBankId]
         );
 
@@ -389,6 +412,13 @@ class fdrController {
 		        UPDATE bank_master
             SET bank_code_status = false
             WHERE doc_id = '${preBankId}'`);
+        }
+
+        if (inputs.bank_id != null) {
+          await pool.query(`
+		        UPDATE bank_master
+            SET bank_code_status = true
+            WHERE doc_id = '${inputs.bank_id}'`);
         }
       }
 

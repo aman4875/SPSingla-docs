@@ -340,13 +340,14 @@
                                                                     <label class="form-label" for="doc_bank_name">Bank
                                                                         Name</label>
                                                                     <select class="form-select form-control js-select2"
-                                                                        data-filter="single" id="select-site"
+                                                                        data-filter="single" id="select_doc_bank_name"
                                                                         name="doc_bank_name" data-placeholder="Select Bank
                                                                             Name" required>
                                                                         <option value="" disabled selected>Select Bank
                                                                             Name</option>
                                                                         <% banks.forEach(bank=> { %>
                                                                             <option data-code="<%= bank.bank_code %>"
+                                                                                data-bank-id="<%= bank.doc_id %>"
                                                                                 id="<%= bank.doc_id %>"
                                                                                 value="<%= bank.bank_name %>">
                                                                                 <%= bank.bank_name %>
@@ -471,7 +472,7 @@
                                                                     <label class="form-label" for="doc_claim_date">Date
                                                                         of Claim</label>
                                                                     <div class="form-control-wrap">
-                                                                         <div class="form-icon form-icon-right"><em
+                                                                        <div class="form-icon form-icon-right"><em
                                                                                 class="icon ni ni-calendar-alt"></em>
                                                                         </div>
                                                                         <input type="text" id="doc_claim_date"
@@ -499,7 +500,7 @@
                                                                     <label class="form-label" for="doc_expiry_date">Date
                                                                         of Expiry</label>
                                                                     <div class="form-control-wrap">
-                                                                         <div class="form-icon form-icon-right"><em
+                                                                        <div class="form-icon form-icon-right"><em
                                                                                 class="icon ni ni-calendar-alt"></em>
                                                                         </div>
                                                                         <input type="text" id="doc_expiry_date"
@@ -516,7 +517,7 @@
                                                                         for="doc_bg_cancelled_date">BG
                                                                         Cancelled on</label>
                                                                     <div class="form-control-wrap">
-                                                                         <div class="form-icon form-icon-right"><em
+                                                                        <div class="form-icon form-icon-right"><em
                                                                                 class="icon ni ni-calendar-alt"></em>
                                                                         </div>
                                                                         <input type="text" id="doc_bg_cancelled_date"
@@ -604,7 +605,8 @@
                                                                             autocomplete="off"
                                                                             name="doc_margin_available"
                                                                             placeholder="Margin Available"
-                                                                            class="form-control" value="" />
+                                                                            class="form-control margin_available"
+                                                                            value="" />
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -643,6 +645,8 @@
         <script src="/app/assets/js/scripts.js"></script>
         <script src="/app/assets/js/charts/gd-default.js"></script>
         <script src="/app/views/manage-bg/create-manage-bg-script.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/decimal.js@10.4.3/decimal.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
         <script>
 
             let dataId
@@ -761,7 +765,6 @@
                     "doc_completion_date",
                     "doc_dlp_period",
                     "doc_retention_amount",
-
                     "doc_total_mobilisation_amount",
                     "doc_bal_mobilisation_amount",
                     "doc_agreement_no",
@@ -820,7 +823,14 @@
                     return false;
                 }
                 NioApp.handleButtonState("uploadDocumentBtn", "Upload", true);
+                const $requiredMargin = $("#doc_required_margin").val();
+                const $bgCommission = $("#doc_bg_commission").val();
+
                 let formData = new FormData(this);
+                
+                // Overwrite with parsed integer values
+                formData.set("doc_bg_commission", parseInt($bgCommission));
+                formData.set("doc_required_margin", parseInt($requiredMargin));
                 formData.append("project_code", dataCode);
                 formData.append("master_project_id", dataId);
                 formData.append("doc_pdf_name", fileName);

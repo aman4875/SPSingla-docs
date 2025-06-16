@@ -40,7 +40,7 @@
                                                 </div>
 
                                                 <div class="nk-block-head-content">
-                                                    <a href="/project-master"
+                                                    <a href="/manage-bg"
                                                         class="btn btn-outline-light bg-white d-none d-sm-inline-flex"><em
                                                             class="icon ni ni-arrow-left"></em><span>Back</span></a>
                                                 </div>
@@ -439,6 +439,9 @@
                                                                     Of
                                                                     Issue</label>
                                                                 <div class="form-control-wrap">
+                                                                    <div class="form-icon form-icon-right"><em
+                                                                            class="icon ni ni-calendar-alt"></em>
+                                                                    </div>
                                                                     <input type="text" id="doc_issue_date"
                                                                         autocomplete="off" name="doc_issue_date"
                                                                         placeholder="Date Of Issue"
@@ -453,6 +456,9 @@
                                                                 <label class="form-label" for="doc_claim_date">Date
                                                                     of Claim</label>
                                                                 <div class="form-control-wrap">
+                                                                    <div class="form-icon form-icon-right"><em
+                                                                            class="icon ni ni-calendar-alt"></em>
+                                                                    </div>
                                                                     <input type="text" id="doc_claim_date"
                                                                         autocomplete="off" name="doc_claim_date"
                                                                         placeholder="Date of Claim"
@@ -479,6 +485,9 @@
                                                                 <label class="form-label" for="doc_expiry_date">Date
                                                                     of Expiry</label>
                                                                 <div class="form-control-wrap">
+                                                                    <div class="form-icon form-icon-right"><em
+                                                                            class="icon ni ni-calendar-alt"></em>
+                                                                    </div>
                                                                     <input type="text" id="doc_expiry_date"
                                                                         autocomplete="off" name="doc_expiry_date"
                                                                         placeholder="BG Amount"
@@ -493,6 +502,9 @@
                                                                 <label class="form-label" for="doc_bg_cancelled_date">BG
                                                                     Cancelled on</label>
                                                                 <div class="form-control-wrap">
+                                                                    <div class="form-icon form-icon-right"><em
+                                                                            class="icon ni ni-calendar-alt"></em>
+                                                                    </div>
                                                                     <input type="text" id="doc_bg_cancelled_date"
                                                                         autocomplete="off" name="doc_bg_cancelled_date"
                                                                         placeholder="BG Cancelled on"
@@ -504,7 +516,8 @@
 
                                                         <div class="col-md-4">
                                                             <div class="form-group">
-                                                                <label class="form-label" for="doc_bg_commission">BG Commission (% pa)</label>
+                                                                <label class="form-label" for="doc_bg_commission">BG
+                                                                    Commission (% pa)</label>
                                                                 <div class="form-control-wrap">
                                                                     <input type="text" id="doc_bg_commission"
                                                                         autocomplete="off" name="doc_bg_commission"
@@ -532,7 +545,8 @@
                                                         <div class="col-md-4">
                                                             <div class="form-group">
                                                                 <label class="form-label"
-                                                                    for="doc_commission_charged">Commision Charged By Bank</label>
+                                                                    for="doc_commission_charged">Commision Charged By
+                                                                    Bank</label>
                                                                 <div class="form-control-wrap">
                                                                     <input type="text" id="doc_commission_charged"
                                                                         autocomplete="off" name="doc_commission_charged"
@@ -546,7 +560,8 @@
                                                         <div class="col-md-4">
                                                             <div class="form-group">
                                                                 <label class="form-label"
-                                                                    for="doc_required_margin">Required Margin (% of BG Amount)</label>
+                                                                    for="doc_required_margin">Required Margin (% of BG
+                                                                    Amount)</label>
                                                                 <div class="form-control-wrap">
                                                                     <input type="text" id="doc_required_margin"
                                                                         autocomplete="off" name="doc_required_margin"
@@ -559,12 +574,12 @@
 
                                                         <div class="col-md-4">
                                                             <div class="form-group">
-                                                                <label class="form-label" for="doc_margin_amount">Margin Amount</label>
+                                                                <label class="form-label" for="doc_margin_amount">Margin
+                                                                    Amount</label>
                                                                 <div class="form-control-wrap">
                                                                     <input type="text" id="doc_margin_amount"
                                                                         autocomplete="off" name="doc_margin_amount"
-                                                                        placeholder="Margin Amount"
-                                                                        class="form-control"
+                                                                        placeholder="Margin Amount" class="form-control"
                                                                         value="<%= manageBgData ? manageBgData.doc_margin_amount : '' %>" />
                                                                 </div>
                                                             </div>
@@ -578,7 +593,7 @@
                                                                     <input type="text" id="doc_margin_available"
                                                                         autocomplete="off" name="doc_margin_available"
                                                                         placeholder="Margin Available"
-                                                                        class="form-control"
+                                                                        class="form-control margin_available"
                                                                         value="<%= manageBgData ? manageBgData.doc_margin_available : '' %>" />
 
                                                                 </div>
@@ -752,6 +767,8 @@
     <script src="/app/assets/js/scripts.js"></script>
     <script src="/app/assets/js/charts/gd-default.js"></script>
     <script src="/app/views//manage-bg/edit-bg-script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/decimal.js@10.4.3/decimal.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
     <script>
         let docIdToDelete = null
         let initialFormData = new FormData($("#documentForm")[0]);
@@ -760,6 +777,7 @@
             isFlag: false,
             msg: ""
         };
+        let selectedBankId
 
         initialFormData.forEach((value, key) => {
             initialFormDataEntries[key] = value;
@@ -772,6 +790,12 @@
                     parentMenu.addClass("active current-page");
                     parentMenu.find(".nk-menu-sub").show();
                 }
+            });
+
+            $('#select-site').on('change', function () {
+                const $selectedOption = $(this).find('option:selected');
+                const docId = $selectedOption.attr('id');
+                selectedBankId = docId
             });
         });
 
@@ -864,9 +888,14 @@
                 return NioApp.Toast(`${validationFlag.msg}`, "error");
             }
             const doc_id = "<%= manageBgData.doc_id %>"
+            const $requiredMargin = $("#doc_required_margin").val();
+            const $bgCommission = $("#doc_bg_commission").val();
+            
             toastr.clear();
             let form = $(this).closest("form")[0];
             let formData = new FormData(form);
+            formData.set("doc_bg_commission", parseInt($bgCommission));
+            formData.set("doc_required_margin", parseInt($requiredMargin));
 
             let newFormDataEntries = {};
 
@@ -884,13 +913,13 @@
             $.ajax({
                 type: "POST",
                 url: "/docs/edit-bg",
-                data: { newFormDataEntries, doc_id },
+                data: { newFormDataEntries, doc_id, "bank_id": selectedBankId },
                 success: function (response) {
                     if (response.status == 1) {
                         $("#doc_site,#doc_folder,#choosePrefixButton,#doc_type").prop("disabled", true);
                         NioApp.handleButtonState("uploadDocumentBtn", "Update", false);
                         NioApp.Toast("<h5>Update Successfully</h5><p>Document Updated Successfully</p>", "success")
-                        location.reload()
+                        window.location.href = "/manage-bg";
 
                     } else {
                         NioApp.handleButtonState("uploadDocumentBtn", "Update", false);
