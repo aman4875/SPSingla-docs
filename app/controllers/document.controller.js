@@ -381,9 +381,8 @@ documentController.editProject = async (req, res) => {
 
 documentController.editBG = async (req, res) => {
 	try {
-		let { newFormDataEntries, doc_id } = req.body;
+		let { newFormDataEntries, doc_id, bank_id } = req.body;
 		let token = req.session.token;
-
 
 		if (!token) {
 			return res.json({ status: 0, msg: "User not logged In" });
@@ -421,7 +420,12 @@ documentController.editBG = async (req, res) => {
 		});
 
 		await pool.query(insertQuery, insertValues);
-
+		if (bank_id != null) {
+			await pool.query(`
+		    UPDATE bank_master
+            SET bank_code_status = true
+            WHERE doc_id = '${bank_id}'`);
+		}
 
 		res.send({ status: 1, msg: "Success" });
 	} catch (error) {
@@ -1263,9 +1267,9 @@ documentController.getProjectsBg = async (req, res) => {
 
 		const subqueryConditions = conditions.map(cond =>
 			cond
-			  .replace(/\bd\./g, 'd2.')
-			  .replace(/\bpm\./g, 'pm2.')
-		  );
+				.replace(/\bd\./g, 'd2.')
+				.replace(/\bpm\./g, 'pm2.')
+		);
 		// total count of documents
 		let countQuery = `
 		SELECT 
@@ -1292,7 +1296,7 @@ documentController.getProjectsBg = async (req, res) => {
 		${conditions.length ? "WHERE " + conditions.join(" AND ") : ""}
 	  `;
 
-	  
+		console.log("Count Query:", countQuery);
 		let { rows: countResult } = await pool.query(countQuery);
 		const totalDocuments = countResult[0]?.total_count;
 		const totalPages = Math.ceil(totalDocuments / pageSize);
@@ -1329,6 +1333,7 @@ documentController.getProjectsBg = async (req, res) => {
 		FROM fetched_docs;`}
 
 		// Execute the main query
+		console.log("Query:", query);
 		let { rows: documents } = await pool.query(query);
 		let totalBgAmount = null
 		let docs = documents
@@ -1623,7 +1628,7 @@ documentController.deleteAttachment = async (req, res) => {
 }
 
 documentController.deleteBG = async (req, res) => {
-	const { docId, docCode ,projectIdToDelete} = req.body;
+	const { docId, docCode, projectIdToDelete } = req.body;
 
 	const token = req?.session?.token;
 

@@ -1,3 +1,5 @@
+require('dotenv').config(); // Load this first
+
 const { Pool } = require("pg");
 
 const pool = new Pool({
@@ -6,7 +8,7 @@ const pool = new Pool({
 	database: process.env.DB_USERNAME,
 	password: process.env.DB_PASSWORD,
 	port: process.env.DB_PORT,
-	ssl: true,
+	ssl: false,
 });
 
 module.exports = { pool };

@@ -456,7 +456,7 @@ renderController.editBG = async (req, res) => {
 		)
 
 		let { rows: bankName } = await pool.query(
-			`SELECT * FROM bank_names ORDER BY id DESC`
+			`SELECT * FROM bank_master ORDER BY doc_id DESC`
 		)
 		const { rows: banks } = await pool.query(`SELECT * FROM bank_master`);
 
@@ -538,7 +538,7 @@ renderController.renderCreateBg = async (req, res) => {
 		`SELECT * FROM contract_types ORDER BY id DESC`
 	)
 	let { rows: bankName } = await pool.query(
-		`SELECT * FROM bank_names ORDER BY id DESC`
+		`SELECT * FROM bank_master ORDER BY doc_id DESC`
 	)
 
 	let { rows: beneficiaryNames } = await pool.query(
@@ -611,8 +611,8 @@ renderController.renderBankMaster = async (req, res) => {
 renderController.renderFdr = async (req, res) => {
 	let token = req.session.token;
 	const bankQuery = `SELECT * FROM bank_master`;
-	const query = `SELECT * FROM bank_master`;
-	const { rows: banks } = await pool.query(query);
+	const { rows: banks } = await pool.query(bankQuery);
+	console.log(banks)
 	try {
 		return res.render("Fdr/Fdr", { token, banks });
 	} catch (err) {

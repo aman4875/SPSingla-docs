@@ -13,6 +13,7 @@ router.post("/edit-fdr", upload.none(), fdrController.editFdr);
 router.get("/get-all-clause", fdrController.getAllClause);
 router.get("/get-all-renewal", fdrController.getAllRenewal);
 router.get("/get-all-purpose", fdrController.getAllPurpose);
+router.get("/get-margin-available", fdrController.getAvailableMargin);
 router.delete("/delete-fdr", fdrController.deleteFdr);
 
 module.exports = router;

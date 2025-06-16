@@ -82,9 +82,9 @@
                                                                     for="doc_purpose">Purpose</label>
                                                                 <div class="form-control-wrap">
                                                                     <select class="form-select form-control js-select2"
-                                                                        id="doc_purpose"
-                                                                        name="doc_purpose"
-                                                                        data-placeholder="Select or Enter Purpose" required>
+                                                                        id="doc_purpose" name="doc_purpose"
+                                                                        data-placeholder="Select or Enter Purpose"
+                                                                        required>
                                                                         <option label="empty" value=""></option>
                                                                         <% purposeTypes.forEach(data=> { %>
                                                                             <option data-id="<%= data.id %>"
@@ -330,7 +330,8 @@
                                                                     for="doc_margin_available">Margin Available</label>
                                                                 <div class="form-control-wrap">
                                                                     <input step="any" required type="number"
-                                                                        class="form-control" placeholder="Closed On"
+                                                                        class="form-control"
+                                                                        placeholder="Margin Available"
                                                                         id="doc_margin_available"
                                                                         name="doc_margin_available" value="" />
                                                                 </div>
@@ -342,6 +343,8 @@
                                                                 <label class="form-label" for="doc_closed_on">Closed
                                                                     on</label>
                                                                 <div class="form-control-wrap">
+                                                                    <div class="form-icon form-icon-right"><em
+                                                                            class="icon ni ni-calendar-alt"></em></div>
                                                                     <input type="text" class="form-control date-picker"
                                                                         placeholder="Closed On" id="doc_closed_on"
                                                                         name="doc_closed_on" value="" />

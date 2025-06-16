@@ -24,6 +24,7 @@
             background-color: #ffe6e6;
             border-left: 4px solid #ff4d4d;
         }
+
         .rowSummary .nk-tb-col {
             color: #3c4d62;
             padding-top: 5px !important;
@@ -60,7 +61,8 @@
                                                                         </option>
                                                                         <% banks.forEach(bank=> { %>
                                                                             <option data-code="<%= bank.bank_code %>"
-                                                                                id="<%= bank.doc_id %>"
+                                                                                id="doc-<%= bank.doc_id %>"
+                                                                                data-bank-id="<%= bank.doc_id %>"
                                                                                 value="<%= bank.bank_name %>">
                                                                                 <%= bank.bank_name %>
                                                                             </option>
@@ -572,7 +574,7 @@
         $(document).ready(function () {
             $("#select_bank").on("change", function () {
                 const selectedOption = $(this).find("option:selected");
-                const docId = selectedOption.attr("id");
+                const docId = selectedOption.data("bank-id");
                 selectedBankId = docId;
                 if ((selectedBankId !== undefined) & (selectedBankId !== null)) {
                     fetchAllfdrs();

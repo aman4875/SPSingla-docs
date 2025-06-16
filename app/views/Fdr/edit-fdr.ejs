@@ -89,7 +89,7 @@
                                                                         <option label="empty" value=""></option>
                                                                         <% purposeTypes.forEach(data=> { %>
                                                                             <option data-id="<%= data.id %>"
-                                                                                  value="<%= data.purpose %>"
+                                                                                value="<%= data.purpose %>"
                                                                                 <%=fdrData.doc_purpose===data.purpose
                                                                                 ? "selected" : "" %>
                                                                                 >
@@ -249,7 +249,7 @@
                                                                         <option label="empty" value=""></option>
                                                                         <% renewalTypes.forEach(data=> { %>
                                                                             <option data-id="<%= data.id %>"
-                                                                                     value="<%= data.renewal %>"
+                                                                                value="<%= data.renewal %>"
                                                                                 <%=fdrData.doc_renewal===data.renewal
                                                                                 ? "selected" : "" %>
                                                                                 >
@@ -351,7 +351,8 @@
                                                                     for="doc_margin_available">Margin Available</label>
                                                                 <div class="form-control-wrap">
                                                                     <input step="any" required type="number"
-                                                                        class="form-control" placeholder="Closed On"
+                                                                        class="form-control"
+                                                                        placeholder="Margin Available  "
                                                                         id="doc_margin_available"
                                                                         name="doc_margin_available"
                                                                         value="<%= fdrData.doc_margin_available %>" />
@@ -364,6 +365,8 @@
                                                                 <label class="form-label" for="doc_closed_on">Closed
                                                                     on</label>
                                                                 <div class="form-control-wrap">
+                                                                    <div class="form-icon form-icon-right"><em
+                                                                            class="icon ni ni-calendar-alt"></em></div>
                                                                     <input type="text" class="form-control date-picker"
                                                                         placeholder="Closed On" id="doc_closed_on"
                                                                         name="doc_closed_on"
