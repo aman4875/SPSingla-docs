@@ -896,6 +896,7 @@
             let formData = new FormData(form);
             formData.set("doc_bg_commission", parseInt($bgCommission));
             formData.set("doc_required_margin", parseInt($requiredMargin));
+            formData.set("bank_id", parseInt(selectedBankId));
 
             let newFormDataEntries = {};
 

@@ -414,7 +414,7 @@ $(document).ready(() => {
             const daysFraction = Decimal.div(days, 365);
             const result = daysFraction.mul(bgCommission).mul(bgAmount);
             const formattedResult = result.toFixed(0);
-            console.log("Inputs:", { rawClaimDate, rawIssueDate, days, bgCommissionRaw, bgCommission: bgCommission.toString(), bgAmount: bgAmount.toString() });
+            // console.log("Inputs:", { rawClaimDate, rawIssueDate, days, bgCommissionRaw, bgCommission: bgCommission.toString(), bgAmount: bgAmount.toString() });
             $("#doc_commission_amount").val(formattedResult);
         } catch (e) {
             $("#error_message").text("Calculation error. Check inputs.");

@@ -653,6 +653,7 @@
             let dataName
             let dataCode
             let fileName = null
+            let selectedBankId = null
             $("#doc_file").on("change", function () {
                 fileName = this.files[0].name;
             });
@@ -682,6 +683,13 @@
                         parentMenu.find(".nk-menu-sub").show();
                     }
                 });
+
+                $('#select_doc_bank_name').on('change', function () {
+                    const $selectedOption = $(this).find('option:selected');
+                    const docId = $selectedOption.attr('id');
+                    selectedBankId = docId
+                });
+                
             });
 
             function fetchProjects(projectId) {
@@ -827,13 +835,14 @@
                 const $bgCommission = $("#doc_bg_commission").val();
 
                 let formData = new FormData(this);
-                
+
                 // Overwrite with parsed integer values
                 formData.set("doc_bg_commission", parseInt($bgCommission));
                 formData.set("doc_required_margin", parseInt($requiredMargin));
                 formData.append("project_code", dataCode);
                 formData.append("master_project_id", dataId);
                 formData.append("doc_pdf_name", fileName);
+                formData.append("bank_id", selectedBankId);
 
                 //AJAX request
                 $.ajax({

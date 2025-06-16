@@ -879,6 +879,7 @@
         let totalPages
         let projectCode = null
         let projectID = null
+        let bank_id = null
 
         $('.js-select2').select2({
             placeholder: 'Select an option',
@@ -969,7 +970,8 @@
                 style="cursor: pointer;" 
                 data-code="${data.doc_code}" 
                 data-id="${data.doc_id}"
-                data-project-id="${data.master_project_id}">
+                data-project-id="${data.master_project_id}"
+                bank_id="${data.bank_id}">
                 <em style="color: #d84040;" class="icon ni ni-trash-fill"></em>
             </span>
             </div>
@@ -1134,6 +1136,7 @@
             docIdToDelete = $(this).data('id');  // Using .data() to get 'data-id'
             docCode = $(this).attr('data-code'); // Using .attr() for 'data-code'
             projectIdToDelete = $(this).attr('data-project-id'); // Using .attr() for 'data-code'
+            bank_id = $(this).attr('bank_id'); // Using .attr() for 'data-code'
 
             if (docIdToDelete) {
                 openModal.click();
@@ -1149,7 +1152,7 @@
             $.ajax({
                 type: "DELETE",
                 url: "/docs/delete-bg",
-                data: { docId: docIdToDelete, docCode: docCode, projectIdToDelete: projectIdToDelete },
+                data: { docId: docIdToDelete, docCode: docCode, projectIdToDelete: projectIdToDelete, bank_id:bank_id },
                 success: function (response) {
                     if (response.status == 1) {
                         NioApp.Toast("<h5>Deleted Successfully</h5><p>Document deleted successfully!</p>", "success");
