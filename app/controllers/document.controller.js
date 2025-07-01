@@ -1534,7 +1534,7 @@ documentController.getProjectsBg = async (req, res) => {
 		${conditions.length ? "WHERE " + conditions.join(" AND ") : ""}
 	  `;
 
-    console.log("Count Query:", countQuery);
+
     let { rows: countResult } = await pool.query(countQuery);
     const totalDocuments = countResult[0]?.total_count;
     const totalPages = Math.ceil(totalDocuments / pageSize);
@@ -1575,7 +1575,6 @@ documentController.getProjectsBg = async (req, res) => {
     }
 
     // Execute the main query
-    console.log("Query:", query);
     let { rows: documents } = await pool.query(query);
     let totalBgAmount = null;
     let docs = documents;
