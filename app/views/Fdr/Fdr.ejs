@@ -30,6 +30,12 @@
             padding-top: 5px !important;
             padding-bottom: 5px !important;
         }
+
+        .update-financials {
+            width: 150px;
+            height: 35px;
+            margin-left: 20px;
+        }
     </style>
 </head>
 
@@ -69,8 +75,10 @@
                                                                             <% }); %>
                                                                     </select>
                                                                 </div>
-
                                                             </div>
+                                                            <div id="updateFinancials"
+                                                                class="btn btn-dim btn-outline-primary update-financials statusText">
+                                                                Update Financials</div>
 
                                                         </div>
                                                     </div>
@@ -275,7 +283,7 @@
                                                                             class="sort-indicator"></span>
                                                                     </div>
                                                                     <div class="nk-tb-col">
-                                                                        <span data-field="doc_interest">Account
+                                                                        <span data-field="doc_interest">Accrued
                                                                             Interest</span><span
                                                                             class="sort-indicator"></span>
                                                                     </div>
@@ -284,8 +292,7 @@
                                                                             class="sort-indicator"></span>
                                                                     </div>
                                                                     <div class="nk-tb-col">
-                                                                        <span data-field="doc_margin_available">Margin
-                                                                            Available</span><span
+                                                                        <span data-field="doc_margin_available">Total Margin</span><span
                                                                             class="sort-indicator"></span>
                                                                     </div>
                                                                     <div class="nk-tb-col">
@@ -606,6 +613,73 @@
                 fetchAllfdrs();
             }
         });
+
+        $(document).ready(() => {
+            const startPolling = () => {
+                localStorage.setItem('recalcPolling', 'true');
+
+                const interval = setInterval(async () => {
+                    try {
+                        const res = await fetch("/fdr/update-financials");
+                        const { message } = await res.json();
+
+                        $(".statusText").text("Running...");
+
+                        if (message === "done") {
+                            clearInterval(interval);
+                            localStorage.removeItem('recalcPolling');
+                            NioApp.Toast(`<h5>Recalculation Finished</h5><p>Financials update successful.</p>`, "success");
+                            $(".statusText").text("Update Financials");
+                            fetchAllfdrs();
+                        }
+
+                    } catch (err) {
+                        clearInterval(interval);
+                        localStorage.removeItem('recalcPolling');
+                        console.error("Polling error:", err);
+                        NioApp.Toast("<h5>Failed to fetch recalculation status.</h5>", "error");
+                    }
+                }, 5000);
+            };
+
+            // If user reloads while process is running, auto-resume polling
+            if (localStorage.getItem('recalcPolling') === 'true') {
+                startPolling(); // no popup
+                $(".statusText").text("Running...");
+            }
+
+            $("#updateFinancials").on("click", async (e) => {
+                e.preventDefault();
+
+                try {
+                    const response = await fetch("/fdr/update-financials", {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    });
+
+                    const data = await response.json();
+
+                    if (data.message === "running") {
+                        $(".statusText").text("Running...");
+                        NioApp.Toast("<h5>Already running !</h5>", "success");
+                        startPolling();
+                    } else {
+                        $(".statusText").text("Running...");
+                        NioApp.Toast("<h5>Running...</h5><p>Please wait while we upspare.</p>", "success");
+                        startPolling();
+                    }
+                } catch (error) {
+                    console.error("🚀 ~ error:", error);
+                    localStorage.removeItem('recalcPolling');
+                    alert("Something went wrong while updating financials. Please try again later.");
+                }
+            });
+        });
+
+
+
     </script>
 </body>
 

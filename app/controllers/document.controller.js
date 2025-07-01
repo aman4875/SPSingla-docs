@@ -856,14 +856,14 @@ documentController.createBG = async (req, res) => {
 
       return { query, values };
     };
-
+    
     const { query, values } = generateInsertQuery(inputs);
     const createProject = await pool.query(query, values);
     const createdDocId = createProject.rows[0].doc_id;
-
+    
     if (req.file && req.file) {
       const fileName = uuidv4();
-
+      
       const s3Params = {
         Bucket: process.env.BUCKET_NAME,
         Key: `docs/${fileName}.pdf`,
@@ -885,7 +885,7 @@ documentController.createBG = async (req, res) => {
         [
           pdfName,
           pdfLocation,
-          inputs.doc_code,
+          inputs.project_code,
           createdDocId,
           token.user_id,
           getCurrentDateTime(),

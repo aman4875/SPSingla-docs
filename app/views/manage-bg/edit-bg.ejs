@@ -777,7 +777,7 @@
             isFlag: false,
             msg: ""
         };
-        let selectedBankId
+        let selectedBankId = null
 
         initialFormData.forEach((value, key) => {
             initialFormDataEntries[key] = value;
@@ -896,7 +896,9 @@
             let formData = new FormData(form);
             formData.set("doc_bg_commission", parseInt($bgCommission));
             formData.set("doc_required_margin", parseInt($requiredMargin));
-            formData.set("bank_id", parseInt(selectedBankId));
+            if (selectedBankId !== null) {
+                formData.set("bank_id", parseInt(selectedBankId));
+            }
 
             let newFormDataEntries = {};
 

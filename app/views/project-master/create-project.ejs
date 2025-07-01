@@ -96,7 +96,8 @@
                                                                     <input type="text" class="form-control"
                                                                         placeholder="Department Name"
                                                                         id="doc_department" name="doc_department"
-                                                                        value="" required />
+                                                                        value="" 
+                                                                         />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -108,7 +109,7 @@
                                                                 <div class="form-control-wrap focused">
                                                                     <div class="form-icon form-icon-right"><em
                                                                             class="icon ni ni-calendar-alt"></em></div>
-                                                                    <input type="text" required id="doc_financial_date"
+                                                                    <input type="text"  id="doc_financial_date"
                                                                         autocomplete="off" name="doc_financial_date"
                                                                         placeholder="Financial Opening Date"
                                                                         class="form-control date-picker" value="" />
@@ -167,7 +168,7 @@
                                                                 <div class="form-control-wrap">
                                                                     <input type="number" class="form-control"
                                                                         placeholder="DLP Period" id="doc_dlp_period"
-                                                                        name="doc_dlp_period" value="" required />
+                                                                        name="doc_dlp_period" value=""  />
                                                                 </div>
                                                                 <small id="error-msg" class="text-danger"
                                                                     style="display:none;"></small>
@@ -337,7 +338,21 @@
         $("#doc_file").on("change", function () {
             fileName = this.files[0].name;
         });
+        $(document).ready(function () {
+            $('#doc_awarded').on('change', function () {
+                const value = $(this).val();
 
+                if (value === 'false') {
+                    $('#doc_department').attr('required', false);
+                    $('#doc_financial_date').attr('required', false);
+                    $('#doc_dlp_period').attr('required', false);
+                } else {
+                    $('#doc_department').attr('required', true);
+                    $('#doc_financial_date').attr('required', true);
+                    $('#doc_dlp_period').attr('required', true);
+                }
+            });
+        });
 
         $("#documentForm").submit(function (event) {
             event.preventDefault();

@@ -612,7 +612,6 @@ renderController.renderFdr = async (req, res) => {
 	let token = req.session.token;
 	const bankQuery = `SELECT * FROM bank_master`;
 	const { rows: banks } = await pool.query(bankQuery);
-	console.log(banks)
 	try {
 		return res.render("Fdr/Fdr", { token, banks });
 	} catch (err) {

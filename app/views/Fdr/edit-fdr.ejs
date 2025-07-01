@@ -322,7 +322,7 @@
 
                                                         <div class="col-md-4">
                                                             <div class="form-group">
-                                                                <label class="form-label" for="doc_interest">Acc.
+                                                                <label class="form-label" for="doc_interest">Accrued
                                                                     Interest</label>
                                                                 <div class="form-control-wrap">
                                                                     <input step="any" required type="number"
@@ -348,7 +348,7 @@
                                                         <div class="col-md-4">
                                                             <div class="form-group">
                                                                 <label class="form-label"
-                                                                    for="doc_margin_available">Margin Available</label>
+                                                                    for="doc_margin_available">Total Margin</label>
                                                                 <div class="form-control-wrap">
                                                                     <input step="any" required type="number"
                                                                         class="form-control"
@@ -532,6 +532,15 @@
                 });
             });
 
+            (async () => {
+                try {
+                    const response = await fetch("/fdr/update-financial?doc_id=" + doc_Id);
+                    const data = await response.json();
+                   
+                } catch (error) {
+                    console.error("Error fetching margin available:", error);
+                }
+            })();
         </script>
 </body>
 

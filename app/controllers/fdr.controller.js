@@ -1,5 +1,10 @@
 const { pool } = require("../helpers/database.helper.js");
 const getCurrentDateTime = require("../utils/getCurrentDateTime.js");
+const { fork } = require("child_process");
+const path = require("path");
+const updateFinancials = require("../utils/updateFinancials.js");
+let isRecalculating = false;
+let recalcStatus = "idle"; // 'idle' | 'running' | 'done' | 'error'
 
 class fdrController {
   getAllFdrData = async (req, res) => {
@@ -79,7 +84,6 @@ class fdrController {
         LIMIT ${pageSize}
         OFFSET ${offset}
       `;
-      console.log(query);
       // Execute the main query
       let { rows: documents } = await pool.query(query);
       let { rows: aggregatedAmountRow } = await pool.query(rowSummary);
@@ -429,6 +433,102 @@ class fdrController {
     } catch (error) {
       console.error(error);
       res.send({ status: 0, msg: "Internal Server Error" });
+    }
+  };
+
+  updateFinancials = async (req, res) => {
+    if (recalcStatus === "done") {
+      return res.json({
+        isRecalculating: false,
+        message: "done",
+      });
+    }
+
+    if (isRecalculating) {
+      return res.json({
+        isRecalculating: true,
+        message: "running",
+      });
+    }
+
+    isRecalculating = true;
+
+    const worker = fork(
+      path.join(__dirname, "../workers/recalculate-worker.js")
+    );
+    worker.send("start");
+
+    worker.on("message", (msg) => {
+      console.log(msg);
+      if (msg.status === "done") {
+        recalcStatus = "done";
+        isRecalculating = false;
+      }
+    });
+
+    worker.on("exit", () => {
+      isRecalculating = false;
+    });
+
+    worker.on("error", () => {
+      message = "error";
+      isRecalculating = false;
+    });
+
+    return res.json({
+      isRecalculating: false,
+      message: "started",
+    });
+  };
+
+  updateFinancial = async (req, res) => {
+    try {
+      const doc_id = req.query.doc_id;
+      const { rows } = await pool.query(
+        `SELECT * FROM fdr_menu WHERE doc_id = $1`,
+        [Number(doc_id)]
+      );
+      if (!rows.length) {
+        return res.status(404).send({ status: 0, msg: "Document not found" });
+      }
+      const docData = rows[0];
+
+      const updatedValue = updateFinancials(
+        docData.doc_renewal_amount,
+        docData.doc_interest_rate,
+        docData.doc_renewal_date,
+        docData.doc_tds_rate
+      );
+
+      const now = getCurrentDateTime();
+
+      await pool.query(
+        `UPDATE fdr_menu
+        SET doc_interest = $1,
+            doc_tds = $2,
+            doc_margin_available = $3,
+            updated_at = $4
+        WHERE doc_id = $5`,
+        [
+          updatedValue.interest,
+          updatedValue.tds,
+          updatedValue.marginAvailable,
+          now,
+          Number(doc_id),
+        ]
+      );
+
+      return res.send({
+        status: 1,
+        msg: "Financials updated",
+        margin_available: updatedValue.marginAvailable,
+      });
+    } catch (error) {
+      console.error("Error updating financials:", error);
+      return res.status(500).send({
+        status: 0,
+        msg: "Internal Server Error",
+      });
     }
   };
 }

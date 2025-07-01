@@ -689,7 +689,7 @@
                     const docId = $selectedOption.attr('id');
                     selectedBankId = docId
                 });
-                
+
             });
 
             function fetchProjects(projectId) {
@@ -842,7 +842,9 @@
                 formData.append("project_code", dataCode);
                 formData.append("master_project_id", dataId);
                 formData.append("doc_pdf_name", fileName);
-                formData.append("bank_id", selectedBankId);
+                if (selectedBankId !== null) {
+                    formData.set("bank_id", parseInt(selectedBankId));
+                }
 
                 //AJAX request
                 $.ajax({
