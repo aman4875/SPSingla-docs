@@ -462,7 +462,17 @@ renderController.editBG = async (req, res) => {
 
 		const { rows } = await pool.query(query, [doc_id]);
 		const manageBgData = rows[0]
-		return res.render("manage-bg/edit-bg.ejs", { token, manageBgData, beneficiaryNames, applicantNames, types, bankName, banks });
+		const bank_id = manageBgData.bank_id
+		const total_margin_available = `
+			SELECT
+				SUM(COALESCE(doc_margin_available, 0)) AS total_margin_available
+			FROM fdr_menu
+			WHERE bank_id = $1
+		`;
+		const {rows:total_margin} = await pool.query(total_margin_available,[bank_id])
+		const dynamic_total_margin = total_margin[0].total_margin_available
+
+		return res.render("manage-bg/edit-bg.ejs", { token, manageBgData, beneficiaryNames, applicantNames, types, bankName, banks,dynamic_total_margin });
 	} catch (error) {
 		console.error(error);
 		return res.send("Internal Server Error");

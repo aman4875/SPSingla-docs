@@ -386,8 +386,7 @@
                                                                         </div>
                                                                         <div class="nk-tb-col">
                                                                             <span
-                                                                                data-field="doc_margin_available">Margin
-                                                                                Available</span><span
+                                                                                data-field="doc_margin_available">Total Margin</span><span
                                                                                 class="sort-indicator"></span>
                                                                         </div>
 
@@ -781,7 +780,7 @@
                                                                                     class="form-control  filter-input"
                                                                                     data-filter="text"
                                                                                     id="doc_margin_available"
-                                                                                    placeholder="Margin Available">
+                                                                                    placeholder="Total Available">
                                                                             </span>
                                                                         </div>
                                                             </div>
@@ -1078,7 +1077,7 @@
                 <span>${data.doc_margin_amount || "-"}</span>
             </div>
              <div class="nk-tb-col text-start">
-                <span>${data.doc_margin_available || "-"}</span>
+                <span>${data.dynamic_total_margin || "-"}</span>
             </div>
         </div>`
                     rowsHtml += rowHtml;

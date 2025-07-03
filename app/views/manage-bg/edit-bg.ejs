@@ -320,7 +320,7 @@
                                                                 <label class="form-label" for="doc_bank_name">Bank
                                                                     Name</label>
                                                                 <select class="form-select form-control js-select2"
-                                                                    data-filter="single" id="select-site"
+                                                                    data-filter="single" id="select_doc_bank_name"
                                                                     name="doc_bank_name" data-placeholder="Select Bank
                                                                             Name" required>
                                                                     <option value="" disabled selected>Select Bank
@@ -328,6 +328,7 @@
                                                                     <% banks.forEach(bank=> { %>
                                                                         <option data-code="<%= bank.bank_code %>"
                                                                             id="<%= bank.doc_id %>"
+                                                                            data-bank-id="<%= bank.doc_id %>"
                                                                             <%=manageBgData.doc_bank_name===bank.bank_name
                                                                             ? "selected" : "" %>>
                                                                             <%= bank.bank_name %>
@@ -588,13 +589,13 @@
                                                         <div class="col-md-8">
                                                             <div class="form-group">
                                                                 <label class="form-label"
-                                                                    for="doc_margin_available">Margin Available</label>
+                                                                    for="doc_margin_available">Total Margin</label>
                                                                 <div class="form-control-wrap">
                                                                     <input type="text" id="doc_margin_available"
                                                                         autocomplete="off" name="doc_margin_available"
                                                                         placeholder="Margin Available"
                                                                         class="form-control margin_available"
-                                                                        value="<%= manageBgData ? manageBgData.doc_margin_available : '' %>" />
+                                                                        value="<%= dynamic_total_margin === null ? 0 : dynamic_total_margin  %>" />
 
                                                                 </div>
                                                             </div>
@@ -777,11 +778,11 @@
             isFlag: false,
             msg: ""
         };
-        let selectedBankId = null
-
+        let selectedBankId = JSON.parse(`<%- JSON.stringify(manageBgData.bank_id) %>`);
         initialFormData.forEach((value, key) => {
             initialFormDataEntries[key] = value;
         });
+        initialFormDataEntries.bank_id = selectedBankId;
 
         $(document).ready(function () {
             $(".nk-menu-sub .nk-menu-item ").each(function () {
@@ -890,17 +891,16 @@
             const doc_id = "<%= manageBgData.doc_id %>"
             const $requiredMargin = $("#doc_required_margin").val();
             const $bgCommission = $("#doc_bg_commission").val();
-            
+
             toastr.clear();
             let form = $(this).closest("form")[0];
             let formData = new FormData(form);
             formData.set("doc_bg_commission", parseInt($bgCommission));
             formData.set("doc_required_margin", parseInt($requiredMargin));
-            if (selectedBankId !== null) {
-                formData.set("bank_id", parseInt(selectedBankId));
-            }
+            formData.set("bank_id", parseInt(selectedBankId));
 
             let newFormDataEntries = {};
+
 
             formData.forEach((value, key) => {
                 newFormDataEntries[key] = value;

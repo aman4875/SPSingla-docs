@@ -72,7 +72,7 @@
                                                                 <div class="form-control-wrap">
                                                                     <input type="text" class="form-control"
                                                                         placeholder="Document Code" id="doc_code"
-                                                                        name="doc_code" value="" required />
+                                                                        name="doc_code" value=""  />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -123,7 +123,7 @@
                                                                 <div class="form-control-wrap focused">
                                                                     <div class="form-icon form-icon-right"><em
                                                                             class="icon ni ni-calendar-alt"></em></div>
-                                                                    <input type="text" required id="doc_agreement_date"
+                                                                    <input type="text"  id="doc_agreement_date"
                                                                         autocomplete="off" name="doc_agreement_date"
                                                                         placeholder="Agreement Date"
                                                                         class="form-control date-picker" value="" />
@@ -139,7 +139,7 @@
                                                                         <input type="number" class="form-control"
                                                                             placeholder="Agreement No"
                                                                             id="doc_agreement_no"
-                                                                            name="doc_agreement_no" value="" required />
+                                                                            name="doc_agreement_no" value=""  />
 
                                                                     </div>
                                                                 </div>
@@ -152,7 +152,7 @@
                                                                 <div class="form-control-wrap focused">
                                                                     <div class="form-icon form-icon-right"><em
                                                                             class="icon ni ni-calendar-alt"></em></div>
-                                                                    <input type="text" required id="doc_completion_date"
+                                                                    <input type="text" id="doc_completion_date"
                                                                         autocomplete="off" name="doc_completion_date"
                                                                         placeholder="Date of Completion"
                                                                         class="form-control date-picker" value="" />
@@ -343,13 +343,17 @@
                 const value = $(this).val();
 
                 if (value === 'false') {
-                    $('#doc_department').attr('required', false);
-                    $('#doc_financial_date').attr('required', false);
-                    $('#doc_dlp_period').attr('required', false);
+                    // $('#doc_department').attr('required', false);
+                    // $('#doc_financial_date').attr('required', false);
+                    // $('#doc_dlp_period').attr('required', false);
                 } else {
                     $('#doc_department').attr('required', true);
                     $('#doc_financial_date').attr('required', true);
                     $('#doc_dlp_period').attr('required', true);
+                    $('#doc_agreement_date').attr('required', true);
+                    $('#doc_completion_date').attr('required', true);
+                    $('#doc_agreement_no').attr('required', true);
+
                 }
             });
         });

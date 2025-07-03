@@ -1345,7 +1345,12 @@ documentController.getProjectsBg = async (req, res) => {
 					BETWEEN CURRENT_DATE AND CURRENT_DATE + INTERVAL '45 days'
 				THEN true
 				ELSE false
-				END AS claim_pass
+				END AS claim_pass,
+       (
+        SELECT COALESCE(SUM(f.doc_margin_available), 0)
+        FROM fdr_menu AS f
+        WHERE f.bank_id = d.bank_id
+        ) AS dynamic_total_margin
 			FROM
 				doc_manage_bg AS d
 			LEFT JOIN
@@ -1573,7 +1578,7 @@ documentController.getProjectsBg = async (req, res) => {
 			) AS result
 		FROM fetched_docs;`;
     }
-
+  console.log(query)
     // Execute the main query
     let { rows: documents } = await pool.query(query);
     let totalBgAmount = null;
