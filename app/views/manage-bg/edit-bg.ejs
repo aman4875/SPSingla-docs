@@ -880,50 +880,64 @@
         });
 
 
-        $("#documentForm").submit(function () {
+        $("#documentForm").submit(function (event) {
             event.preventDefault();
+
             if (!this.checkValidity()) {
                 return false;
             }
+
             if (validationFlag.isFlag) {
                 return NioApp.Toast(`${validationFlag.msg}`, "error");
             }
-            const doc_id = "<%= manageBgData.doc_id %>"
+
+            const doc_id = "<%= manageBgData.doc_id %>";
             const $requiredMargin = $("#doc_required_margin").val();
             const $bgCommission = $("#doc_bg_commission").val();
-
             toastr.clear();
+
             let form = $(this).closest("form")[0];
             let formData = new FormData(form);
+
             formData.set("doc_bg_commission", parseInt($bgCommission));
             formData.set("doc_required_margin", parseInt($requiredMargin));
             formData.set("bank_id", parseInt(selectedBankId));
+            if (isNaN(parseInt($bgCommission)) || $bgCommission === "") {
+                formData.set("doc_bg_commission", 0);
+            }
 
             let newFormDataEntries = {};
 
-
             formData.forEach((value, key) => {
-                newFormDataEntries[key] = value;
+                // Convert empty strings to null
+                const sanitizedValue = typeof value === "string" && value.trim() === "" ? null : value;
+                newFormDataEntries[key] = sanitizedValue;
             });
 
-            let hasChanges = Object.keys(newFormDataEntries).some(key => newFormDataEntries[key]?.trim() !== initialFormDataEntries[key]?.trim());
+            let hasChanges = Object.keys(newFormDataEntries).some(key =>
+                (newFormDataEntries[key] ?? "").toString().trim() !== (initialFormDataEntries[key] ?? "").toString().trim()
+            );
+
             if (!hasChanges) {
                 return NioApp.Toast("<h5>No Changes</h5><p>No changes to save</p>", "info");
             }
-            NioApp.handleButtonState("uploadDocumentBtn", "Update", true);
 
+            NioApp.handleButtonState("uploadDocumentBtn", "Update", true);
 
             $.ajax({
                 type: "POST",
                 url: "/docs/edit-bg",
-                data: { newFormDataEntries, doc_id, "bank_id": selectedBankId },
+                data: {
+                    newFormDataEntries,
+                    doc_id,
+                    "bank_id": selectedBankId
+                },
                 success: function (response) {
                     if (response.status == 1) {
                         $("#doc_site,#doc_folder,#choosePrefixButton,#doc_type").prop("disabled", true);
                         NioApp.handleButtonState("uploadDocumentBtn", "Update", false);
-                        NioApp.Toast("<h5>Update Successfully</h5><p>Document Updated Successfully</p>", "success")
+                        NioApp.Toast("<h5>Update Successfully</h5><p>Document Updated Successfully</p>", "success");
                         window.location.href = "/manage-bg";
-
                     } else {
                         NioApp.handleButtonState("uploadDocumentBtn", "Update", false);
                         NioApp.Toast(`<h5>Something Went Wrong</h5>${response.msg || `<p>Error while updating document.</p>`}`, "error");
@@ -936,6 +950,7 @@
                 },
             });
         });
+
 
         $(document).ready(function () {
             $("#doc_dlp_period").on("input", function () {

@@ -288,64 +288,96 @@ $(".js-select2").select2({
   width: "resolve",
 });
 
-$(document).ready(() => {
-  const $input = $("#doc_bg_commission");
 
-  $input.on("input", function () {
-    let val = $(this).val().replace(/[^0-9.]/g, ""); // allow digits and dot
-    $(this).data("raw", val); // Store the raw value without %
-  });
-
-  $input.on("focus", function () {
-    let val = $(this).val().replace("%", "");
-    $(this).val(val);
-  });
-
-  $input.on("blur", function () {
-    let val = $(this).data("raw") || "";
-    if (val !== "") {
-      val = parseFloat(val);
-      if (!isNaN(val)) {
-        val = val.toFixed(2);
-        $(this).val(val + "%");
-      } else {
-        $(this).val(""); // fallback in case parseFloat fails
-      }
-    } else {
-      $(this).val("");
-    }
-  });
-});
 
 $(document).ready(() => {
   const $input = $("#doc_required_margin");
 
+  // Handle input — store raw value without %
   $input.on("input", function () {
-    let val = $(this).val().replace(/[^0-9.]/g, ""); // allow digits and dot
-    $(this).data("raw", val); // Store the raw value without %
+    let val = $(this)
+      .val()
+      .replace(/[^0-9.]/g, ""); // allow digits and dot
+    $(this).data("raw", val); // Store raw value
   });
 
+  // On focus, remove the % only for visual editing
   $input.on("focus", function () {
-    let val = $(this).val().replace("%", "");
+    let val = $(this).val();
+    if (val.endsWith("%")) {
+      val = val.slice(0, -1); // Remove trailing %
+    }
     $(this).val(val);
   });
 
+  // On blur, restore % if a valid number exists; else fallback to 0%
   $input.on("blur", function () {
-    let val = $(this).data("raw") || "";
-    if (val !== "") {
+    let val = $(this).data("raw");
+
+    if (val !== undefined && val !== "") {
       val = parseFloat(val);
       if (!isNaN(val)) {
-        val = val.toFixed(2);
-        $(this).val(val + "%");
+        $(this).val(val.toFixed(2) + "%");
       } else {
-        $(this).val(""); // fallback in case parseFloat fails
+        $(this).val("0.00%"); // fallback if user enters something invalid
       }
     } else {
-      $(this).val("");
+      // If user left it blank or deleted everything, reset to 0%
+      $(this).val("0.00%");
+      $(this).data("raw", "0.00");
     }
   });
-});
 
+  // Set initial value if blank
+  if ($input.val().trim() === "") {
+    $input.val("0.00%");
+    $input.data("raw", "0.00");
+  }
+});
+$(document).ready(() => {
+  const $input = $("#doc_bg_commission");
+
+  // Handle input — store raw value without %
+  $input.on("input", function () {
+    let val = $(this)
+      .val()
+      .replace(/[^0-9.]/g, ""); // allow digits and dot
+    $(this).data("raw", val); // Store raw value
+  });
+
+  // On focus, remove the % only for visual editing
+  $input.on("focus", function () {
+    let val = $(this).val();
+    if (val.endsWith("%")) {
+      val = val.slice(0, -1); // Remove trailing %
+    }
+    $(this).val(val);
+  });
+
+  // On blur, restore % if a valid number exists; else fallback to 0%
+  $input.on("blur", function () {
+    let val = $(this).data("raw");
+
+    if (val !== undefined && val !== "") {
+      val = parseFloat(val);
+      if (!isNaN(val)) {
+        $(this).val(val.toFixed(2) + "%");
+      } else {
+        $(this).val("0.00%"); // fallback if user enters something invalid
+      }
+    } else {
+      // If user left it blank or deleted everything, reset to 0%
+      $(this).val("0.00%");
+      $(this).data("raw", "0.00");
+    }
+  });
+
+  // Set initial value if blank
+  if ($input.val().trim() === "") {
+    $input.val("0.00%");
+    $input.data("raw", "0.00");
+  }
+});
 
 $(document).ready(() => {
   function parseDDMMYYYY(dateStr) {
@@ -359,16 +391,15 @@ $(document).ready(() => {
       console.error(`Invalid date format: ${dateStr}. Expected DD/MM/YYYY`);
       return null;
     }
-    return parsedDate.startOf('day');
+    return parsedDate.startOf("day");
   }
 
   function calculateDaysDifference(startDate, endDate) {
-    return endDate.diff(startDate, 'days')
+    return endDate.diff(startDate, "days");
   }
 
   function calculateCommission() {
-
-    const rawClaimDate = $("#doc_claim_date").val()
+    const rawClaimDate = $("#doc_claim_date").val();
     const rawIssueDate = $("#doc_issue_date").val();
     const bgCommissionRaw = $("#doc_bg_commission").val() || 0;
     const bgAmountRaw = $("#doc_bg_amount").val() || 0;
@@ -395,7 +426,9 @@ $(document).ready(() => {
         return;
       }
     } catch (e) {
-      $("#error_message").text("Invalid commission percentage (e.g., 1 or 1%).");
+      $("#error_message").text(
+        "Invalid commission percentage (e.g., 1 or 1%)."
+      );
       return;
     }
 
@@ -415,16 +448,25 @@ $(document).ready(() => {
       const daysFraction = Decimal.div(days, 365);
       const result = daysFraction.mul(bgCommission).mul(bgAmount);
       const formattedResult = result.toFixed(0);
-      console.log("Inputs:", { rawClaimDate, rawIssueDate, days, bgCommissionRaw, bgCommission: bgCommission.toString(), bgAmount: bgAmount.toString() });
+      console.log("Inputs:", {
+        rawClaimDate,
+        rawIssueDate,
+        days,
+        bgCommissionRaw,
+        bgCommission: bgCommission.toString(),
+        bgAmount: bgAmount.toString(),
+      });
       $("#doc_commission_amount").val(formattedResult);
     } catch (e) {
       $("#error_message").text("Calculation error. Check inputs.");
       console.error("Calculation error:", e);
     }
   }
-  $("#doc_claim_date, #doc_issue_date, #doc_bg_commission, #doc_bg_amount").on("input change", calculateCommission);
+  $("#doc_claim_date, #doc_issue_date, #doc_bg_commission, #doc_bg_amount").on(
+    "input change",
+    calculateCommission
+  );
 });
-
 
 $(document).ready(() => {
   function calculateMarginAmount() {
@@ -451,10 +493,9 @@ $(document).ready(() => {
 
 $(document).ready(() => {
   function getMarginAvailable(bankID) {
-
     fetch(`/fdr/get-margin-available?bank_id=${bankID}`)
-      .then(response => response.json())
-      .then(data => {
+      .then((response) => response.json())
+      .then((data) => {
         if (data.status === 1) {
           $("#doc_margin_available").val(data.totalMarginAvailable || "0");
           console.log("Margin available:", data.totalMarginAvailable);
@@ -463,19 +504,15 @@ $(document).ready(() => {
           console.error("Error fetching margin available:", data.message);
         }
       })
-      .catch(error => {
+      .catch((error) => {
         console.error("Error fetching margin available:", error);
         $("#doc_margin_available").val("0");
       });
-
   }
 
-
   $("#select_doc_bank_name").on("change", async function () {
-    let val = $(this).val()
+    let val = $(this).val();
     let bankID = $(this).find("option:selected").data("bank-id");
     getMarginAvailable(bankID);
   });
-
-
-})
+});

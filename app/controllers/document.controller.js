@@ -448,33 +448,38 @@ documentController.editBG = async (req, res) => {
 
     const generateInsertQuery = (data) => {
       let query;
-      const keys = Object.keys(data);
+
+      // Add additional fields
       data["doc_uploaded_by"] = token.user_name;
       data["doc_uploaded_by_id"] = token.user_id;
       data["doc_uploaded_at"] = moment().format("MM/DD/YYYY");
 
-      const nonEmptyKeys = keys.filter((key) => {
+      // Convert empty strings/arrays to null
+      Object.keys(data).forEach((key) => {
         const value = data[key];
-        return (
-          value !== undefined &&
-          value !== null &&
-          (Array.isArray(value)
-            ? value.length > 0
-            : typeof value === "string"
-            ? value.trim() !== ""
-            : true)
-        );
+        if (
+          value === undefined ||
+          value === null ||
+          (typeof value === "string" && value.trim() === "") ||
+          (Array.isArray(value) && value.length === 0)
+        ) {
+          data[key] = null;
+        }
       });
+
+      const keys = Object.keys(data);
+      const nonEmptyKeys = keys.filter((key) => data[key] !== undefined); // now empty strings/arrays are already null
 
       const condition = `doc_id = ${doc_id}`;
       const setClause = nonEmptyKeys
         .map((key, index) => `${key} = $${index + 1}`)
         .join(", ");
+
       const values = nonEmptyKeys.map((key) => data[key]);
 
       query = `UPDATE doc_manage_bg SET ${setClause} WHERE ${condition}`;
 
-      return { query, values: values };
+      return { query, values };
     };
 
     const { query: insertQuery, values: insertValues } = generateInsertQuery({
@@ -856,14 +861,14 @@ documentController.createBG = async (req, res) => {
 
       return { query, values };
     };
-    
+
     const { query, values } = generateInsertQuery(inputs);
     const createProject = await pool.query(query, values);
     const createdDocId = createProject.rows[0].doc_id;
-    
+
     if (req.file && req.file) {
       const fileName = uuidv4();
-      
+
       const s3Params = {
         Bucket: process.env.BUCKET_NAME,
         Key: `docs/${fileName}.pdf`,
@@ -1539,7 +1544,6 @@ documentController.getProjectsBg = async (req, res) => {
 		${conditions.length ? "WHERE " + conditions.join(" AND ") : ""}
 	  `;
 
-
     let { rows: countResult } = await pool.query(countQuery);
     const totalDocuments = countResult[0]?.total_count;
     const totalPages = Math.ceil(totalDocuments / pageSize);
@@ -1578,7 +1582,7 @@ documentController.getProjectsBg = async (req, res) => {
 			) AS result
 		FROM fetched_docs;`;
     }
-  console.log(query)
+    console.log(query);
     // Execute the main query
     let { rows: documents } = await pool.query(query);
     let totalBgAmount = null;
