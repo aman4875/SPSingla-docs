@@ -57,7 +57,11 @@ const ProcessDocument = async (cronJob) => {
 
                 console.log("Skipped file and updated cron status.");
                 
-                await pool.query(`UPDATE documents SET doc_ocr_proccessed = true  WHERE doc_number = '${activeCron[0].cron_feed}'`);
+                await pool.query(
+                    'UPDATE documents SET doc_ocr_proccessed = true WHERE doc_number = $1',
+                    [activeCron[0].cron_feed]
+                );
+
                   return
             } else {
                 console.log("Previous cron is still running within the allowed time.");

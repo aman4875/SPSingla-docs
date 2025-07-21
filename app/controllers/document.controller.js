@@ -951,12 +951,12 @@ documentController.getFilteredDocuments = async (req, res) => {
 										)
 									)
 								)
-							FROM UNNEST(
-								ARRAY(
-									SELECT REGEXP_REPLACE(TRIM(ref), '\s*/\s*', '/', 'g') 
-									FROM UNNEST(STRING_TO_ARRAY(d.doc_reference, ',')) AS ref
-								)
-							) AS ref
+              FROM UNNEST(
+              ARRAY(
+                SELECT TRIM(ref)
+                FROM UNNEST(STRING_TO_ARRAY(d.doc_reference, ',')) AS ref
+              )
+            ) AS ref
 						) AS references,
 						(
 							SELECT JSON_AGG(
