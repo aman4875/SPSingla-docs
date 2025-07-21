@@ -101,5 +101,5 @@ app.use("/", router);
 
 // Starting server on port
 app.listen(port, function () {
-	console.log(`http://localhost:${port}/`);
+	console.log(`\n\n****** Ready on development > http://localhost:${port}/ ****** \n\n`);
 });

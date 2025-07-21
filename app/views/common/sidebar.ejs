@@ -53,22 +53,46 @@
               </a>
             </li>
             <li
+              class="nk-menu-item <%= typeof active !== 'undefined' && active == 'bank-master' ? 'active current-page' : '' %>">
+              <a href="/bank-master" class="nk-menu-link">
+                <span class="nk-menu-icon"><em class="icon ni ni-cc-secure-fill"></em></span>
+                <span class="nk-menu-text">Bank Master</span>
+              </a>
+            </li>
+            <li class="nk-menu-item has-sub">
+              <a href="#" class="nk-menu-link nk-menu-toggle">
+                <span class="nk-menu-icon"><em class="icon ni ni-shield-star"></em></span>
+                <span class="nk-menu-text">Bank Guarantee</span>
+              </a>
+              <ul class="nk-menu-sub bg-items" style="display: none;">
+                <li
+                  class="nk-menu-item <%= typeof subItems !== 'undefined' && subItems.active == 'projectMaster' ? 'active' : '' %>">
+                  <a href="/project-master" class="nk-menu-link">
+                    <span class="nk-menu-text">Project Master</span>
+                  </a>
+                </li>
+                <li
+                  class="nk-menu-item <%= typeof subItems !== 'undefined' && subItems.active == 'manageBg' ? 'active' : '' %>">
+                  <a href="/manage-bg" class="nk-menu-link">
+                    <span class="nk-menu-text">Manage BG</span>
+                  </a>
+                </li>
+              </ul>
+            </li>
+            <li
+              class="nk-menu-item <%= typeof active !== 'undefined' && active == 'fdr' ? 'active current-page' : '' %>"">
+              <a href=" /fdr" class="nk-menu-link">
+              <span class="nk-menu-icon"><em class="icon ni ni-bag"></em></span>
+              <span class="nk-menu-text">FDR</span>
+              </a>
+            </li>
+            <li
               class="nk-menu-item <%= typeof active !== 'undefined' && active == 'settings' ? 'active current-page' : '' %>"">
-              <a href=" /settings" class="nk-menu-link">
+            <a href=" /settings" class="nk-menu-link">
               <span class="nk-menu-icon"><em class="icon ni ni-setting"></em></span>
               <span class="nk-menu-text">Settings</span>
               </a>
             </li>
-            <!-- <li class="nk-menu-item has-sub "><a href="#" class="nk-menu-link nk-menu-toggle"><span class="nk-menu-icon"><em
-                    class="icon ni ni-shield-star"></em></span><span class="nk-menu-text">Bank Guarantee</span></a>
-              <ul class="nk-menu-sub bg-items" style="display: none;">
-                
-                <li class="nk-menu-item <%= typeof subItems !== 'undefined' &&  subItems.active == 'projectMaster' ? 'active' : '' %>"><a href="/project-master" class="nk-menu-link"><span class="nk-menu-text">Project
-                      Master</span></a></li>
-                <li class="nk-menu-item"><a href="/demo3/cms/page-list.html" class="nk-menu-link"><span class="nk-menu-text">Manage
-                      BG</span></a></li>
-              </ul>
-            </li> -->
           </ul>
           <%} else {%>
             <ul class="nk-menu">
@@ -89,6 +113,42 @@
                   <span class="nk-menu-text">Documents</span>
                 </a>
               </li>
+
+
+              <% if (token.bank_guarantee_status==true) { %>
+                <li class="nk-menu-item has-sub">
+                  <a href="#" class="nk-menu-link nk-menu-toggle">
+                    <span class="nk-menu-icon"><em class="icon ni ni-shield-star"></em></span>
+                    <span class="nk-menu-text">Bank Guarantee</span>
+                  </a>
+                  <ul class="nk-menu-sub bg-items" style="display: none;">
+                    <li
+                      class="nk-menu-item <%= typeof subItems !== 'undefined' && subItems.active == 'projectMaster' ? 'active' : '' %>">
+                      <a href="/project-master" class="nk-menu-link">
+                        <span class="nk-menu-text">Project Master</span>
+                      </a>
+                    </li>
+                    <li
+                      class="nk-menu-item <%= typeof subItems !== 'undefined' && subItems.active == 'manageBg' ? 'active' : '' %>">
+                      <a href="/manage-bg" class="nk-menu-link">
+                        <span class="nk-menu-text">Manage BG</span>
+                      </a>
+                    </li>
+                  </ul>
+                </li>
+                <% } %>
+
+                  <% if (token.fdr_status==true) { %>
+                    <li
+                      class="nk-menu-item <%= typeof active !== 'undefined' && active == 'fdr' ? 'active current-page' : '' %>"">
+                       <a href=" /fdr" class="nk-menu-link">
+                      <span class="nk-menu-icon"><em class="icon ni ni-bag"></em></span>
+                      <span class="nk-menu-text">FDR</span>
+                      </a>
+                    </li>
+
+                    <% } %>
+
             </ul>
             <%}%>
       </div>

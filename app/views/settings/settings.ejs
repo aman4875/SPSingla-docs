@@ -86,21 +86,36 @@
     <script src="/app/assets/js/bundle.js"></script>
     <script src="/app/assets/js/scripts.js"></script>
     <script>
+        let initialFormData = new FormData($("#documentForm")[0]);
+        let initialFormDataEntries = {};
+        initialFormData.forEach((value, key) => {
+            initialFormDataEntries[key] = value;
+        });
+
         $("#documentForm").submit(function (event) {
             event.preventDefault();
             if (!this.checkValidity()) {
                 return false;
             }
 
-            NioApp.handleButtonState("uploadDocumentBtn", "Upload", true);
+            let newFormDataEntries = {};
+
+
 
             let formData = new FormData(this);
-            console.log("🚀 Form Data:");
             for (let pair of formData.entries()) {
                 console.log(pair[0] + ": " + pair[1]);
             }
+            formData.forEach((value, key) => {
+                newFormDataEntries[key] = value;
+            });
 
+            let hasChanges = Object.keys(newFormDataEntries).some(key => newFormDataEntries[key].trim() !== initialFormDataEntries[key].trim());
+            if (!hasChanges) {
+                return NioApp.Toast("<h5>No Changes</h5><p>No changes to save</p>", "info");
+            }
 
+            NioApp.handleButtonState("uploadDocumentBtn", "Upload", true);
             // Your AJAX request
             $.ajax({
                 type: "POST",

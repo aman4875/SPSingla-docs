@@ -1,15 +1,3 @@
-.grid-header {
-  text-transform: uppercase;
-}
-.project-master .nk-tb-col {
-  white-space: nowrap;
-}
-.project-master .form-control {
-  min-width: 100px;
-}
-.project-master .editDocument em.icon {
-  font-size: 20px;
-}
 .is-compact .nk-tb-item:not(.nk-tb-head) .nk-tb-col {
   padding-top: 2px;
   padding-bottom: 2px;
@@ -22,15 +10,11 @@
 .nk-tb-col {
   white-space: nowrap;
   /* overflow: hidden;
-     text-overflow: ellipsis; */
+ text-overflow: ellipsis; */
   padding: 5px 15px;
   width: 100%;
   min-width: 100%;
   max-width: 100%;
-}
-
-#table-head.nk-tb-head {
-  cursor: pointer;
 }
 
 .sort-indicator {
@@ -78,16 +62,18 @@
 }
 
 /* .editDocument {
-    text-align: center !important;
+text-align: center !important;
 } */
 
 .nk-tb-col .sort-indicator:after {
   content: "";
   position: absolute;
   right: 10px;
+  /* Adjust as needed */
   top: 50%;
   transform: translateY(-50%);
   font-size: 12px;
+  /* Adjust as needed */
 }
 
 .nk-tb-col.sort-asc .sort-indicator:after {
@@ -99,6 +85,10 @@
   content: "▼";
   /* Downward arrow */
 }
+
+/* .nk-tb-col.active {
+Optional: styling for the active column
+} */
 
 .replied-vide-select {
   min-width: 200px;
@@ -126,34 +116,66 @@
   background-color: beige;
 }
 
-.project-master span.sort-indicator {
-  display: inline-block;
-  margin-left: 15px;
-}
-
 .select2-result-project {
   display: flex;
   align-items: center;
   padding: 8px 10px;
 }
+
 .select2-result-project__icon {
   font-size: 1.5em;
   margin-right: 10px;
 }
+
 .select2-result-project__meta {
   display: flex;
   flex-direction: column;
 }
+
 .select2-result-project__code {
   font-weight: bold;
   color: #333;
 }
+
 .select2-result-project__name {
   font-size: 0.9em;
   color: #777;
 }
 
-.disableInput {
-  background-color: #f5f6fa !important;
-  pointer-events: none !important;
+.select2-result-project.custom-project {
+  padding: 0;
+}
+
+#table-head {
+  text-transform: uppercase;
+}
+
+.create-manage-bg .upload-btn {
+  pointer-events: none;
+  opacity: 0.6;
+}
+.manage-bg .form-control {
+  min-width: 100px;
+}
+
+.bg_amount {
+  padding-bottom: 10px;
+  padding-top: 10px;
+}
+
+.manage-bg select#doc_type ~ span.select2 {
+  min-width: 150px;
+}
+
+.grid-header {
+  cursor: pointer;
+}
+.manage-bg span.sort-indicator {
+  margin-left: 15px;
+}
+
+.margin_available {
+  background-color: #f5f6fa;
+  opacity: 1;
+  pointer-events: none;
 }

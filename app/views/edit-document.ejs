@@ -607,13 +607,11 @@
       })
 
         $(document).on('click', '#deleteDoc', function (event) {
-          console.log('wqdkp');
 
           event.preventDefault();
           let openModal = document.getElementById('open-modal')
 
           docIdToDelete = $(this).data('id');
-          console.log(docIdToDelete);
           if (docIdToDelete) {
             openModal.click();
           }
@@ -655,7 +653,6 @@
               url: url,
               type: 'GET',
               success: function (response) {
-                console.log(response);
                 if (response.status === 1) {
                   let $dropdown = $("#doc_purpose");
 

@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="zxx" class="js">
+
+<head>
+    <base href="../" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" />
+    <!-- Fav Icon  -->
+    <link rel="shortcut icon" href="/app/assets/images/favicon.png" />
+    <!-- Page Title  -->
+    <title>Dashboard | ProjectMaster</title>
+    <!-- StyleSheets  -->
+    <link rel="stylesheet" href="/app/assets/css/dashlite.css" />
+    <link id="skin-default" rel="stylesheet" href="/app/assets/css/theme.css" />
+    <link rel="stylesheet" href="/app/views/manage-bg/styles.css" />
+    <style>
+    </style>
+</head>
+
+<body class="nk-body bg-lighter npc-general has-sidebar">
+    <div class="nk-app-root">
+        <div class="nk-main">
+            <%- include('./common/sidebar' , {subItems:{active:"manageBg"} }); -%>
+                <div class="nk-wrap">
+
+                    <div class="nk-content">
+                        <div class="container-fluid">
+                            <div class="nk-content-inner">
+                                <div class="nk-content-body">
+                                    <div class="nk-block nk-block-lg">
+                                        <div class="nk-block-head nk-block-head-sm">
+                                            <div class="nk-block-between g-3">
+                                                <div class="nk-block-head-content d-flex">
+                                                    <h3 class="nk-block-title page-title">Edit BG</h3>
+                                                    <button id="saveDraftButton"
+                                                        style="margin: -5px 20px 5px 20px; min-width: 88px"
+                                                        class="btn btn-sm btn-dim btn-outline-primary d-none text-center">Save
+                                                        Draft</button>
+                                                </div>
+
+                                                <div class="nk-block-head-content">
+                                                    <a href="/manage-bg"
+                                                        class="btn btn-outline-light bg-white d-none d-sm-inline-flex"><em
+                                                            class="icon ni ni-arrow-left"></em><span>Back</span></a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card card-bordered">
+                                            <div class="card-inner">
+                                                <form id="documentForm" class="form-validate is-alter">
+                                                    <div class="row g-gs">
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label" for="doc_code">Code</label>
+                                                                <div class="form-control-wrap">
+                                                                    <input type="text" class="form-control"
+                                                                        placeholder="Document Code" id="doc_code"
+                                                                        name="doc_code"
+                                                                        value="<%= manageBgData ? manageBgData.doc_code : '' %>"
+                                                                        disabled />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label" for="doc_work_name">Name
+                                                                    of
+                                                                    Work</label>
+                                                                <div class="form-control-wrap">
+                                                                    <input type="text" class="form-control"
+                                                                        placeholder="Name of Work" id="doc_work_name"
+                                                                        name="doc_work_name"
+                                                                        value="<%= manageBgData ? manageBgData.doc_work_name : '' %>"
+                                                                        disabled />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label"
+                                                                    for="doc_department">Department
+                                                                    Name</label>
+                                                                <div class="form-control-wrap">
+                                                                    <input type="text" class="form-control"
+                                                                        placeholder="Department Name"
+                                                                        id="doc_department" name="doc_department"
+                                                                        value="<%= manageBgData ? manageBgData.doc_department : '' %>"
+                                                                        disabled />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label"
+                                                                    for="doc_financial_date">Financial
+                                                                    Opening Date</label>
+                                                                <div class="form-control-wrap focused">
+                                                                    <div class="form-icon form-icon-right"><em
+                                                                            class="icon ni ni-calendar-alt"></em>
+                                                                    </div>
+                                                                    <input type="text" required id="doc_financial_date"
+                                                                        autocomplete="off" name="doc_financial_date"
+                                                                        placeholder="Document Date"
+                                                                        class="form-control date-picker"
+                                                                        value="<%= manageBgData ? manageBgData.doc_financial_date : '' %>"
+                                                                        disabled />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-8">
+                                                            <div class="form-group">
+                                                                <label class="form-label"
+                                                                    for="doc_agreement_no">Agreement No</label>
+                                                                <div class="form-control-wrap">
+                                                                    <div class="input-group">
+                                                                        <input type="number" class="form-control"
+                                                                            placeholder="Agreement No"
+                                                                            id="doc_agreement_no"
+                                                                            name="doc_agreement_no"
+                                                                            value="<%= manageBgData ? manageBgData.doc_agreement_no : '' %>"
+                                                                            disabled />
+
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label" for="doc_completion_date">Date
+                                                                    of Completion</label>
+                                                                <div class="form-control-wrap focused">
+                                                                    <div class="form-icon form-icon-right"><em
+                                                                            class="icon ni ni-calendar-alt"></em>
+                                                                    </div>
+                                                                    <input type="text" required id="doc_completion_date"
+                                                                        autocomplete="off" name="doc_completion_date"
+                                                                        placeholder="Document Date"
+                                                                        class="form-control date-picker"
+                                                                        value="<%= manageBgData ? manageBgData.doc_completion_date : '' %>"
+                                                                        disabled />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label"
+                                                                    for="doc_awarded">Awarded</label>
+                                                                <div class="form-control-wrap">
+                                                                    <select
+                                                                        class="form-select form-control js-select2 form-control"
+                                                                        id="doc_awarded" name="doc_awarded"
+                                                                        data-placeholder="Select Option" disabled>
+                                                                        <option label="empty" value=""></option>
+                                                                        <option <%=manageBgData &&
+                                                                            manageBgData.doc_awarded==="true"
+                                                                            ? 'selected' : '' %>
+                                                                            value="true">Yes
+                                                                        </option>
+                                                                        <option <%=manageBgData &&
+                                                                            manageBgData.doc_awarded==="false"
+                                                                            ? 'selected' : '' %>
+                                                                            value="false">No
+                                                                        </option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label"
+                                                                    for="doc_agreement_date">Agreement
+                                                                    Date</label>
+                                                                <div class="form-control-wrap focused">
+                                                                    <div class="form-icon form-icon-right"><em
+                                                                            class="icon ni ni-calendar-alt"></em>
+                                                                    </div>
+                                                                    <input type="text" required id="doc_agreement_date"
+                                                                        autocomplete="off" name="doc_agreement_date"
+                                                                        placeholder="Document Date"
+                                                                        class="form-control date-picker"
+                                                                        value="<%= manageBgData ? manageBgData.doc_agreement_date : '' %>"
+                                                                        disabled />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label" for="doc_DLP_period">DLP
+                                                                    Period
+                                                                    (in months)</label>
+                                                                <div class="form-control-wrap">
+                                                                    <input type="number" class="form-control"
+                                                                        placeholder="DLP Period" id="doc_dlp_period"
+                                                                        name="doc_dlp_period"
+                                                                        value="<%= manageBgData ? manageBgData.doc_dlp_period : '' %>"
+                                                                        disabled />
+                                                                    <small id="error-msg" class="text-danger"
+                                                                        style="display:none;"></small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label" for="doc_revised_date">Revised
+                                                                    Completion Date</label>
+                                                                <div class="form-control-wrap focused">
+                                                                    <div class="form-icon form-icon-right"><em
+                                                                            class="icon ni ni-calendar-alt"></em>
+                                                                    </div>
+                                                                    <input type="text" id="doc_revised_date"
+                                                                        autocomplete="off" name="doc_revised_date"
+                                                                        placeholder="Revised Completion Date"
+                                                                        class="form-control date-picker"
+                                                                        value="<%= manageBgData ? manageBgData.doc_revised_date : '' %>" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label" for="doc_dlp_ending">DLP
+                                                                    Ending on</label>
+                                                                <div class="form-control-wrap focused">
+                                                                    <div class="form-icon form-icon-right"><em
+                                                                            class="icon ni ni-calendar-alt"></em>
+                                                                    </div>
+                                                                    <input type="text" id="doc_dlp_ending"
+                                                                        autocomplete="off" name="doc_dlp_ending"
+                                                                        placeholder="DLP Ending on"
+                                                                        class="form-control date-picker"
+                                                                        value="<%= manageBgData ? manageBgData.doc_dlp_ending : '' %>" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label"
+                                                                    for="doc_performance_security">Performance
+                                                                    Security</label>
+                                                                <div class="form-control-wrap">
+                                                                    <input type="number" class="form-control"
+                                                                        placeholder="Tota Mobilisation Amount"
+                                                                        id="doc_performance_security"
+                                                                        name="doc_performance_security"
+                                                                        value="<%= manageBgData ? manageBgData.doc_performance_security : '' %>" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label"
+                                                                    for="doc_performance_security">Additional
+                                                                    Performance Security</label>
+                                                                <div class="form-control-wrap">
+                                                                    <input type="number" class="form-control"
+                                                                        placeholder="Additional Performance Security"
+                                                                        id="doc_additional_performance_security"
+                                                                        name="doc_additional_performance_security"
+                                                                        value="<%= manageBgData ? manageBgData.doc_additional_performance_security : '' %>" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label"
+                                                                    for="doc_bal_mobilisation_amount">Balance
+                                                                    Mobilisation Amount</label>
+                                                                <div class="form-control-wrap">
+                                                                    <input type="number" class="form-control"
+                                                                        placeholder="Balance Mobilisation Amount"
+                                                                        id="doc_bal_mobilisation_amount"
+                                                                        name="doc_bal_mobilisation_amount"
+                                                                        value="<%= manageBgData ? manageBgData.doc_bal_mobilisation_amount : '' %>" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label"
+                                                                    for="doc_retention_amount">Retention Amount
+                                                                    as on Date</label>
+                                                                <div class="form-control-wrap">
+                                                                    <input type="number" class="form-control"
+                                                                        placeholder="Retention Amount as on Date"
+                                                                        id="doc_retention_amount"
+                                                                        name="doc_retention_amount"
+                                                                        value="<%= manageBgData ? manageBgData.doc_retention_amount : '' %>" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label" for="doc_type">Type</label>
+                                                                <div class="form-control-wrap">
+                                                                    <select class="form-select form-control js-select2"
+                                                                        id="doc_type" name="doc_type"
+                                                                        data-placeholder="Select or Enter Type"
+                                                                        required>
+                                                                        <option label="empty" value=""></option>
+                                                                        <% types.forEach(type=> { %>
+                                                                            <option data-id="<%= type.id %>"
+                                                                                value="<%= type.type_name %>"
+                                                                                <%=manageBgData.doc_type===type.type_name
+                                                                                ? "selected" : "" %>>
+                                                                                <%= type.type_name %>
+                                                                            </option>
+                                                                            <% }); %>
+
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-4">
+                                                            <div class="">
+                                                                <label class="form-label" for="doc_bank_name">Bank
+                                                                    Name</label>
+                                                                <select class="form-select form-control js-select2"
+                                                                    data-filter="single" id="select_doc_bank_name"
+                                                                    name="doc_bank_name" data-placeholder="Select Bank
+                                                                            Name" required>
+                                                                    <option value="" disabled selected>Select Bank
+                                                                        Name</option>
+                                                                    <% banks.forEach(bank=> { %>
+                                                                        <option data-code="<%= bank.bank_code %>"
+                                                                            id="<%= bank.doc_id %>"
+                                                                            data-bank-id="<%= bank.doc_id %>"
+                                                                            <%=manageBgData.doc_bank_name===bank.bank_name
+                                                                            ? "selected" : "" %>>
+                                                                            <%= bank.bank_name %>
+                                                                        </option>
+                                                                        <% }); %>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label"
+                                                                    for="doc_issuing_branch">Issuing
+                                                                    Branch</label>
+                                                                <div class="form-control-wrap">
+                                                                    <input type="text" class="form-control"
+                                                                        placeholder="Issuing Branch"
+                                                                        id="doc_issuing_branch"
+                                                                        name="doc_issuing_branch"
+                                                                        value="<%= manageBgData ? manageBgData.doc_issuing_branch : '' %>" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-8">
+                                                            <div class="form-group">
+                                                                <label class="form-label"
+                                                                    for="doc_beneficiary_name">Beneficiary
+                                                                    Name</label>
+                                                                <div class="form-control-wrap">
+                                                                    <select class="form-select form-control js-select2"
+                                                                        id="doc_beneficiary_name"
+                                                                        name="doc_beneficiary_name"
+                                                                        data-placeholder="Select or Enter Beneficiary Name">
+                                                                        <option label="empty" value=""></option>
+                                                                        <% beneficiaryNames.forEach(beneficiaryName=>
+                                                                            { %>
+                                                                            <option data-id="<%= beneficiaryName.id %>"
+                                                                                value="<%= beneficiaryName.beneficiary_code %>"
+                                                                                <%=manageBgData.doc_beneficiary_name===beneficiaryName.beneficiary_code
+                                                                                ? "selected" : "" %>>
+                                                                                <%= beneficiaryName.beneficiary_code %>
+                                                                            </option>
+                                                                            <% }); %>
+                                                                    </select>
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label" for="doc_bg_number">BG
+                                                                    number</label>
+                                                                <div class="form-control-wrap">
+                                                                    <input type="text" class="form-control"
+                                                                        placeholder="BG number" id="doc_bg_number"
+                                                                        name="doc_bg_number"
+                                                                        value="<%= manageBgData ? manageBgData.doc_bg_number : '' %>"
+                                                                        required />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-8">
+                                                            <div class="form-group">
+                                                                <label class="form-label"
+                                                                    for="doc_bg_amendment_number">BG
+                                                                    Amendment Number</label>
+                                                                <div class="form-control-wrap">
+                                                                    <input type="text" class="form-control"
+                                                                        placeholder="BG Amendment Number"
+                                                                        id="doc_bg_amendment_number"
+                                                                        name="doc_bg_amendment_number"
+                                                                        value="<%= manageBgData ? manageBgData.doc_bg_amendment_number : '' %>"
+                                                                        required />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-8">
+                                                            <div class="form-group">
+                                                                <label class="form-label"
+                                                                    for="doc_applicant_name">Applicant
+                                                                    Name</label>
+                                                                <div class="form-control-wrap">
+                                                                    <select class="form-select form-control js-select2"
+                                                                        id="doc_applicant_name"
+                                                                        name="doc_applicant_name"
+                                                                        data-placeholder="Select or Enter Beneficiary Name">
+                                                                        <option label="empty" value=""></option>
+                                                                        <% applicantNames.forEach(data=>
+                                                                            { %>
+                                                                            <option data-id="<%= data.id %>"
+                                                                                value="<%=  data.applicant_name %>"
+                                                                                <%=manageBgData.doc_applicant_name===data.applicant_name
+                                                                                ? "selected" : "" %>>
+                                                                                <%= data.applicant_name %>
+                                                                            </option>
+                                                                            <% }); %>
+                                                                    </select>
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label" for="doc_issue_date">Date
+                                                                    Of
+                                                                    Issue</label>
+                                                                <div class="form-control-wrap">
+                                                                    <div class="form-icon form-icon-right"><em
+                                                                            class="icon ni ni-calendar-alt"></em>
+                                                                    </div>
+                                                                    <input type="text" id="doc_issue_date"
+                                                                        autocomplete="off" name="doc_issue_date"
+                                                                        placeholder="Date Of Issue"
+                                                                        class="form-control date-picker"
+                                                                        value="<%= manageBgData ? manageBgData.doc_issue_date : '' %>" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label" for="doc_claim_date">Date
+                                                                    of Claim</label>
+                                                                <div class="form-control-wrap">
+                                                                    <div class="form-icon form-icon-right"><em
+                                                                            class="icon ni ni-calendar-alt"></em>
+                                                                    </div>
+                                                                    <input type="text" id="doc_claim_date"
+                                                                        autocomplete="off" name="doc_claim_date"
+                                                                        placeholder="Date of Claim"
+                                                                        class="form-control date-picker"
+                                                                        value="<%= manageBgData ? manageBgData.doc_claim_date : '' %>" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label" for="doc_bg_amount">BG
+                                                                    Amount</label>
+                                                                <div class="form-control-wrap">
+                                                                    <input type="number" id="doc_bg_amount"
+                                                                        autocomplete="off" name="doc_bg_amount"
+                                                                        placeholder="BG Amount" class="form-control"
+                                                                        value="<%= manageBgData ? manageBgData.doc_bg_amount : '' %>" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label" for="doc_expiry_date">Date
+                                                                    of Expiry</label>
+                                                                <div class="form-control-wrap">
+                                                                    <div class="form-icon form-icon-right"><em
+                                                                            class="icon ni ni-calendar-alt"></em>
+                                                                    </div>
+                                                                    <input type="text" id="doc_expiry_date"
+                                                                        autocomplete="off" name="doc_expiry_date"
+                                                                        placeholder="BG Amount"
+                                                                        class="form-control date-picker"
+                                                                        value="<%= manageBgData ? manageBgData.doc_expiry_date : '' %>" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label" for="doc_bg_cancelled_date">BG
+                                                                    Cancelled on</label>
+                                                                <div class="form-control-wrap">
+                                                                    <div class="form-icon form-icon-right"><em
+                                                                            class="icon ni ni-calendar-alt"></em>
+                                                                    </div>
+                                                                    <input type="text" id="doc_bg_cancelled_date"
+                                                                        autocomplete="off" name="doc_bg_cancelled_date"
+                                                                        placeholder="BG Cancelled on"
+                                                                        class="form-control date-picker"
+                                                                        value="<%= manageBgData ? manageBgData.doc_bg_cancelled_date : '' %>" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label" for="doc_bg_commission">BG
+                                                                    Commission (% pa)</label>
+                                                                <div class="form-control-wrap">
+                                                                    <input type="text" id="doc_bg_commission"
+                                                                        autocomplete="off" name="doc_bg_commission"
+                                                                        placeholder="BG Commission (% pa)"
+                                                                        class="form-control"
+                                                                        value="<%= manageBgData ? manageBgData.doc_bg_commission : '' %>" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label"
+                                                                    for="doc_commission_amount">Commision Amount</label>
+                                                                <div class="form-control-wrap">
+                                                                    <input type="text" id="doc_commission_amount"
+                                                                        autocomplete="off" name="doc_commission_amount"
+                                                                        placeholder="Commision Amount"
+                                                                        class="form-control"
+                                                                        value="<%= manageBgData ? manageBgData.doc_commission_amount : '' %>" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label"
+                                                                    for="doc_commission_charged">Commision Charged By
+                                                                    Bank</label>
+                                                                <div class="form-control-wrap">
+                                                                    <input type="text" id="doc_commission_charged"
+                                                                        autocomplete="off" name="doc_commission_charged"
+                                                                        placeholder="Commision Charged By Bank"
+                                                                        class="form-control"
+                                                                        value="<%= manageBgData ? manageBgData.doc_commission_charged : '' %>" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label"
+                                                                    for="doc_required_margin">Required Margin (% of BG
+                                                                    Amount)</label>
+                                                                <div class="form-control-wrap">
+                                                                    <input type="text" id="doc_required_margin"
+                                                                        autocomplete="off" name="doc_required_margin"
+                                                                        placeholder="Required Margin (% of BG Amount)"
+                                                                        class="form-control"
+                                                                        value="<%= manageBgData ? manageBgData.doc_required_margin : '' %>" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-4">
+                                                            <div class="form-group">
+                                                                <label class="form-label" for="doc_margin_amount">Margin
+                                                                    Amount</label>
+                                                                <div class="form-control-wrap">
+                                                                    <input type="text" id="doc_margin_amount"
+                                                                        autocomplete="off" name="doc_margin_amount"
+                                                                        placeholder="Margin Amount" class="form-control"
+                                                                        value="<%= manageBgData ? manageBgData.doc_margin_amount : '' %>" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-8">
+                                                            <div class="form-group">
+                                                                <label class="form-label"
+                                                                    for="doc_margin_available">Total Margin</label>
+                                                                <div class="form-control-wrap">
+                                                                    <input type="text" id="doc_margin_available"
+                                                                        autocomplete="off" name="doc_margin_available"
+                                                                        placeholder="Margin Available"
+                                                                        class="form-control margin_available"
+                                                                        value="<%= dynamic_total_margin === null ? 0 : dynamic_total_margin  %>" />
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-12">
+                                                            <div class="form-group">
+                                                                <button id="uploadDocumentBtn"
+                                                                    class="btn btn-lg btn-primary upload-btn">Upload</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                                <div class="row gy-5" style="margin-top: 5px;">
+                                                    <div class="col-lg-12">
+                                                        <div class="nk-block-head">
+                                                            <div class="nk-block-head-content">
+                                                                <h5 class="nk-block-title title">Agreements
+                                                                    <button id="addAttachmentButton"
+                                                                        data-bs-toggle="modal"
+                                                                        data-bs-target="#attachmentModal"
+                                                                        style="margin-left: 10px;margin-bottom: 8px;"
+                                                                        class="btn btn-sm btn-dim  btn-outline-primary">Add
+                                                                        Agreements</button>
+                                                                </h5>
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="card card-bordered card-preview disabled">
+                                                            <table class="table table-bordered">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th scope="col">#</th>
+                                                                        <th scope="col">Agreement's Name</th>
+                                                                        <th scope="col">Upload Date</th>
+                                                                        <th scope="col" width="160">Actions</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <% if (manageBgData.attachments &&
+                                                                        manageBgData.attachments.length>
+                                                                        0) {
+                                                                        %>
+                                                                        <% manageBgData.attachments.forEach((attachment,
+                                                                            index)=>
+                                                                            { %>
+                                                                            <tr>
+                                                                                <th scope="row">
+                                                                                    <%= index + 1 %>
+                                                                                </th>
+                                                                                <td>
+                                                                                    <%= attachment.project_pdf_name %>
+                                                                                </td>
+                                                                                <td>
+                                                                                    <%= attachment?.attachment_upload_date
+                                                                                        ?
+                                                                                        attachment.attachment_upload_date.split(" ")[0] 
+                                                                                        : " -" %>
+                                                                                </td>
+
+                                                                                <td>
+                                                                                    <a href="
+                                                                                        <%=attachment.project_pdf_link
+                                                                                        %>" target="_blank" class="btn btn-sm
+                                                                                        btn-outline-primary">View</a>
+                                                                                    <button data-id=" <%=attachment.doc_id
+                                                                                        %>" id="deleteDoc"
+                                                                                        class="btn
+                                                                                        btn-sm
+                                                                                        btn-outline-danger">Delete</button>
+                                                                                </td>
+                                                                            </tr>
+                                                                            <% }); %>
+                                                                                <% } else { %>
+                                                                                    <tr>
+                                                                                        <th scope="row">1</th>
+                                                                                        <td>none</td>
+                                                                                        <td>none</td>
+                                                                                        <td>
+                                                                                            <button
+                                                                                                class="btn btn-sm btn-outline-secondary"
+                                                                                                disabled>No
+                                                                                                Link</button>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                    <% } %>
+                                                                </tbody>
+
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal fade" id="attachmentModal">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Add Agreement</h5>
+                                    <a href="#" class="close" data-bs-dismiss="modal" aria-label="Close">
+                                        <em class="icon ni ni-cross"></em>
+                                    </a>
+                                </div>
+                                <div class="modal-body" style="padding: 1.25rem">
+                                    <form id="attachmentForm" class="form-validate is-alter">
+                                        <!-- <div class="form-group displayNone">
+                                            <label class="form-label" for="doc_attachment">Attachment Name</label>
+                                            <div class="form-control-wrap">
+                                                <input type="text" placeholder="Attachment Name" class="form-control"
+                                                    name="doc_attachment" id="doc_attachment" required />
+                                            </div>
+                                        </div> -->
+                                        <div class="form-group">
+                                            <label class="form-label" for="doc_file">Upload PDF</label>
+                                            <div class="form-control-wrap">
+                                                <input type="file" class="form-control" placeholder="Upload File"
+                                                    id="doc_file" name="doc_file" required accept=".pdf" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group" style="display: flex; justify-content: space-between">
+                                            <button data-bs-dismiss="modal" type="button" aria-label="Close"
+                                                class="btn btn-light">Cancel</button>
+                                            <button id="uploadAttachmentButton" class="btn btn-primary">Upload
+                                                Agreement</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <%- include('./common/footer'); -%>
+                </div>
+                <button style="display: none" id="open-modal" type="button" class="btn btn-primary"
+                    data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                    Launch static backdrop modal
+                </button>
+
+                <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false"
+                    tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="staticBackdropLabel">Delete Document</h5>
+                                <button type="button" id="closeModal" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Are you sure you want to delete this Agreement pdf ? </p>
+                            </div>
+                            <div class="modal-footer" id="modalAction">
+                                <button type="button" class="btn btn-secondary" id="rejectModelBtn"
+                                    data-bs-dismiss="modal">No</button>
+                                <button type="button" id="deleteDocument" class="btn btn-primary">Yes</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+        </div>
+
+    </div>
+    <script src="/app/assets/js/bundle.js"></script>
+    <script src="/app/assets/js/scripts.js"></script>
+    <script src="/app/assets/js/charts/gd-default.js"></script>
+    <script src="/app/views//manage-bg/edit-bg-script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/decimal.js@10.4.3/decimal.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
+    <script>
+        let docIdToDelete = null
+        let initialFormData = new FormData($("#documentForm")[0]);
+        let initialFormDataEntries = {};
+        let validationFlag = {
+            isFlag: false,
+            msg: ""
+        };
+        let selectedBankId = JSON.parse(`<%- JSON.stringify(manageBgData.bank_id) %>`);
+        initialFormData.forEach((value, key) => {
+            initialFormDataEntries[key] = value;
+        });
+        initialFormDataEntries.bank_id = selectedBankId;
+
+        $(document).ready(function () {
+            $(".nk-menu-sub .nk-menu-item ").each(function () {
+                if ($(this).hasClass("active")) {
+                    let parentMenu = $(this).closest(".nk-menu-item.has-sub");
+                    parentMenu.addClass("active current-page");
+                    parentMenu.find(".nk-menu-sub").show();
+                }
+            });
+
+            $('#select-site').on('change', function () {
+                const $selectedOption = $(this).find('option:selected');
+                const docId = $selectedOption.attr('id');
+                selectedBankId = docId
+            });
+        });
+
+
+        $(document).ready(function () {
+            let pdfFileName = null
+            $("#doc_file").on("change", function () {
+                pdfFileName = this.files[0].name;
+            });
+
+            $('#attachmentForm').on('submit', function (event) {
+                event.preventDefault();
+                if (!this.checkValidity()) {
+                    return false;
+                }
+                const project_code = "<%= manageBgData.project_code %>"
+                const project_id = "<%= manageBgData.doc_id %>"
+
+                let formData = new FormData(this);
+                formData.append("pdfFileName", pdfFileName);
+                formData.append("project_code", project_code);
+                formData.append("project_id", project_id);
+                NioApp.handleButtonState("uploadAttachmentButton", "Uploading...", true);
+
+                $.ajax({
+                    url: '/docs/upload-bg-pdfs',
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        if (response.status === 1) {
+                            location.reload();
+                            NioApp.Toast("<h5>Uploaded Successfully</h5><p>Document uploaded successfully!</p>", "success");
+                        } else {
+                            NioApp.Toast(`<h5>Something Went Wrong</h5>${response.msg || `<p>Error while uploading document</p>`}`, "error");
+                            NioApp.handleButtonState("uploadAttachmentButton", "Upload File", false);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        NioApp.handleButtonState("uploadAttachmentButton", "Upload File", false);
+                        console.error('Error:', error);
+                    }
+                });
+            });
+        })
+
+        $(document).on('click', '#deleteDoc', function (event) {
+
+            event.preventDefault();
+            let openModal = document.getElementById('open-modal')
+            docIdToDelete = $(this).data('id');
+            if (docIdToDelete) {
+                openModal.click();
+            }
+        });
+
+        $(document).on('click', '#deleteDocument', function (event) {
+            event.preventDefault();
+            let formData = new FormData();
+            formData.append("docId", docIdToDelete);
+            $.ajax({
+                url: '/docs/delete-bg-pdf?docId=' + docIdToDelete,
+                type: 'DELETE',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    if (response.status === 1) {
+                        NioApp.Toast("<h5>Deleted Successfully</h5><p>Document deleted successfully!</p>", "success");
+                        location.reload();
+                    } else {
+                        NioApp.Toast(`<h5>Something Went Wrong</h5>${response.msg || `<p>Error while Document deleted</p>`}`, "error");
+                        location.reload();
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error:', error);
+                }
+            });
+        });
+
+
+        $("#documentForm").submit(function (event) {
+            event.preventDefault();
+
+            if (!this.checkValidity()) {
+                return false;
+            }
+
+            if (validationFlag.isFlag) {
+                return NioApp.Toast(`${validationFlag.msg}`, "error");
+            }
+
+            const doc_id = "<%= manageBgData.doc_id %>";
+            const $requiredMargin = $("#doc_required_margin").val();
+            const $bgCommission = $("#doc_bg_commission").val();
+            toastr.clear();
+
+            let form = $(this).closest("form")[0];
+            let formData = new FormData(form);
+
+            formData.set("doc_bg_commission", parseInt($bgCommission));
+            formData.set("doc_required_margin", parseInt($requiredMargin));
+            formData.set("bank_id", parseInt(selectedBankId));
+            if (isNaN(parseInt($bgCommission)) || $bgCommission === "") {
+                formData.set("doc_bg_commission", 0);
+            }
+
+            let newFormDataEntries = {};
+
+            formData.forEach((value, key) => {
+                // Convert empty strings to null
+                const sanitizedValue = typeof value === "string" && value.trim() === "" ? null : value;
+                newFormDataEntries[key] = sanitizedValue;
+            });
+
+            let hasChanges = Object.keys(newFormDataEntries).some(key =>
+                (newFormDataEntries[key] ?? "").toString().trim() !== (initialFormDataEntries[key] ?? "").toString().trim()
+            );
+
+            if (!hasChanges) {
+                return NioApp.Toast("<h5>No Changes</h5><p>No changes to save</p>", "info");
+            }
+
+            NioApp.handleButtonState("uploadDocumentBtn", "Update", true);
+
+            $.ajax({
+                type: "POST",
+                url: "/docs/edit-bg",
+                data: {
+                    newFormDataEntries,
+                    doc_id,
+                    "bank_id": selectedBankId
+                },
+                success: function (response) {
+                    if (response.status == 1) {
+                        $("#doc_site,#doc_folder,#choosePrefixButton,#doc_type").prop("disabled", true);
+                        NioApp.handleButtonState("uploadDocumentBtn", "Update", false);
+                        NioApp.Toast("<h5>Update Successfully</h5><p>Document Updated Successfully</p>", "success");
+                        window.location.href = "/manage-bg";
+                    } else {
+                        NioApp.handleButtonState("uploadDocumentBtn", "Update", false);
+                        NioApp.Toast(`<h5>Something Went Wrong</h5>${response.msg || `<p>Error while updating document.</p>`}`, "error");
+                    }
+                },
+                error: function (xhr, status, error) {
+                    NioApp.handleButtonState("uploadDocumentBtn", "Update", false);
+                    NioApp.Toast("<h5>Something Went Wrong</h5><p>Error while updating document.</p>", "error");
+                    console.error("Error saving draft:", error);
+                },
+            });
+        });
+
+
+        $(document).ready(function () {
+            $("#doc_dlp_period").on("input", function () {
+                let value = $(this).val();
+                value = value.replace(/\D/g, "");
+                if (value.length > 2) {
+                    value = value.substring(0, 2);
+                }
+
+                $(this).val(value); // Update the field with the cleaned value
+            });
+
+            $("#doc_dlp_period").on("blur", function () {
+                let value = $(this).val();
+                let numericValue = parseInt(value, 10);
+
+                if (numericValue < 1 || numericValue > 12 || isNaN(numericValue)) {
+                    $("#error-msg").text("Please enter a valid month (1-12)").show();
+                    $(this).addClass("is-invalid");
+                    validationFlag.isFlag = true
+                    validationFlag.msg = "<h5>Invalid Input</h5><p>Please enter a valid month (1-12)</p>"
+                } else {
+                    $("#error-msg").hide();
+                    $(this).removeClass("is-invalid");
+                    validationFlag.isFlag = false
+                    validationFlag.msg = ""
+                }
+            });
+        });
+
+    </script>
+</body>
+
+</html>

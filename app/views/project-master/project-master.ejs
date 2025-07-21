@@ -23,7 +23,7 @@
 		<div class="nk-main">
 			<%- include('./common/sidebar' , {subItems:{active:"projectMaster"} }); -%>
 				<div class="nk-wrap project-master">
-					<%- include('./common/navbar'); -%>
+					<%- include('./common/navbar',{headerText:"Projects Controller"}); -%>
 						<div class="nk-content">
 							<div class="container-fluid">
 								<div class="nk-content-inner">
@@ -57,7 +57,7 @@
 																			<a href="/project/create-project"
 																				class="btn btn-white btn-dim btn-outline-light"><em
 																					class="icon ni ni-plus-sm"></em><span>Add
-																					Document</span></a>
+																					Project</span></a>
 														</div>
 														<%}%>
 												</div>
@@ -166,7 +166,8 @@
 															</div>
 														</div>
 													</div>
-													<div class="card-inner p-0 scrollable-datatable">
+													<div class="card-inner p-0 scrollable-datatable"
+														id="total-bg-amount">
 														<div class="nk-tb-list nk-tb-ulist is-compact">
 															<div class="nk-tb-item nk-tb-head grid-header"
 																id="table-head">
@@ -240,9 +241,14 @@
 																		</div>
 																		<div class="nk-tb-col">
 																			<span
-																				data-field="doc_mobilisation_amount">Total
-																				Mobilisation
-																				Amount</span><span
+																				data-field="doc_mobilisation_amount">Performance
+																				Security</span><span
+																				class="sort-indicator"></span>
+																		</div>
+																		<div class="nk-tb-col">
+																			<span
+																				data-field="doc_mobilisation_amount">Additional
+																				Performance Security</span><span
 																				class="sort-indicator"></span>
 																		</div>
 																		<div class="nk-tb-col">
@@ -410,8 +416,17 @@
 																				<input type="number"
 																					class="form-control filter-input"
 																					data-filter="number"
-																					id="doc_total_mobilisation_amount"
-																					placeholder="Total Mobilisation Amount">
+																					id="doc_performance_security"
+																					placeholder="Performance Security">
+																			</span>
+																		</div>
+																		<div class="nk-tb-col">
+																			<span>
+																				<input type="number"
+																					class="form-control filter-input"
+																					data-filter="number"
+																					id="doc_additional_performance_security"
+																					placeholder="Additional Performance Security">
 																			</span>
 																		</div>
 																		<div class="nk-tb-col">
@@ -501,7 +516,7 @@
 	<script src="/app/assets/js/bundle.js"></script>
 	<script src="/app/assets/js/scripts.js"></script>
 	<script src="/app/assets/js/charts/gd-default.js"></script>
-	<script src="/app/views/project-master/script.js"></script>
+	<script src="/app/views/project-master/project-script.js"></script>
 	<script>
 		let isFetching = false;
 		let docIdToDelete = null;
@@ -523,6 +538,7 @@
 				}
 			});
 		});
+
 		function renderPdfLinks(attachments) {
 			let links = ''
 			if (attachments && attachments.length > 0) {
@@ -532,6 +548,7 @@
 			} else return `-`
 			return links;
 		}
+
 		function renderTabledata(response) {
 			if (response.payload.documents && response.payload.documents.length > 0) {
 				$("#table-status").empty();
@@ -546,7 +563,7 @@
 								<em class="icon ni ni-edit-fill"></em>
 							</a>
 						</span>
-						<span id="deleteDoc" style="cursor: pointer;" data-id="${data.doc_id}">
+						<span class="${data.doc_bg_selected ? "disable" : ""}" id="deleteDoc" style="cursor: pointer;" data-id="${data.doc_id}">
 							<em style="color: #d84040;" class="icon ni ni-trash-fill"></em>
 						</span>
 					</div>
@@ -585,7 +602,10 @@
 						<span>${data.doc_dlp_ending || "-"}</span>
 					</div>
 					<div class="nk-tb-col text-start">
-						<span>${data.doc_total_mobilisation_amount || "-"}</span>
+						<span>${data.doc_performance_security || "-"}</span>
+					</div>
+					<div class="nk-tb-col text-start">
+						<span>${data.doc_additional_performance_security || "-"}</span>
 					</div>
 					<div class="nk-tb-col text-start">
 						<span>${data.doc_bal_mobilisation_amount || "-"}</span>
@@ -729,13 +749,12 @@
 			const modalCloseBtn = document.querySelector('#closeModal');
 			event.preventDefault();
 			$(`#modalAction`).addClass('disable');
-			console.log(docIdToDelete);
 			$.ajax({
 				type: "POST",
 				url: "/docs/delete-project/",
 				data: { docId: docIdToDelete },
 				success: function (response) {
-					if (response.status == 0) {
+					if (response.status == 1) {
 						NioApp.Toast("<h5>Deleted Successfully</h5><p>Document deleted successfully!</p>", "success");
 						modalCloseBtn.click();
 						fetchProjects();
@@ -758,7 +777,7 @@
 		});
 
 		$(document).ready(function () {
-			$("#doc_DLP_period").on("input", function () {
+			$("#doc_dlp_period").on("input", function () {
 				let value = $(this).val();
 				value = value.replace(/\D/g, "");
 				if (value.length > 2) {
@@ -781,7 +800,6 @@
 			let value = e.target.value.trim();
 			let id = e.target.id;
 			let dataFilter = e.target.dataset.filter;
-			console.log("🚀 ~ $ ~ dataFilter:", dataFilter)
 
 			if (e.target.multiple) {
 				value = Array.from(e.target.selectedOptions).map(option => option.value);

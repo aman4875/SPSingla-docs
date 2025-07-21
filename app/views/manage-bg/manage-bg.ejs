@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="zxx" class="js">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" />
+    <!-- Fav Icon  -->
+    <link rel="shortcut icon" href="/app/assets/images/favicon.png" />
+    <!-- Page Title  -->
+    <title>Documents | Manage BG</title>
+    <!-- StyleSheets  -->
+    <link rel="stylesheet" href="/app/assets/css/dashlite.css" />
+    <link id="skin-default" rel="stylesheet" href="/app/assets/css/theme.css" />
+    <link rel="stylesheet" href="/app/views/manage-bg/styles.css">
+</head>
+<style>
+    .rowHighlight {
+        background-color: #ffe6e6;
+        /* Softer red */
+        border-left: 4px solid #ff4d4d;
+    }
+
+    .manage-bg select#doc_bank_name~span.select2 {
+        min-width: 150px;
+    }
+</style>
+
+<body class="nk-body bg-lighter npc-general has-sidebar">
+    <div class="nk-app-root manage-bg">
+        <!-- main @s -->
+        <div class="nk-main">
+            <%- include('./common/sidebar' , {subItems:{active:"manageBg"} }); -%>
+                <div class="nk-wrap">
+                    <%- include('./common/navbar',{headerText:"Manage Controller"}); -%>
+                        <div class="nk-content manage-bg">
+                            <div class="container-fluid">
+                                <div class="nk-content-inner">
+                                    <div class="nk-content-body">
+                                        <div class="nk-block">
+                                            <div class="nk-block-head nk-block-head-sm">
+                                                <div class="nk-block-between g-3">
+                                                    <div class="nk-block-head-content">
+                                                        <div class="row align-items-center">
+                                                            <div class="col">
+                                                                <h3 class="nk-block-title page-title">Manage BG</h3>
+                                                            </div>
+                                                            <div class="col  px-0 ">
+                                                                <div class="nk-tb-col px-0 py-0 replied-vide-select">
+                                                                    <select data-placeholder="Select Project"
+                                                                        class="form-select form-control js-select2"
+                                                                        id="manage-project" name="doc_folder">
+                                                                        <option value="">Select Project</option>
+
+                                                                        <% projects.forEach(project=> { %>
+                                                                            <option value="<%= project.doc_work_name %>"
+                                                                                data-code="<%= project.doc_code %>"
+                                                                                data-name="<%= project.doc_work_name %>"
+                                                                                data-project-id="<%= project.doc_id %>">
+                                                                                <%= project.doc_code %>: <%=
+                                                                                        project.doc_work_name %>
+                                                                            </option>
+                                                                            <% }); %>
+                                                                    </select>
+                                                                </div>
+
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                    <%if(token.user_role !=3){%>
+                                                        <div class="nk-block-head-content">
+                                                            <a href="/manage/create-bg"
+                                                                class="btn btn-white btn-dim btn-outline-light"><em
+                                                                    class="icon ni ni-plus-sm"></em><span>Add
+                                                                    BG</span>
+                                                            </a>
+                                                        </div>
+                                                        <%}%>
+                                                </div>
+                                            </div>
+                                            <div class="card card-bordered card-stretch">
+                                                <div class="card-inner-group">
+                                                    <div class="card-inner position-relative card-tools-toggle">
+                                                        <div class="card-title-group">
+                                                            <div class="card-tools"></div>
+                                                            <div class="card-tools me-n1">
+                                                                <ul class="btn-toolbar gx-1">
+                                                                    <li>
+                                                                        <a href="#"
+                                                                            class="btn btn-icon search-toggle toggle-search"
+                                                                            data-target="search"><em
+                                                                                class="icon ni ni-search"></em></a>
+                                                                    </li>
+                                                                    <li class="btn-toolbar-sep"></li>
+                                                                    <li>
+                                                                        <div class="toggle-wrap">
+                                                                            <a href="#"
+                                                                                class="btn btn-icon btn-trigger toggle"
+                                                                                data-target="cardTools"><em
+                                                                                    class="icon ni ni-menu-right"></em></a>
+                                                                            <div class="toggle-content"
+                                                                                data-content="cardTools">
+                                                                                <ul class="btn-toolbar gx-1">
+                                                                                    <li class="toggle-close">
+                                                                                        <a href="#"
+                                                                                            class="btn btn-icon btn-trigger toggle"
+                                                                                            data-target="cardTools"><em
+                                                                                                class="icon ni ni-arrow-left"></em></a>
+                                                                                    </li>
+                                                                                    <li>
+                                                                                        <div class="dropdown">
+                                                                                            <a href="#"
+                                                                                                class="btn btn-trigger btn-icon dropdown-toggle"
+                                                                                                data-bs-toggle="dropdown">
+                                                                                                <em
+                                                                                                    class="icon ni ni-setting"></em>
+                                                                                            </a>
+                                                                                            <div
+                                                                                                class="dropdown-menu dropdown-menu-xs dropdown-menu-end">
+                                                                                                <ul
+                                                                                                    class="filter-limit link-check">
+                                                                                                    <li><span>Show</span>
+                                                                                                    </li>
+                                                                                                    <li class="active">
+                                                                                                        <a href="#"
+                                                                                                            data-limit="10">10</a>
+                                                                                                    </li>
+                                                                                                    <li><a href="#"
+                                                                                                            data-limit="20">20</a>
+                                                                                                    </li>
+                                                                                                    <li><a href="#"
+                                                                                                            data-limit="50">50</a>
+                                                                                                    </li>
+                                                                                                    <li><a href="#"
+                                                                                                            data-limit="100">100</a>
+                                                                                                    </li>
+                                                                                                </ul>
+                                                                                            </div>
+
+                                                                                        </div>
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </div>
+
+                                                                        </div>
+                                                                    </li>
+                                                                    <li>
+                                                                        <a id="resetFilters"
+                                                                            class="btn btn-dim btn-outline-primary">
+                                                                            <em class="icon ni ni-reload-alt"></em>
+                                                                            <span>Reset Filter</span>
+                                                                        </a>
+                                                                    </li>
+                                                                    <li>
+                                                                        <div class="scroll-buttons">
+                                                                            <a id="scroll-left"
+                                                                                class="btn btn-icon btn-primary"><em
+                                                                                    class="icon ni ni-chevron-left"></em></a>
+                                                                            <a id="scroll-right"
+                                                                                class="btn btn-icon btn-primary"><em
+                                                                                    class="icon ni ni-chevron-right"></em></a>
+                                                                        </div>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                        <div class="card-search search-wrap" data-search="search">
+                                                            <div class="card-body">
+                                                                <div class="search-content">
+                                                                    <a href="#"
+                                                                        class="search-back btn btn-icon toggle-search"
+                                                                        data-target="search"><em
+                                                                            class="icon ni ni-arrow-left"></em></a>
+                                                                    <input type="text" id="doc_ocr_content"
+                                                                        class="form-control border-transparent form-focus-none filter-input"
+                                                                        data-filter="keyword"
+                                                                        placeholder="Search Keywords" />
+                                                                    <button id="searchDocumentButton"
+                                                                        class="search-submit btn btn-icon"><em
+                                                                            class="icon ni ni-search"></em></button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-inner p-0 scrollable-datatable">
+                                                        <div class="nk-tb-list nk-tb-ulist is-compact">
+                                                            <div class="nk-tb-item nk-tb-head grid-header"
+                                                                id="table-head">
+                                                                <%if(token.user_role !=3){%>
+                                                                    <div class="nk-tb-col no-click  text-start">
+                                                                        <span data-field="edit_doc">Actions</span><span
+                                                                            class="sort-indicator"></span>
+                                                                    </div>
+                                                                    <%}%>
+                                                                        <div class="nk-tb-col ">
+                                                                            <span
+                                                                                data-field="project_code">code</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span data-table="projects_master"
+                                                                                data-field="doc_work_name">Name of
+                                                                                Work</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span data-table="projects_master"
+                                                                                data-field="doc_department">Department
+                                                                                Name</span><span
+                                                                                class="sort-indicator "></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span data-table="projects_master"
+                                                                                data-field="doc_financial_date">Financial
+                                                                                Opening Date</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span data-table="projects_master"
+                                                                                data-field="doc_agreement_no">Agreement
+                                                                                No</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span data-table="projects_master"
+                                                                                data-field="doc_agreement_date">Agreement
+                                                                                Date</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+
+                                                                        <div class="nk-tb-col">
+                                                                            <span data-table="projects_master"
+                                                                                data-field="doc_completion_date">Date
+                                                                                of
+                                                                                Completion</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+
+                                                                        <div class="nk-tb-col">
+                                                                            <span data-table="projects_master"
+                                                                                data-field="doc_awarded">Awarded</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+
+                                                                        <div class="nk-tb-col">
+                                                                            <span data-table="projects_master"
+                                                                                data-field="doc_dlp_period">DLP Period
+                                                                                (in months)</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span data-field="doc_revised_date">Revised
+                                                                                Completion Date</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+
+                                                                        <div class="nk-tb-col">
+                                                                            <span data-field="doc_dlp_ending">DLP Ending
+                                                                                on</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span
+                                                                                data-field="doc_performance_security">Performance
+                                                                                Security</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span
+                                                                                data-field="doc_additional_performance_security">Additional
+                                                                                Performance Security</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span
+                                                                                data-field="doc_bal_mobilisation_amount">Balance
+                                                                                Mobilisation Amount</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span
+                                                                                data-field="doc_retention_amount">Retention
+                                                                                Amount as on Date</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span data-field="doc_type">Type</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span data-field="doc_bank_name">Bank
+                                                                                Name</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span
+                                                                                data-field="doc_issuing_branch">Issuing
+                                                                                Branch</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span
+                                                                                data-field="doc_beneficiary_name">Beneficiary
+                                                                                Name</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span data-field="doc_bg_number">BG
+                                                                                Number</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span
+                                                                                data-field="doc_bg_amendment_number">BG
+                                                                                Amendment Number</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span
+                                                                                data-field="doc_applicant_name">Applicant
+                                                                                Name</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span data-field="doc_issue_date">Date
+                                                                                Of Issue</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span data-field="doc_claim_date">Date
+                                                                                of Claim</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span data-field="doc_bg_amount">BG
+                                                                                Amount</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span data-field="doc_expiry_date">Date
+                                                                                of Expiry</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span data-field="doc_bg_cancelled_date">BG
+                                                                                Cancelled on</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col no-click">
+                                                                            <span
+                                                                                data-field="">Upload
+                                                                                BG</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span data-field="doc_bg_commission">BG
+                                                                                Commission (% pa)</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span
+                                                                                data-field="doc_commission_amount">Commision
+                                                                                Amount</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span
+                                                                                data-field="doc_commission_charged">Commision
+                                                                                Charged
+                                                                                By Bank</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span
+                                                                                data-field="doc_required_margin">Required
+                                                                                Margin (% of
+                                                                                BG Amount)</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span
+                                                                                data-field="doc_margin_amount">Margin
+                                                                                Amount</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span
+                                                                                data-field="doc_margin_available">Total Margin</span><span
+                                                                                class="sort-indicator"></span>
+                                                                        </div>
+
+                                                            </div>
+
+                                                            <div class="nk-tb-item nk-tb-head" id="table-filters">
+                                                                <%if(token.user_role !=3){%>
+                                                                    <div class="nk-tb-col text-start">
+                                                                        <span>
+                                                                        </span>
+                                                                    </div>
+                                                                    <%}%>
+                                                                        <div class="nk-tb-col ">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="text" id="project_code"
+                                                                                    placeholder="code">
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_work_name"
+                                                                                    placeholder="Name of Work"
+                                                                                    data-table="projects_master">
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_department"
+                                                                                    placeholder="Department Name"
+                                                                                    data-table="projects_master">
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control date-picker filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_financial_date"
+                                                                                    placeholder="Financial Opening Date"
+                                                                                    data-table="projects_master">
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="number"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="number"
+                                                                                    id="doc_agreement_no"
+                                                                                    placeholder="Agreement No"
+                                                                                    data-table="projects_master">
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <div class="form-group">
+                                                                                    <div class="form-control-wrap">
+                                                                                        <input placeholder="Date"
+                                                                                            id="doc_agreement_date"
+                                                                                            type="text"
+                                                                                            class="form-control date-picker filter-input"
+                                                                                            data-filter="date"
+                                                                                            data-table="projects_master">
+                                                                                    </div>
+                                                                                </div>
+                                                                            </span>
+                                                                        </div>
+
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <span>
+                                                                                    <div class="form-group">
+                                                                                        <div class="form-control-wrap">
+                                                                                            <input placeholder="Date"
+                                                                                                id="doc_completion_date"
+                                                                                                type="text"
+                                                                                                class="form-control date-picker filter-input"
+                                                                                                data-filter="date"
+                                                                                                data-table="projects_master">
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </span>
+                                                                            </span>
+                                                                        </div>
+
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <select
+                                                                                    class="form-select form-control js-select2 filter-input"
+                                                                                    data-filter="boolean"
+                                                                                    id="doc_awarded" name="doc_awarded"
+                                                                                    data-placeholder="Awarded"
+                                                                                    data-table="projects_master">
+                                                                                    <option label="empty" value="">
+                                                                                    </option>
+                                                                                    <option label="Yes" value="Yes">Yes
+                                                                                    </option>
+                                                                                    <option label="No" value="No">No
+                                                                                    </option>
+                                                                                </select>
+                                                                            </span>
+                                                                        </div>
+
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="number"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="number"
+                                                                                    id="doc_dlp_period"
+                                                                                    placeholder="DLP Period"
+                                                                                    data-table="projects_master">
+
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input placeholder="Date"
+                                                                                    id="doc_revised_date" type="text"
+                                                                                    class="form-control date-picker filter-input"
+                                                                                    data-filter="date">
+                                                                            </span>
+                                                                        </div>
+
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_dlp_period"
+                                                                                    placeholder="DLP Period">
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="number"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="number"
+                                                                                    id="doc_performance_security"
+                                                                                    placeholder="Performance Security">
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="number"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="number"
+                                                                                    id="doc_additional_performance_security"
+                                                                                    placeholder="Additional Performance Security">
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="number"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="number"
+                                                                                    id="doc_bal_mobilisation_amount"
+                                                                                    placeholder="Balance Mobilisation Amount">
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="number"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="number"
+                                                                                    id="doc_retention_amount"
+                                                                                    placeholder="Retention Amount as on Date">
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <select
+                                                                                    class="form-select form-control js-select2 filter-input bg_type"
+                                                                                    data-filter="text" id="doc_type"
+                                                                                    name="doc_type"
+                                                                                    data-placeholder="Type">
+                                                                                    <option label="empty" value="">
+                                                                                    </option>
+                                                                                    <% types.forEach(type=>
+                                                                                        { %>
+                                                                                        <option data-id="<%= type.id %>"
+                                                                                            value="<%= type.type_name %>">
+                                                                                            <%= type.type_name %>
+                                                                                        </option>
+                                                                                        <% }); %>
+                                                                                </select>
+
+
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <select
+                                                                                    class="form-select form-control js-select2 filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_bank_name"
+                                                                                    name="doc_bank_name"
+                                                                                    data-placeholder="Bank Name">
+                                                                                    <option value="" disabled selected>
+                                                                                        Select Bank
+                                                                                        Name</option>
+                                                                                    <% banks.forEach(bank=> { %>
+                                                                                        <option
+                                                                                            data-code="<%= bank.bank_code %>"
+                                                                                            id="<%= bank.doc_id %>"
+                                                                                            value="<%= bank.bank_name %>">
+                                                                                            <%= bank.bank_name %>
+                                                                                        </option>
+                                                                                        <% }); %>
+                                                                                </select>
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_issuing_branch"
+                                                                                    placeholder="Issuing Branch">
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <select
+                                                                                    class="form-select form-control js-select2 filter-input"
+                                                                                    id="doc_beneficiary_name"
+                                                                                    data-filter="text"
+                                                                                    name="doc_beneficiary_name"
+                                                                                    data-placeholder="Select Beneficiary">
+                                                                                    <option label="empty" value="">
+                                                                                    </option>
+                                                                                    <%
+                                                                                        beneficiaryNames.forEach(beneficiaryName=>
+                                                                                        { %>
+                                                                                        <option
+                                                                                            data-id="<%= beneficiaryName.id %>"
+                                                                                            value="<%= beneficiaryName.beneficiary_code %>">
+                                                                                            <%= beneficiaryName.beneficiary_code
+                                                                                                %>
+                                                                                        </option>
+                                                                                        <% }); %>
+                                                                                </select>
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_bg_number"
+                                                                                    placeholder="BG number">
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_bg_amendment_number"
+                                                                                    placeholder="BG Amendment Number">
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <select
+                                                                                    class="form-select form-control js-select2 filter-input"
+                                                                                    id="doc_applicant_name"
+                                                                                    data-filter="text"
+                                                                                    name="doc_applicant_name"
+                                                                                    data-placeholder="Select Applicant">
+                                                                                    <option label="empty" value="">
+                                                                                    </option>
+                                                                                    <% applicantNames.forEach(data=>
+                                                                                        { %>
+                                                                                        <option data-id="<%= data.id %>"
+                                                                                            value="<%=  data.applicant_name %>">
+                                                                                            <%= data.applicant_name %>
+                                                                                        </option>
+                                                                                        <% }); %>
+                                                                                </select>
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control date-picker filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_issue_date"
+                                                                                    placeholder="Date Of Issue">
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control date-picker filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_claim_date"
+                                                                                    placeholder="Date of Claim">
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="number"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="number"
+                                                                                    id="doc_bg_amount"
+                                                                                    placeholder="BG Amount">
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control date-picker filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_expiry_date"
+                                                                                    placeholder="Date of Expiry">
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control date-picker filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_bg_cancelled_date"
+                                                                                    placeholder="Date">
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+
+                                                                            </span>
+                                                                        </div>
+
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_bg_commission"
+                                                                                    placeholder="BG Commission (% pa)">
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control  filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_commission_amount"
+                                                                                    placeholder="Commision Amount">
+                                                                            </span>
+                                                                        </div>
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_commission_charged"
+                                                                                    placeholder="Commision Charged By Bank">
+                                                                            </span>
+                                                                        </div>
+
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control  filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_required_margin"
+                                                                                    placeholder="Required Margin (% of BG Amount)">
+                                                                            </span>
+                                                                        </div>
+
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control  filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_margin_amount"
+                                                                                    placeholder="Margin Amount">
+                                                                            </span>
+                                                                        </div>
+
+                                                                        <div class="nk-tb-col">
+                                                                            <span>
+                                                                                <input type="text"
+                                                                                    class="form-control  filter-input"
+                                                                                    data-filter="text"
+                                                                                    id="doc_margin_available"
+                                                                                    placeholder="Total Available">
+                                                                            </span>
+                                                                        </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div id="table-status" class="card-inner text-center d-none">
+                                                        <div class="text-center">
+                                                            <p>Please Select Project</p>
+                                                        </div>
+                                                    </div>
+                                                    <div id="table-bg-amount"
+                                                        class="card-inner text-center bg_amount d-none">
+                                                        <div class="row justify-content-between">
+                                                            <div class="w-auto">
+                                                                <div class="fs-4 d-flex gap-4"><strong>Total BG in
+                                                                        effect as on today :</strong>
+                                                                    <div class="w-auto fs-4" id="bg_amount">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+
+                                                        </div>
+                                                    </div>
+
+                                                    <div id="table-pagination" class="card-inner ">
+                                                        <ul class="pagination">
+                                                            <li class="paginate_button page-item previous disabled"
+                                                                id="DataTables_Table_2_previous">
+                                                                <a aria-controls="DataTables_Table_2"
+                                                                    aria-disabled="true" role="link"
+                                                                    data-dt-idx="previous" tabindex="0"
+                                                                    class="page-link">Prev</a>
+                                                            </li>
+                                                            <li class="paginate_button page-item next"
+                                                                id="DataTables_Table_2_next">
+                                                                <a aria-controls="DataTables_Table_2" role="link"
+                                                                    data-dt-idx="next" tabindex="0"
+                                                                    class="page-link">Next</a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <%- include('./common/footer'); -%>
+                </div>
+        </div>
+        <button style="display: none" id="open-modal" type="button" class="btn btn-primary" data-bs-toggle="modal"
+            data-bs-target="#staticBackdrop">
+            Launch static backdrop modal
+        </button>
+
+        <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+            aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">Delete Document</h5>
+                        <button type="button" id="closeModal" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to delete this document ? </p>
+                    </div>
+                    <div class="modal-footer" id="modalAction">
+                        <button type="button" class="btn btn-secondary" id="rejectModelBtn"
+                            data-bs-dismiss="modal">No</button>
+                        <button type="button" id="deleteDocument" class="btn btn-primary">Yes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/app/assets/js/bundle.js"></script>
+    <script src="/app/assets/js/scripts.js"></script>
+    <script src="/app/views/manage-bg/manage-bg-script.js"></script>
+    <script>
+        let filters = {
+            limit: 10,
+            page: 1,
+            sort: {},
+            activeFilter: {},
+        };
+
+        let isFetching
+        let docCode
+        let docIdToDelete
+        let projectIdToDelete
+        let totalPages
+        let projectCode = null
+        let projectID = null
+        let bank_id = null
+
+        $('.js-select2').select2({
+            placeholder: 'Select an option',
+            width: 'resolve'
+        });
+
+        $(document).ready(function () {
+            $(".nk-menu-sub .nk-menu-item ").each(function () {
+                if ($(this).hasClass("active")) {
+                    let parentMenu = $(this).closest(".nk-menu-item.has-sub");
+                    parentMenu.addClass("active current-page");
+                    parentMenu.find(".nk-menu-sub").show();
+                }
+            });
+        });
+
+
+
+
+        // fetch projects
+        function fetchProjects() {
+            if (isFetching) return; // Exit if already fetching
+            isFetching = true;
+            $(".table-content").remove();
+            $('#table-status').removeClass('d-none');
+            $("#table-status").html(`<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>`);
+            $.ajax({
+                type: "POST",
+                url: `/docs/get-projects-bg/?project=${projectID ? projectID : null}`,
+                data: JSON.stringify(filters),
+                contentType: "application/json",
+                success: function (response) {
+                    isFetching = false; // Reset flag
+                    if (response.status == 1) {
+                        if (response.payload.totalBgAmount != null) {
+                            $("table-bg-amount").removeClass('d-none');
+                        }
+
+                        renderTabledata(response)
+                        totalPages = response.payload.totalPages || 1;
+                        updatePagination(totalPages, filters.page);
+                    } else {
+                        $("#table-status").html(`<div class="text-center"><p>Something Went Wrong</p></div>`);
+                        $(".scrollable-datatable").css({ 'overflow': 'none !important' });
+                    }
+                },
+                error: function (xhr, status, error) {
+                    isFetching = false; // Reset flag
+                    console.log(error);
+                    $("#table-status").html(`<div class="text-center"><p>Something Went Wrong</p></div>`);
+                    $(".scrollable-datatable").css({ 'overflow': 'none !important' });
+                },
+            });
+        }
+
+
+        function renderPdfLinks(attachments) {
+            let links = ''
+            if (attachments && attachments.length > 0) {
+                attachments.forEach((attachment) => {
+                    links += `<a class="badge bg-outline-primary" href="${attachment.project_pdf_link}">${attachment.project_pdf_name}</a>`
+                })
+            } else return `-`
+            return links;
+        }
+
+
+        function renderTabledata(response) {
+            if (response.payload.documents && response.payload.documents.length > 0) {
+                $("#table-status").empty();
+                $("#bg_amount").empty();
+                $('#table-bg-amount').removeClass('d-none');
+                $('#table-status').addClass('d-none');
+                let rowsHtml = "";
+                response.payload.documents.forEach((data) => {
+                    let rowHtml = `
+          <div class="nk-tb-item text-left table-content ${data.claim_pass ? "rowHighlight" : ""}">
+
+            <%if(token.user_role != 3){%>
+            <div class="nk-tb-col text-start editDocument">
+                <span style="margin-right: 8px;">
+                    <a href="/edit-bg/${btoa(data.doc_id)}">
+                        <em class="icon ni ni-edit-fill"></em>
+                    </a>
+                </span>
+            <span class="${data.doc_bg_selected ? 'disable' : ''}" 
+                id="deleteDoc" 
+                style="cursor: pointer;" 
+                data-code="${data.doc_code}" 
+                data-id="${data.doc_id}"
+                data-project-id="${data.master_project_id}"
+                bank_id="${data.bank_id}">
+                <em style="color: #d84040;" class="icon ni ni-trash-fill"></em>
+            </span>
+            </div>
+            <%}%>
+            <div class="nk-tb-col text-start">
+                <span>${data.doc_code || "-"}</span>
+            </div>
+            <div class="nk-tb-col text-start">
+                <span>${data.doc_work_name || "-"}</span>
+            </div>
+            <div class="nk-tb-col text-start">
+                <span>${data.doc_department || "-"}</span>
+            </div>
+            <div class="nk-tb-col text-start">
+                <span>${data.doc_financial_date || "-"}</span>
+            </div>
+            <div class="nk-tb-col text-start">
+                <span>${data.doc_agreement_no || "-"}</span>
+            </div>
+            <div class="nk-tb-col text-start">
+                <span>${data.doc_agreement_date || "-"}</span>
+            </div>
+            <div class="nk-tb-col text-start">
+                <span>${data.doc_completion_date || "-"}</span>
+            </div>
+            <div class="nk-tb-col text-start">
+                <span>${data.doc_awarded == true ? "Yes" : "No" || "-"}</span>
+            </div>
+            <div class="nk-tb-col text-start">
+                <span>${data.doc_dlp_period || "-"}</span>
+            </div>
+            <div class="nk-tb-col text-start">
+                <span>${data.doc_revised_date || "-"}</span>
+            </div>
+            <div class="nk-tb-col text-start">
+                <span>${data.doc_dlp_ending || "-"}</span>
+            </div>
+            <div class="nk-tb-col text-start">
+                <span>${data.doc_performance_security || "-"}</span>
+            </div>
+            <div class="nk-tb-col text-start">
+                <span>${data.doc_additional_performance_security || "-"}</span>
+            </div>
+            <div class="nk-tb-col text-start">
+                <span>${data.doc_bal_mobilisation_amount || "-"}</span>
+            </div>
+            <div class="nk-tb-col text-start">
+                <span>${data.doc_retention_amount || "-"}</span>
+            </div>
+            <div class="nk-tb-col text-start">
+                <span>${data.doc_type || "-"}</span>
+            </div>
+            <div class="nk-tb-col text-start">
+                <span>${data.doc_bank_name || "-"}</span>
+            </div>
+            <div class="nk-tb-col text-start">
+                <span>${data.doc_issuing_branch || "-"}</span>
+            </div>
+            <div class="nk-tb-col text-start">
+                <span>${data.doc_beneficiary_name || "-"}</span>
+            </div>
+            <div class="nk-tb-col text-start">
+                <span>${data.doc_bg_number || "-"}</span>
+            </div>
+            <div class="nk-tb-col text-start">
+                <span>${data.doc_bg_amendment_number || "-"}</span>
+            </div>
+            <div class="nk-tb-col text-start">
+                <span>${data.doc_applicant_name || "-"}</span>
+            </div>
+            <div class="nk-tb-col text-start">
+                <span>${data.doc_issue_date || "-"}</span>
+            </div>
+            <div class="nk-tb-col text-start">
+                <span>${data.doc_claim_date || "-"}</span>
+            </div>
+            <div class="nk-tb-col text-start">
+                <span>${data.doc_bg_amount || "-"}</span>
+            </div>
+            <div class="nk-tb-col text-start">
+                <span>${data.doc_expiry_date || "-"}</span>
+            </div>
+            <div class="nk-tb-col text-start">
+                <span>${data.doc_bg_cancelled_date || "-"}</span>
+            </div>
+            <div class="nk-tb-col text-start">
+                <span>
+                ${renderPdfLinks(data?.attachments)} 
+                </span>
+            </div>
+             <div class="nk-tb-col text-start">
+                <span>${data.doc_bg_commission || "-"}</span>
+            </div>
+             <div class="nk-tb-col text-start">
+                <span>${data.doc_margin_amount || "-"}</span>
+            </div>
+             <div class="nk-tb-col text-start">
+                <span>${data.doc_commission_charged || "-"}</span>
+            </div>
+             <div class="nk-tb-col text-start">
+                <span>${data.doc_required_margin || "-"}</span>
+            </div>
+             <div class="nk-tb-col text-start">
+                <span>${data.doc_margin_amount || "-"}</span>
+            </div>
+             <div class="nk-tb-col text-start">
+                <span>${data.dynamic_total_margin || "-"}</span>
+            </div>
+        </div>`
+                    rowsHtml += rowHtml;
+                })
+                $("#table-filters").after(rowsHtml);
+                if (response.payload.totalBgAmount != null) {
+                    $("#bg_amount").append(`<strong>${response.payload.totalBgAmount}</strong>`);
+                } else {
+                    $('#table-bg-amount').addClass('d-none');
+                    $('#table-status').removeClass('d-none');
+                }
+
+            } else {
+                console.log("No Records Found");
+                $('table-status').removeClass('d-none');
+                $("#table-status").html(`<div class="text-center"><p>No Records Found</p></div>`);
+                $('#table-bg-amount').addClass('d-none');
+            }
+        }
+
+
+        (function () {
+            fetchProjects()
+        })();
+
+        function handlePaginationClick(event) {
+            event.preventDefault();
+            const $target = $(event.target).closest('li');
+            let newPage = filters.page;
+
+            if ($target.hasClass('previous') && filters.page > 1) {
+                newPage--;
+            } else if ($target.hasClass('next') && filters.page < totalPages) {
+                newPage++;
+            } else {
+                const clickedPage = parseInt($target.find('a').text());
+                if (!isNaN(clickedPage)) {
+                    newPage = clickedPage;
+                }
+            }
+
+            if (newPage !== filters.page) {
+                filters.page = newPage;
+                fetchProjects()
+            }
+        }
+
+        $('#table-pagination').on('click', 'a', handlePaginationClick);
+
+
+        $(document).on('click', '#deleteDoc', function (event) {
+            event.preventDefault();
+            let openModal = document.getElementById('open-modal');
+
+            docIdToDelete = $(this).data('id');  // Using .data() to get 'data-id'
+            docCode = $(this).attr('data-code'); // Using .attr() for 'data-code'
+            projectIdToDelete = $(this).attr('data-project-id'); // Using .attr() for 'data-code'
+            bank_id = $(this).attr('bank_id'); // Using .attr() for 'data-code'
+
+            if (docIdToDelete) {
+                openModal.click();
+
+            }
+        });
+
+
+        $(document).on('click', '#deleteDocument', function (event) {
+            const modalCloseBtn = document.querySelector('#closeModal');
+            event.preventDefault();
+            $(`#modalAction`).addClass('disable');
+            $.ajax({
+                type: "DELETE",
+                url: "/docs/delete-bg",
+                data: { docId: docIdToDelete, docCode: docCode, projectIdToDelete: projectIdToDelete, bank_id:bank_id },
+                success: function (response) {
+                    if (response.status == 1) {
+                        NioApp.Toast("<h5>Deleted Successfully</h5><p>Document deleted successfully!</p>", "success");
+                        modalCloseBtn.click();
+                        fetchProjects();
+                        $(`#modalAction`).removeClass('disable');
+
+                    } else {
+                        NioApp.Toast(`<h5>Something Went Wrong</h5>${response.msg || `<p>Error while Document deleted</p>`}`, "error");
+                        modalCloseBtn.click();
+                        $(`#modalAction`).removeClass('disable');
+
+                    }
+                },
+
+                error: function (xhr, status, error) {
+                    NioApp.Toast(`<h5>Something Went Wrong</h5>${response.msg || `<p>Error while Document deleted</p>`}`, "error");
+                    modalCloseBtn.click();
+                    $(`#modalAction`).removeClass('disable');
+                },
+            });
+        });
+
+        $(document).ready(function () {
+            $("#doc_dlp_period").on("input", function () {
+                let value = $(this).val();
+                value = value.replace(/\D/g, "");
+                if (value.length > 2) {
+                    value = value.substring(0, 2);
+                }
+                $(this).val(value);
+            })
+        });;
+
+        $('.filter-limit a').click(function (event) {
+            event.preventDefault();
+            var selectedLimit = $(this).data('limit');
+            filters.limit = selectedLimit;
+            $('.filter-limit li').removeClass('active');
+            $(this).parent().addClass('active');
+            fetchProjects()
+        });
+
+        $(".filter-input").change((e) => {
+            let value = e.target.value.trim();
+            let id = e.target.id;
+            let dataFilter = e.target.dataset.filter;
+            let dataTable = e.target.dataset.table || null
+
+            if (e.target.multiple) {
+                value = Array.from(e.target.selectedOptions).map(option => option.value);
+            }
+
+            if (filters.activeFilter.hasOwnProperty(id)) {
+                delete filters.activeFilter[id];
+            }
+
+            if (value.length > 0) {
+                filters.activeFilter[id] = {
+                    type: dataFilter,
+                    value: value,
+                    dataTable: dataTable
+                };
+            }
+            fetchProjects()
+        });
+
+    </script>
+</body>
+
+</html>
