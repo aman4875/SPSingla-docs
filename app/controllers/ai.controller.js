@@ -12,6 +12,7 @@ const checkFolderType = require("../helpers/checkFolderType.js")
 const generateAlphaNumericSuffix = require('../utils/generateRandomAlphanumeric.js')
 const parseSubject = require('../utils/parseSubject.js')
 const updateFailedStatus = require('../helpers/updateFailedStatus.js')
+const validateAIResponse = require('../helpers/valiDateAIResponse.js')
 
 
 // AWS Config
@@ -115,7 +116,7 @@ aiController.processSingleFile = async (req, res) => {
             return res.send({ status: 0, msg: "Unsupported file type" });
         }
         let extractData = await openAIHelper(textractData.textractResult);
-        let extractedOpenAIData = JSON.parse(extractData?.choices && extractData?.choices[0]?.message?.content);
+        let extractedOpenAIData = validateAIResponse(JSON.parse(extractData?.choices && extractData?.choices[0]?.message?.content));
 
         if (!extractedOpenAIData) {
             await updateFailedStatus(name, s3, "No AI Response", s3Response.Key, token.user_id)

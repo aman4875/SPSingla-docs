@@ -917,12 +917,14 @@ documentController.createBG = async (req, res) => {
 };
 
 documentController.getFilteredDocuments = async (req, res) => {
-  try {
-    let inputs = req.body;
-    let token = req.session.token;
-    const page = inputs.page || 1;
-    const pageSize = inputs.limit || 10;
-    const offset = (page - 1) * pageSize;
+	try {
+		let inputs = req.body;
+		let token = req.session.token;
+		const userRole = token.user_role;
+		const userId = token.user_id;
+		const page = inputs.page || 1;
+		const pageSize = inputs.limit || 10;
+		const offset = (page - 1) * pageSize;
 
     let { rows } = await pool.query(
       `SELECT setting_value FROM admin_settings WHERE setting_name = $1`,
@@ -1008,14 +1010,23 @@ documentController.getFilteredDocuments = async (req, res) => {
 							END
 						) AS actionActive
 						 FROM documents d
-						 `;
-    let conditions = [];
-    let joins = "";
-    let folderQuery = "";
-    // Handle folder permissions based on user role
-    if (token.user_role == "0") {
-      // Admin role
-      folderQuery = `
+						 `
+		let conditions = [`(
+        d.doc_confidential = FALSE
+        OR (
+            d.doc_confidential = TRUE
+            AND (
+                ${userRole} = 0
+                OR d.doc_uploaded_by_id = ${userId}
+            )
+        )
+    )`];
+		let joins = "";
+		let folderQuery = ''
+		// Handle folder permissions based on user role
+		if (token.user_role == "0") {
+			// Admin role
+			folderQuery = `
           SELECT s.*, sp.site_name as site_parent_name
           FROM sites s
           LEFT JOIN sites sp ON s.site_parent_id = sp.site_id
@@ -1146,21 +1157,21 @@ documentController.getFilteredDocuments = async (req, res) => {
         OFFSET ${offset}
       `;
 
-    // Execute the main query
-    let { rows: documents } = await pool.query(query);
-    res.json({
-      status: 1,
-      msg: "Success",
-      payload: {
-        documents,
-        totalPages,
-        currentPage: page,
-      },
-    });
-  } catch (err) {
-    console.error("Error fetching filtered documents:", err);
-    res.json({ status: 0, msg: "Internal Server Error" });
-  }
+		// Execute the main query
+		let { rows: documents } = await pool.query(query);
+		res.json({
+			status: 1,
+			msg: "Success",
+			payload: {
+				documents,
+				totalPages,
+				currentPage: page,
+			},
+		});
+	} catch (err) {
+		console.error("Error fetching filtered documents:", err);
+		res.json({ status: 0, msg: "Internal Server Error" });
+	}
 };
 
 documentController.getFilteredProjects = async (req, res) => {

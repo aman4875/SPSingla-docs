@@ -9,6 +9,7 @@ const AWS = require("aws-sdk");
 const checkFolderType = require('../helpers/checkFolderType.js')
 const generateAlphaNumericSuffix = require('../utils/generateRandomAlphanumeric.js')
 const parseSubject = require('../utils/parseSubject.js')
+const validateAIResponse = require('../helpers/valiDateAIResponse.js')
 
 // AWS Config
 AWS.config.update({
@@ -52,7 +53,7 @@ const processDocument = async (jobID) => {
 
 			}
 			let extractData = await openAIHelper(textractData.textractResult);
-			let extractedOpenAIData = JSON.parse(extractData?.choices && extractData?.choices[0]?.message?.content);
+			let extractedOpenAIData = validateAIResponse(JSON.parse(extractData?.choices && extractData?.choices[0]?.message?.content));
 
 			if (!extractedOpenAIData) {
 				console.log('Flagged pdf');
@@ -60,8 +61,8 @@ const processDocument = async (jobID) => {
 
 
 				await pool.query(
-					`INSERT INTO failed_job_stats (flagged, feed, status, end_at, failed_pdf,job_status,user_id) 
-							 VALUES ($1, $2, $3, $4, $5, $6, 7$)`,
+					`INSERT INTO failed_job_stats (flagged, feed, status, end_at, failed_pdf, job_status, user_id) 
+							 VALUES ($1, $2, $3, $4, $5, $6, $7)`,
 					[
 						true,
 						"Empty AI Response",
