@@ -1238,7 +1238,6 @@ documentController.getFilteredProjects = async (req, res) => {
 				LOWER(d.doc_agreement_no::TEXT) LIKE LOWER('%${filter.value}%') OR
 				LOWER(d.doc_agreement_date::TEXT) LIKE LOWER('%${filter.value}%') OR
 				LOWER(d.doc_completion_date::TEXT) LIKE LOWER('%${filter.value}%') OR
-				LOWER(d.doc_total_mobilisation_amount::TEXT) LIKE LOWER('%${filter.value}%') OR
 				LOWER(d.doc_bal_mobilisation_amount::TEXT) LIKE LOWER('%${filter.value}%') OR
 				LOWER(d.doc_retention_amount::TEXT) LIKE LOWER('%${filter.value}%') OR
 				LOWER(d.doc_dlp_period::TEXT) LIKE LOWER('%${filter.value}%') OR
@@ -1465,22 +1464,21 @@ documentController.getProjectsBg = async (req, res) => {
 				LOWER(pm.doc_agreement_no::TEXT) LIKE LOWER('%${filter.value}%') OR
 				LOWER(pm.doc_agreement_date::TEXT) LIKE LOWER('%${filter.value}%') OR
 				LOWER(pm.doc_completion_date::TEXT) LIKE LOWER('%${filter.value}%') OR
-				LOWER(pm.doc_total_mobilisation_amount::TEXT) LIKE LOWER('%${filter.value}%') OR
 				LOWER(pm.doc_bal_mobilisation_amount::TEXT) LIKE LOWER('%${filter.value}%') OR
 				LOWER(pm.doc_retention_amount::TEXT) LIKE LOWER('%${filter.value}%') OR
 				LOWER(pm.doc_dlp_period::TEXT) LIKE LOWER('%${filter.value}%') OR
 				LOWER(pm.doc_revised_date::TEXT) LIKE LOWER('%${filter.value}%') OR
-				LOWER(pm.doc_dlp_ending::TEXT) LIKE LOWER('%${filter.value}%') 
-				LOWER(d.doc_type::TEXT) LIKE LOWER('%${filter.value}%') 
-				LOWER(d.doc_bank_name::TEXT) LIKE LOWER('%${filter.value}%') 
-				LOWER(d.doc_issuing_branch::TEXT) LIKE LOWER('%${filter.value}%') 
-				LOWER(d.doc_beneficiary_name::TEXT) LIKE LOWER('%${filter.value}%') 
-				LOWER(d.doc_bg_number::TEXT) LIKE LOWER('%${filter.value}%') 
-				LOWER(d.doc_applicant_name::TEXT) LIKE LOWER('%${filter.value}%') 
-				LOWER(d.doc_claim_date::TEXT) LIKE LOWER('%${filter.value}%') 
-				LOWER(d.doc_bg_amount::TEXT) LIKE LOWER('%${filter.value}%') 
-				LOWER(d.doc_expiry_date::TEXT) LIKE LOWER('%${filter.value}%') 
-				LOWER(d.doc_bg_cancelled_date::TEXT) LIKE LOWER('%${filter.value}%') 
+				LOWER(pm.doc_dlp_ending::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(d.doc_type::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(d.doc_bank_name::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(d.doc_issuing_branch::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(d.doc_beneficiary_name::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(d.doc_bg_number::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(d.doc_applicant_name::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(d.doc_claim_date::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(d.doc_bg_amount::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(d.doc_expiry_date::TEXT) LIKE LOWER('%${filter.value}%') OR
+				LOWER(d.doc_bg_cancelled_date::TEXT) LIKE LOWER('%${filter.value}%') OR
 				LOWER(d.doc_issue_date::TEXT) LIKE LOWER('%${filter.value}%') 
 				`);
       }
@@ -1593,7 +1591,7 @@ documentController.getProjectsBg = async (req, res) => {
 			) AS result
 		FROM fetched_docs;`;
     }
-    console.log(query);
+
     // Execute the main query
     let { rows: documents } = await pool.query(query);
     let totalBgAmount = null;

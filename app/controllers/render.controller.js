@@ -634,6 +634,7 @@ renderController.renderAddFdr = async (req, res) => {
 	let token = req.session.token;
 	const query = `SELECT * FROM bank_master`;
 	const { rows: banks } = await pool.query(query);
+	console.log("🚀 ~ renderController.renderAddFdr= ~ banks:", banks)
 	const payoutClause = `SELECT * FROM fdr_payout_clause`;
 	const renewalQuery = `SELECT * FROM renewal_types`
 	const purposeQuery = `SELECT * FROM purpose_types`

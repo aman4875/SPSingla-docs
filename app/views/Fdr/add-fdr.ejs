@@ -60,10 +60,10 @@
                                                                 <div class="form-control-wrap">
                                                                     <select class="form-select form-control js-select2"
                                                                         data-filter="single" id="select-site"
-                                                                        name="doc_bank_name" data-placeholder="Select Bank
-                                                                            Name" required>
-                                                                        <option value="" disabled selected>Select Bank
-                                                                            Name</option>
+                                                                        name="doc_bank_name"
+                                                                        data-placeholder="Select Bank Name" required>
+                                                                        <option></option>
+                                                                        <!-- Empty placeholder option (required for Select2) -->
                                                                         <% banks.forEach(bank=> { %>
                                                                             <option data-code="<%= bank.bank_code %>"
                                                                                 id="<%= bank.doc_id %>"
@@ -302,7 +302,8 @@
 
                                                         <div class="col-md-4">
                                                             <div class="form-group">
-                                                                <label class="form-label" for="doc_interest">Accrued Interest</label>
+                                                                <label class="form-label" for="doc_interest">Accrued
+                                                                    Interest</label>
                                                                 <div class="form-control-wrap">
                                                                     <input step="any" required type="number"
                                                                         class="form-control" placeholder="Acc. Interest"
@@ -382,6 +383,12 @@
         }
         let closedByBackdropClick = false;
         let dplEndingMonths = 0
+
+        $('#select-site').select2({
+            placeholder: 'Select Bank Name',
+            allowClear: true,
+            width: '100%'
+        });
 
 
         $(document).ready(function () {
