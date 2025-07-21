@@ -977,7 +977,7 @@ documentController.getFilteredDocuments = async (req, res) => {
 								)
 							FROM UNNEST(
 								ARRAY(
-									SELECT REGEXP_REPLACE(TRIM(ref), '\s*/\s*', '/', 'g') 
+									SELECT TRIM(ref)
 									FROM UNNEST(STRING_TO_ARRAY(d.doc_replied_vide, ',')) AS ref
 								)
 							) AS ref
